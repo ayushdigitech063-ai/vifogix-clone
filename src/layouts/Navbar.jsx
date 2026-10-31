@@ -6,15 +6,15 @@ import { navLinks } from "../data/navLinks";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const linkClass = ({ isActive }) =>
-    `text-sm font-medium ${isActive ? "text-primary" : "text-muted hover:text-fg"}`;
+    `text-sm font-semibold ${isActive ? "text-primary" : "text-fg hover:text-fg"}`;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
         <Link to="/" className="flex items-center">
           <img
             src="/images/logo.png"
-            alt="Vefogix"
+            alt="sumitdevtech"
             className="h-10 w-auto object-contain"
           />
         </Link>

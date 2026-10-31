@@ -1,6 +1,7 @@
-
+// src/components/marketplace-sections/HeroSearch.jsx
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Link2, TrendingUp, FileText } from "lucide-react";
+import BannerHeading from "../sheared/BannerHeading";
 
 const categories = [
   "Guest Post Packages",
@@ -10,27 +11,63 @@ const categories = [
   "Google My Business",
 ];
 
+const gridMask = "radial-gradient(ellipse at center, black 30%, transparent 75%)";
 
-const HeroSearch = () =>{
+const HeroBackground = () => (
+  <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    {/* Faint grid, fading out toward the edges */}
+    <div
+      className="absolute inset-0 opacity-70"
+      style={{
+        backgroundImage:
+          "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
+        backgroundSize: "48px 48px",
+        maskImage: gridMask,
+        WebkitMaskImage: gridMask,
+      }}
+    />
+
+    {/* Drifting colour blobs */}
+    <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-primary-light/25 blur-3xl animate-blob motion-reduce:animate-none" />
+    <div className="absolute -right-24 top-0 h-80 w-80 rounded-full bg-accent-yellow/25 blur-3xl animate-blob [animation-delay:3s] motion-reduce:animate-none" />
+    <div className="absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-primary/15 blur-3xl animate-blob [animation-delay:6s] motion-reduce:animate-none" />
+
+    {/* Floating chips (desktop only) */}
+    <div className="absolute left-[8%] top-[28%] hidden items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur animate-float motion-reduce:animate-none lg:flex">
+      <TrendingUp className="h-3.5 w-3.5" /> DR 70+
+    </div>
+    <div className="absolute right-[9%] top-[22%] hidden items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur animate-float [animation-delay:1.5s] motion-reduce:animate-none lg:flex">
+      <Link2 className="h-3.5 w-3.5" /> Dofollow Link
+    </div>
+    <div className="absolute bottom-[18%] left-[14%] hidden items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur animate-float [animation-delay:3s] motion-reduce:animate-none lg:flex">
+      <FileText className="h-3.5 w-3.5" /> Guest Post
+    </div>
+    <div className="absolute bottom-[24%] right-[13%] hidden items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur animate-float [animation-delay:4.5s] motion-reduce:animate-none lg:flex">
+      <TrendingUp className="h-3.5 w-3.5" /> 50K+ Traffic
+    </div>
+  </div>
+);
+
+const HeroSearch = () => {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(categories[0]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // later: call the search service / update URL params
     console.log({ query, activeCategory });
   };
 
   return (
-    <section className="bg-surface border-b border-border">
-      <div className="mx-auto max-w-7xl px-4 py-14 text-center md:py-20">
-        <h1>
-          AI-Powered Link Building and{" "}
-          <span className="text-primary">Guest Post Marketplace</span>
-        </h1>
-        <p className="mt-4 text-lg text-muted">
-          Distribute on 70k+ Websites Across the Globe!
-        </p>
+    <section className="relative overflow-hidden border-b border-border bg-surface">
+      <HeroBackground />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-14 text-center md:py-20">
+        <BannerHeading
+          as="h1"
+          title="AI-Powered Link Building and"
+          highlight="Guest Post Marketplace"
+          description="Distribute on 70k+ Websites Across the Globe!"
+        />
 
         <form
           onSubmit={handleSubmit}
@@ -58,7 +95,7 @@ const HeroSearch = () =>{
           role="tablist"
           aria-label="Marketplace categories"
         >
-          {categories.map((cat) => {
+          {/* {categories.map((cat) => {
             const isActive = cat === activeCategory;
             return (
               <button
@@ -69,17 +106,17 @@ const HeroSearch = () =>{
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                   isActive
                     ? "border-primary bg-primary text-white"
-                    : "border-border bg-surface text-muted hover:border-primary-light hover:text-primary"
+                    : "border-border bg-surface/80 text-muted hover:border-primary-light hover:text-primary"
                 }`}
               >
                 {cat}
               </button>
             );
-          })}
+          })} */}
         </div>
       </div>
     </section>
   );
-}
+};
 
 export default HeroSearch;
