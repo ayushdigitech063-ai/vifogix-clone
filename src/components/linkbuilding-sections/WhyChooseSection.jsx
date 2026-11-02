@@ -6,7 +6,7 @@ const WhyChooseSection = () => (
   <section className="bg-surface py-16 md:py-20">
     <div className="mx-auto max-w-7xl px-4">
       <SectionHeading
-        eyebrow="Why Vefogix"
+        eyebrow="Why Us"
         title="Why Businesses Choose Us for Link Building Services"
       />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

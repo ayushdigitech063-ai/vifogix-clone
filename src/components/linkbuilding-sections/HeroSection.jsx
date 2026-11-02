@@ -26,8 +26,8 @@ const HeroVisual = () => (
 );
 
 const HeroSection = () => (
-  <section className="border-b border-border bg-surface">
-    <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 lg:grid-cols-2 lg:py-24">
+  <section className="relative flex min-h-[560px] items-center border-b border-border bg-surface">
+    <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-14 lg:grid-cols-2 lg:py-24">
       <div>
         <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary">
           <Star className="h-4 w-4" /> Trusted by 5,000+ brands across 150+ countries

@@ -1,7 +1,9 @@
-// src/components/marketplace-sections/HeroSearch.jsx
+// src/components/home-sections/HeroSearch.jsx
 import { useState } from "react";
 import { Search, Link2, TrendingUp, FileText } from "lucide-react";
-import BannerHeading from "../sheared/BannerHeading";
+import BannerHeading, { Highlight } from "../sheared/BannerHeading";
+import DataPartner from "./DataPartner";
+import VideoBackground from "./VideoBackground";
 
 const categories = [
   "Guest Post Packages",
@@ -48,7 +50,8 @@ const HeroBackground = () => (
   </div>
 );
 
-const HeroSearch = () => {
+const HeroSearch = ({variant = "light"}) => {
+  const isVideo = variant === "video";
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(categories[0]);
 
@@ -58,15 +61,30 @@ const HeroSearch = () => {
   };
 
   return (
-    <section className="relative overflow-hidden border-b border-border bg-surface">
-      <HeroBackground />
+    <section
+      className={`relative flex min-h-[560px] items-center overflow-hidden border-b border-border ${
+        isVideo ? "bg-fg" : "bg-surface"
+      }`}
+    >
+      {isVideo ? <VideoBackground /> : <HeroBackground />}
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-14 text-center md:py-20">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-14 text-center md:py-24">
         <BannerHeading
           as="h1"
-          title="AI-Powered Link Building and"
-          highlight="Guest Post Marketplace"
-          description="Distribute on 70k+ Websites Across the Globe!"
+          maxWidth="xl"
+          tone={isVideo ? "dark" : "light"}
+          title={
+            <>
+              <Highlight>AI-Powered</Highlight> Link Building and Guest Post Marketplace
+            </>
+          }
+          description={
+            <>
+              Distribute on{" "}
+              <strong className={`font-semibold ${isVideo ? "text-white" : "text-fg"}`}>128k+</strong>{" "}
+              Websites Across the Globe!
+            </>
+          }
         />
 
         <form
@@ -92,27 +110,9 @@ const HeroSearch = () => {
 
         <div
           className="mt-8 flex flex-wrap justify-center gap-3"
-          role="tablist"
           aria-label="Marketplace categories"
         >
-          {/* {categories.map((cat) => {
-            const isActive = cat === activeCategory;
-            return (
-              <button
-                key={cat}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveCategory(cat)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "border-primary bg-primary text-white"
-                    : "border-border bg-surface/80 text-muted hover:border-primary-light hover:text-primary"
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })} */}
+          <DataPartner tone={isVideo ? "dark" : "light"} />
         </div>
       </div>
     </section>

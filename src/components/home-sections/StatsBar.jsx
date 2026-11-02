@@ -16,12 +16,12 @@ const StatsBar = () =>{
             key={label}
             className="flex items-center gap-4 rounded-xl border border-border bg-surface p-5"
           >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-green-800">
               <Icon className="h-6 w-6" />
             </span>
             <div>
-              <p className="text-xl font-bold text-fg">{value}</p>
-              <p className="text-sm text-muted">{label}</p>
+              <p className="text-xl font-bold text-green-800">{value}</p>
+              <p className="text-sm text-black">{label}</p>
             </div>
           </div>
         ))}
