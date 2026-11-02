@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { websites } from "../../data/websites";
-import WebsiteRow from "./WebsiteRow";
-import Pagination from "./Pagination";
+import WebsiteRow from "../marketplace-sections/WebsiteRow";
+import Pagination from "../marketplace-sections/Pagination";
 import SectionHeading from "../sheared/SectionHeading";
 
 const PAGE_SIZE = 3; // small on purpose so you can see pagination; raise it later

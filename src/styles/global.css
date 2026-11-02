@@ -10,6 +10,7 @@
   --text-primary: #0f172a;
   --text-secondary: #64748b;
   --border: #e2e8f0;
+  --cream: #fff7ed;
 }
 
 @theme inline {
@@ -22,6 +23,7 @@
   --color-fg: var(--text-primary);
   --color-muted: var(--text-secondary);
   --color-border: var(--border);
+  --color-cream: var(--cream);
 
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
@@ -35,9 +37,11 @@
   h3 { @apply text-lg font-semibold; }
   a  { @apply transition-colors; }
 }
+
 @theme {
   --animate-blob: blob 12s ease-in-out infinite;
   --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-in: fadeIn 0.4s ease-out forwards;
 
   @keyframes blob {
     0%, 100% { transform: translate(0, 0) scale(1); }
@@ -49,7 +53,19 @@
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-14px); }
   }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
+
 @theme {
   --animate-marquee: marquee 40s linear infinite;
   @keyframes marquee {

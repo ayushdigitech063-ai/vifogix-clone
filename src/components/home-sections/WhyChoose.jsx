@@ -5,7 +5,7 @@ const WhyChooseUs = () => (
   <section className="bg-background py-16 md:py-20">
     <div className="mx-auto max-w-7xl px-4">
       <BannerHeading
-        eyebrow="Why Vefogix"
+        eyebrow="Why Us"
         title="Choose Us For A"
         highlight="Reason!"
         description="From driving traffic to building goodwill, we can be your partner in growth."

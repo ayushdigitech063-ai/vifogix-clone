@@ -1,16 +1,19 @@
-import DataPartner  from "../components/marketplace-sections/DataPartner"
-import HeroSearch  from "../components/marketplace-sections/HeroSearch"
-import  StatsBar  from "../components/marketplace-sections/statsBar"
+import HeroBanner from "../components/marketplace-sections/HeroBanner"
 import WebsiteListing from "../components/marketplace-sections/WebsiteListing"
-import  WebsitesTable  from "../components/marketplace-sections/WebsitesTable"
+import CtaBanner from "../components/sheared/CtaBanner";
+import FaqSection from "../components/sheared/FaqSection";
+import TestimonialsSection from "../components/sheared/TestimonialsSection";
 
 const Marketplace =()=>{
     return(
         <>
-        <HeroSearch />
-        <DataPartner />
-        <StatsBar />
+        <HeroBanner  total={128120}
+  onCategoryChange={(cat) => console.log(cat)}
+  onFiltersClick={() => setShowFilters(true)}/>
        <WebsiteListing />
+       <TestimonialsSection />
+       <CtaBanner />
+       <FaqSection />
         </>
     )
 }

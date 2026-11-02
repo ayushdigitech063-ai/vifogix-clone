@@ -1,4 +1,3 @@
-
 const alignStyles = {
   left:   { box: "mr-auto text-left",   actions: "justify-start" },
   center: { box: "mx-auto text-center", actions: "justify-center" },
@@ -19,8 +18,16 @@ const widthStyles = {
   full: "max-w-none",
 };
 
+const toneStyles = {
+  light: { eyebrow: "text-primary-light", title: "",           description: "text-muted" },
+  dark:  { eyebrow: "text-accent-yellow", title: "text-white", description: "text-white/80" },
+   warm:  { eyebrow: "text-accent-red",    title: "",           description: "text-fg/70" },
+};
+
 export const Highlight = ({ children }) => (
-  <span className="text-primary">{children}</span>
+  <span className="text-primary group-data-[tone=dark]/banner:text-accent-yellow">
+    {children}
+  </span>
 );
 
 const BannerHeading = ({
@@ -30,22 +37,28 @@ const BannerHeading = ({
   description,
   align = "center",
   centerOnMobile = false,
+  tone = "light",
+  titleClassName ="",
   as: Tag = "h2",
   maxWidth = "lg",
   className = "",
   children,
 }) => {
   const styles = (centerOnMobile ? responsiveStyles : alignStyles)[align] ?? alignStyles.center;
+  const colors = toneStyles[tone] ?? toneStyles.light;
 
   return (
-    <div className={`${styles.box} ${widthStyles[maxWidth] ?? widthStyles.lg} ${className}`}>
+    <div
+      data-tone={tone}
+      className={`group/banner ${styles.box} ${widthStyles[maxWidth] ?? widthStyles.lg} ${className}`}
+    >
       {eyebrow && (
-        <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary-light">
+        <p className={`mb-3 text-sm font-semibold uppercase tracking-wider ${colors.eyebrow}`}>
           {eyebrow}
         </p>
       )}
 
-      <Tag>
+      <Tag className={`${colors.title} ${titleClassName}`}>
         {title}
         {highlight && (
           <>
@@ -55,7 +68,7 @@ const BannerHeading = ({
         )}
       </Tag>
 
-      {description && <p className="mt-4 text-lg text-muted">{description}</p>}
+      {description && <p className={`mt-4 text-lg ${colors.description}`}>{description}</p>}
 
       {children && (
         <div className={`mt-8 flex flex-wrap gap-4 ${styles.actions}`}>{children}</div>

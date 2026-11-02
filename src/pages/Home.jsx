@@ -1,9 +1,8 @@
 import { testimonials } from "../data/linkbuilding";
 import { homeFaqs } from "../data/home";
-import HeroSearch from "../components/marketplace-sections/HeroSearch";
-import DataPartner from "../components/marketplace-sections/DataPartner";
-import StatsBar from "../components/marketplace-sections/StatsBar";
-import WebsitesTable from "../components/marketplace-sections/WebsitesTable";
+import HeroSearch from "../components/home-sections/HeroSearch";
+import StatsBar from "../components/home-sections/StatsBar";
+import WebsitesTable from "../components/home-sections/WebsitesTable";
 import PopularServices from "../components/home-sections/PopularServices";
 import FeaturedOn from "../components/home-sections/FeaturedOn";
 import FeaturedPackages from "../components/home-sections/FeaturedPackages";
@@ -20,8 +19,7 @@ import ContactForm from "../components/sheared/ContactForm";
 
 const Home = () => (
   <>
-    <HeroSearch />
-    <DataPartner />
+    <HeroSearch variant="video" />
     <StatsBar />
     <WebsitesTable />
     <PopularServices />
