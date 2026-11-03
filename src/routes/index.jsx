@@ -15,6 +15,7 @@ import { adminRoutes } from "./AdminRoutes";
 
 const Marketplace = lazy(() => import("../pages/Marketplace"));
 const LinkBuilding = lazy(() => import("../pages/Linkbuilding"));
+const WebsiteDetail = lazy(() => import("../pages/WebsiteDetail"));
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "marketplace", element: <Marketplace /> },
+      { path: "website/:slug", element: <WebsiteDetail /> },
       { path: "link-building-services", element: <LinkBuilding /> },
       { path: "guest-posting-services", element: <GuestPosting /> },
       { path: "press-release", element: <PressRelease /> },

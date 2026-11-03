@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
+import { getWebsiteSlug } from "../../utils/websiteHelpers";
 
 const Metric = ({ value, label }) => (
-  <div className="flex-1 rounded-lg bg-gray-50 py-2 text-center">
+  <div className="flex-1 rounded-lg bg-cream py-2 text-center">
     <div className="text-lg font-bold text-fg">{value}</div>
     <div className="text-[11px] text-gray-500">{label}</div>
   </div>
@@ -20,7 +22,7 @@ const WebsiteCard = ({ site }) => {
 
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-white">
-      <div className="bg-gray-50 p-4">
+      <div className="bg-primary/5 p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-wrap gap-1.5">
             {site.categories.map((c) => (
@@ -50,7 +52,14 @@ const WebsiteCard = ({ site }) => {
             className="rounded-lg bg-white p-1"
           />
           <div className="min-w-0">
-            <h3 className="truncate text-base font-bold text-fg">{site.domain}</h3>
+            <h3 className="truncate text-base font-bold text-fg">
+              <Link
+                to={`/website/${getWebsiteSlug(site)}`}
+                className="transition hover:text-primary"
+              >
+                {site.domain}
+              </Link>
+            </h3>
             <p className="text-xs text-gray-500">{site.country}</p>
           </div>
         </div>
@@ -69,7 +78,7 @@ const WebsiteCard = ({ site }) => {
           <Row label="Links" value={`${site.maxLinks} ${site.linkType} Links`} />
         </div>
 
-        <div className="flex items-center justify-between rounded-xl bg-gray-50 p-3">
+        <div className="flex items-center justify-between rounded-xl bg-primary-50 p-3">
           <span className="text-sm font-semibold text-fg">{site.days} Days</span>
           <div className="text-right">
             <p className="flex items-center justify-end gap-1 text-[11px] text-gray-500">
@@ -82,7 +91,7 @@ const WebsiteCard = ({ site }) => {
 
         <a
           href="/signup"
-          className="block rounded-lg bg-primary py-2 text-center text-sm font-semibold text-white transition hover:opacity-90"
+          className="block rounded-lg bg-primary py-2 text-center text-sm font-semibold text-white transition hover:bg-primary-light"
         >
           Buy now
         </a>

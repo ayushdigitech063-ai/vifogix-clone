@@ -2,20 +2,27 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import SectionHeading from "./SectionHeading";
-import { faqs } from "../../data/linkbuilding";
+import { faqs as defaultFaqs } from "../../data/linkbuilding";
 
-const FaqSection = () => {
+const FaqSection = ({ title = "Frequently Asked Questions (FAQs)", items, tone = "default" }) => {
   const [openIndex, setOpenIndex] = useState(0);
+  const list = items || defaultFaqs;
+  const isCream = tone === "cream";
 
   return (
-    <section className="bg-background py-16 md:py-20">
+    <section className={`${isCream ? "bg-cream" : "bg-background"} py-16 md:py-20`}>
       <div className="mx-auto max-w-3xl px-4">
-        <SectionHeading title="Frequently Asked Questions (FAQs)" />
+        <SectionHeading title={title} />
         <div className="space-y-3">
-          {faqs.map(({ q, a }, i) => {
+          {list.map(({ q, a }, i) => {
             const isOpen = openIndex === i;
             return (
-              <div key={q} className="rounded-xl border border-border bg-surface">
+              <div
+                key={q}
+                className={`rounded-xl border transition-colors ${
+                  isCream ? "bg-white" : "bg-surface"
+                } ${isOpen ? "border-primary" : "border-border"}`}
+              >
                 <button
                   onClick={() => setOpenIndex(isOpen ? -1 : i)}
                   aria-expanded={isOpen}
@@ -23,7 +30,9 @@ const FaqSection = () => {
                 >
                   {q}
                   <ChevronDown
-                    className={`h-5 w-5 shrink-0 text-muted transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    className={`h-5 w-5 shrink-0 transition-transform ${
+                      isOpen ? "rotate-180 text-primary" : "text-muted"
+                    }`}
                   />
                 </button>
                 {isOpen && <p className="px-5 pb-4 text-sm text-muted">{a}</p>}

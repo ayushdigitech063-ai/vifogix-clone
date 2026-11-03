@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Stat = ({ value, label }) => (
-  <div className="flex-1 rounded-lg bg-gray-50 py-2 text-center">
+  <div className="flex-1 rounded-lg bg-cream py-2 text-center">
     <div className="text-sm font-bold text-fg">{value}</div>
     <div className="text-[11px] text-gray-500">{label}</div>
   </div>
@@ -9,7 +9,7 @@ const Stat = ({ value, label }) => (
 
 const PackageCard = ({ pkg }) => (
   <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-white">
-    <div className="flex items-center gap-3 bg-gray-50 p-4">
+    <div className="flex items-center gap-3 bg-primary/5 p-4">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white">
         {pkg.logoDomain ? (
           <img
@@ -34,7 +34,7 @@ const PackageCard = ({ pkg }) => (
 
       <ul className="flex flex-wrap gap-1.5">
         {pkg.highlights.map((h) => (
-          <li key={h} className="rounded-full bg-gray-50 px-3 py-1 text-[11px] font-medium text-gray-600">
+          <li key={h} className="rounded-full bg-cream px-3 py-1 text-[11px] font-medium text-fg">
             {h}
           </li>
         ))}

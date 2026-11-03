@@ -3,7 +3,7 @@ import SectionHeading from "../sheared/SectionHeading";
 import { whyChoose } from "../../data/linkbuilding";
 
 const WhyChooseSection = () => (
-  <section className="bg-surface py-16 md:py-20">
+  <section className="bg-white py-16 md:py-20">
     <div className="mx-auto max-w-7xl px-4">
       <SectionHeading
         eyebrow="Why Us"

@@ -40,7 +40,7 @@ const WebsiteListing = () => {
   const visible = results.slice(start, start + PAGE_SIZE);
 
   return (
-    <section ref={sectionRef} className="scroll bg-background pb-16 mt-12">
+    <section ref={sectionRef} className="scroll bg-white pb-16 mt-12">
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeading
           eyebrow="Websites"

@@ -7,11 +7,11 @@ const StorySection = ({ story }) => {
           <div className="md:col-span-5">
             <div
               aria-hidden="true"
-              className="relative overflow-hidden rounded-2xl border border-border bg-[#101626] p-8 text-white shadow-xl"
+              className="relative overflow-hidden rounded-2xl border border-border bg-navy-900 p-8 text-white shadow-xl"
             >
               {/* Subtle ambient blur */}
               <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-accent-yellow/10 blur-2xl" />
-              <div className="pointer-events-none absolute -bottom-12 -left-12 h-44 w-44 rounded-full bg-primary/20 blur-2xl" />
+              <div className="pointer-events-none absolute -bottom-12 -left-12 h-44 w-44 rounded-full bg-primary/25 blur-2xl" />
 
               <div className="relative z-10">
                 <span className="block text-xs font-semibold uppercase tracking-wider text-gray-400">

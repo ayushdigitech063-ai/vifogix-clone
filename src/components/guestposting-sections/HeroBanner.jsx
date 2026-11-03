@@ -2,14 +2,14 @@ import BannerHeading from "../sheared/BannerHeading";
 import heroBackground from "../../assets/images/hero-guest-posting-services.png";
 
 const HeroBanner = ({ data }) => (
-  <section className="relative flex min-h-[560px] items-center overflow-hidden border-b border-border bg-[#23314e] text-white">
+  <section className="relative flex min-h-[560px] items-center overflow-hidden border-b border-border bg-gradient-to-r from-navy-800 via-navy-900 to-navy-950 text-white">
     {/* Background Image with Overlay */}
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
-      <img
+      {/* <img
         src={heroBackground}
         alt=""
         className="h-full w-full object-cover object-center"
-      />
+      /> */}
     </div>
 
     <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-14 text-left md:py-24">
@@ -46,7 +46,7 @@ const HeroBanner = ({ data }) => (
               href={c.href}
               className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors ${
                 c.primary
-                  ? "bg-accent-yellow text-fg hover:opacity-90"
+                  ? "bg-accent-yellow text-navy-900 hover:bg-accent-yellow/90"
                   : "border border-white/40 text-white hover:bg-white hover:text-fg"
               }`}
             >

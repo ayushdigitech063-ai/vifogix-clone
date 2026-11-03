@@ -1,5 +1,4 @@
 // src/pages/Linkbuilding.jsx
-
 import BuildOptionsSection from "../components/linkbuilding-sections/BuildOptionsSection";
 import ComparisonSection from "../components/linkbuilding-sections/ComparisonSection";
 import ContactForm from "../components/sheared/ContactForm";
@@ -15,11 +14,9 @@ import StatsStrip from "../components/linkbuilding-sections/StatsStripe";
 import TestimonialsSection from "../components/sheared/TestimonialsSection";
 import WhyChooseSection from "../components/linkbuilding-sections/WhyChooseSection";
 
-
 const Linkbuilding = () => (
   <>
     <HeroSection />
-    <StatsStrip />
     <ServicesSection />
     <PricingSection />
     <WhyChooseSection />
@@ -27,11 +24,11 @@ const Linkbuilding = () => (
     <HowItWorksSection />
     <OutsourceSection />
     <BuildOptionsSection />
-    <TestimonialsSection />
-    <CountriesSection />
-    <FaqSection />
-    <CtaBanner/>
-    <ContactForm />
+    <TestimonialsSection tone="cream" />
+    <CountriesSection tone="white" />
+    <FaqSection tone="cream" />
+    <CtaBanner tone="navy" />
+    <ContactForm tone="navy-950" />
   </>
 );
 

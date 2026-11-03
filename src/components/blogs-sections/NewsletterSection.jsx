@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useToast } from "../../hooks/useToast";
 
 const NewsletterSection = ({ newsletter }) => {
+  const toast = useToast();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // idle | success | error
   const [errorMessage, setErrorMessage] = useState("");
@@ -10,18 +12,20 @@ const NewsletterSection = ({ newsletter }) => {
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       setStatus("error");
       setErrorMessage("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     setStatus("success");
     setErrorMessage("");
+    toast.success("Thank you for subscribing to our weekly newsletter!");
     // TODO: Connect newsletter subscription API endpoint here
   };
 
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#171f38] via-[#101626] to-[#0a0e1a] px-6 py-12 text-center text-white shadow-xl md:px-12 md:py-16">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-800 via-navy-900 to-navy-950 px-6 py-12 text-center text-white shadow-xl md:px-12 md:py-16">
           {/* Background glows */}
           <div
             aria-hidden="true"

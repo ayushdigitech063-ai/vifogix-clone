@@ -1,5 +1,6 @@
 // src/layouts/Footer.jsx
 import { useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin } from "lucide-react";
 import {
@@ -11,27 +12,32 @@ import {
 
 const Footer = () => {
   const [email, setEmail] = useState("");
+  const toast = useToast();
 
   const handleSubscribe = (e) => {
     e.preventDefault();
-    // later: call a newsletter service
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
     console.log("Subscribe:", email);
+    toast.success("Thank you for subscribing!");
     setEmail("");
   };
 
   return (
-    <footer className="mt-auto bg-fg text-white">
+    <footer className="mt-auto bg-navy-950 text-white">
       {/* Top section */}
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 lg:grid-cols-6">
         {/* Brand + contact */}
         <div className="lg:col-span-2">
-        <Link to="/" className="flex items-center">
-          <img
-            src="/images/logo.png"
-            alt="Vefogix"
-            className="h-10 w-auto object-contain"
-          />
-        </Link>
+          <Link to="/" className="inline-flex items-center rounded-lg bg-white p-2">
+            <img
+              src="/images/logo.png"
+              alt="Vefogix"
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
           <p className="mt-4 text-sm leading-relaxed text-white/70">
             Top #1 SEO &amp; Guest Post Agency. We help you build a stronger
             online presence with trusted guest posts and link building.

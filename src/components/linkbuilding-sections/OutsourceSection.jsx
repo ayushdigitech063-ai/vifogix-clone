@@ -4,8 +4,8 @@ import { Check } from "lucide-react";
 import { outsourcePoints } from "../../data/linkbuilding";
 
 const OutsourceSection = () => (
-  <section className="bg-background py-16 md:py-20">
-    <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 lg:grid-cols-2">
+  <section className="bg-cream py-16 md:py-20">
+    <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 lg:grid-cols-2 lg:[&>*:first-child]:order-2 lg:[&>*:last-child]:order-1">
       <div>
         <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary-light">Outsource</p>
         <h2>Build High-Quality Backlinks Around Your SEO Strategy</h2>

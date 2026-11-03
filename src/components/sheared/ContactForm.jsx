@@ -1,5 +1,6 @@
 // ContactForm.jsx
 import { useState } from "react";
+import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
 import { ShoppingBag, Globe } from "lucide-react";
 import { companySizes, buyerGoals } from "../../data/linkbuilding";
@@ -18,7 +19,7 @@ const countryCodes = ["us +1", "uk +44", "in +91", "ae +971", "au +61", "ca +1"]
 // Optional: put an image in /public/images and set the path, e.g. "/images/contact-bg.webp"
 const BG_IMAGE = "https://thumbs.dreamstime.com/b/professional-sitting-office-front-laptop-home-based-student-getting-distant-education-serious-man-working-desktop-159868691.jpg";
 
-const SECTION_BG = "#0b0908";
+const SECTION_BG = "#060d20";
 
 // TODO: replace "#" with your real profile links
 const socials = [
@@ -36,7 +37,7 @@ const initialValues = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-white/25 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-primary-light [&>option]:bg-white [&>option]:text-fg";
+  "w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-primary-light [&>option]:bg-white [&>option]:text-fg";
 
 const Label = ({ htmlFor, children }) => (
   <label htmlFor={htmlFor} className="mb-2 block text-sm text-white/90">
@@ -57,7 +58,8 @@ const AUDIENCES = [
   { id: "publisher", label: "For Publisher", Icon: PublisherIcon },
 ];
 
-const ContactForm = () => {
+const ContactForm = ({ tone = "default" }) => {
+  const toast = useToast();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [audience, setAudience] = useState("buyer");
@@ -86,6 +88,7 @@ const ContactForm = () => {
         if (msgs && msgs[0]) next[key] = msgs[0];
       }
       setErrors(next);
+      toast.error("Please fill all required fields correctly.");
       return;
     }
 
@@ -94,6 +97,7 @@ const ContactForm = () => {
     console.log({ audience, ...values });
     setValues(initialValues);
     setSent(true);
+    toast.success("Message sent successfully! Our strategy team will contact you shortly.");
     setTimeout(() => setSent(false), 5000);
   };
 

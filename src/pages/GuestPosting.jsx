@@ -16,14 +16,14 @@ const GuestPosting = () => (
     <HeroBanner data={hero} />
     <WebsiteListing data={listing} websites={websites} onFiltersClick={() => {}} />
     <ProcessSection data={process} />
-    <FeatureGrid data={whyChoose} numbered />
-    <FeatureGrid data={benefits} bg="bg-background" />
-    <FeatureGrid data={audiences} numbered />
-    <FeatureGrid data={buyOptions} bg="bg-background" numbered />
+    <FeatureGrid data={whyChoose} numbered bg="bg-white" />
+    <FeatureGrid data={benefits} bg="bg-cream" />
+    <FeatureGrid data={audiences} numbered bg="bg-white" />
+    <FeatureGrid data={buyOptions} bg="bg-cream" numbered />
     <IndustriesSection data={industries} />
-    <TestimonialsSection data={testimonials} />
-    <FaqSection items={faqs} />
-    <CtaBanner data={cta} />
+    <TestimonialsSection data={testimonials} tone="cream" />
+    <FaqSection items={faqs} tone="white" />
+    <CtaBanner data={cta} tone="navy" />
   </main>
 );
 

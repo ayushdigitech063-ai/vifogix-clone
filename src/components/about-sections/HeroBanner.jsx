@@ -3,19 +3,8 @@ import BannerHeading from "../sheared/BannerHeading";
 
 const HeroBanner = ({ hero }) => {
   return (
-    <section className="relative flex min-h-[560px] items-center overflow-hidden border-b border-border bg-gradient-to-r from-[#171f38] via-[#101626] to-[#0a0e1a] text-white">
-      {/* Subtle dot-grid layer */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-          maskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
-          WebkitMaskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
-        }}
-      />
-
+    <section className="relative flex min-h-[560px] items-center overflow-hidden border-b border-border bg-gradient-to-r from-navy-800 via-navy-900 to-navy-950 text-white">
+     
       {/* Soft blurred glows */}
       <div
         aria-hidden="true"
@@ -23,7 +12,7 @@ const HeroBanner = ({ hero }) => {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary/20 blur-3xl"
+        className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary/25 blur-3xl"
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-4 py-14 text-center md:py-24">

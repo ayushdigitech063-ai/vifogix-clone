@@ -5,11 +5,11 @@ const DataPartner = ({ tone = "light", heading = "Data Integrated With:" }) => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:gap-2">
-      <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-fg"}`}>
+      <p className={`text-sm font-semibold ${isDark ? "text-fg" : "text-white"}`}>
         {heading}
       </p>
 
-      <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 md:gap-x-2">
+      <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 md:gap-x-5">
         {partners.map(({ name, logo }) => (
           <li
             key={name}

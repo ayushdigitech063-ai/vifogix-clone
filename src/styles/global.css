@@ -1,23 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #104cba;
-  --primary-light: #2e62c0;
-  --accent-red: #d60000;
-  --accent-yellow: #f9bc15;
-  --background: #f8fafc;
+  --primary: #1850b8;
+  --primary-light: #2f6fe0;
+  --primary-dark: #123f91;
+  --primary-50: #eef4ff;
+  --accent-red: #d80808;
+  --accent-yellow: #f8b818;
+  --navy-800: #0d1b40;
+  --navy-900: #0a1530;
+  --navy-950: #060d20;
+  --background: #ffffff;
   --surface: #ffffff;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --cream: #fff7ed;
+  --text-primary: #0b1530;
+  --text-secondary: #5b6785;
+  --border: #e2e8f4;
+  --cream: #f6f8fc;
 }
 
 @theme inline {
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-50: var(--primary-50);
   --color-accent-red: var(--accent-red);
   --color-accent-yellow: var(--accent-yellow);
+  --color-navy-800: var(--navy-800);
+  --color-navy-900: var(--navy-900);
+  --color-navy-950: var(--navy-950);
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-fg: var(--text-primary);
@@ -26,6 +36,16 @@
   --color-cream: var(--cream);
 
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-sm: 0 4px 16px -8px rgba(24, 80, 184, 0.18);
+  --shadow-md: 0 8px 24px -12px rgba(24, 80, 184, 0.25);
+  --shadow-lg: 0 12px 32px -12px rgba(24, 80, 184, 0.28);
+  --shadow-xl: 0 16px 40px -12px rgba(24, 80, 184, 0.32);
+}
+
+::selection {
+  background: #f8b818;
+  color: #0b1530;
 }
 
 @layer base {

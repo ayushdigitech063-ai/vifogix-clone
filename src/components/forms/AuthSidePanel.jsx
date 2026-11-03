@@ -17,7 +17,7 @@ const AuthSidePanel = ({
   return (
     <>
       {/* Mobile compact header strip (below lg) */}
-      <section className="border-b border-border bg-gradient-to-br from-[#171f38] via-[#101626] to-[#0a0e1a] px-6 py-8 text-center text-white lg:hidden">
+      <section className="border-b border-border bg-gradient-to-br from-navy-800 via-navy-900 to-navy-950 px-6 py-8 text-center text-white lg:hidden">
         <h2 className="text-2xl font-bold tracking-tight">
           {headline}{" "}
           <span className="text-accent-yellow">{accentText}</span>
@@ -26,7 +26,7 @@ const AuthSidePanel = ({
       </section>
 
       {/* Desktop split-screen panel (lg and above) */}
-      <section className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-[#171f38] via-[#101626] to-[#0a0e1a] p-12 text-white lg:flex">
+      <section className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-navy-800 via-navy-900 to-navy-950 p-12 text-white lg:flex">
         {/* Subtle dot-grid texture */}
         <div
           aria-hidden="true"
@@ -44,14 +44,17 @@ const AuthSidePanel = ({
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-primary/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-primary/25 blur-3xl"
         />
 
         {/* Panel content */}
         <div className="relative z-10 max-w-md">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-accent-yellow backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent-yellow" />
-            Vefogix Marketplace
+          <div className="mb-6 inline-flex items-center rounded-lg bg-white p-2 shadow-sm">
+            <img
+              src="/images/logo.png"
+              alt="Vefogix"
+              className="h-8 w-auto object-contain"
+            />
           </div>
 
           <h2 className="text-4xl font-extrabold leading-tight tracking-tight">

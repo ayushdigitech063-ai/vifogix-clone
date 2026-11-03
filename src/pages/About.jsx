@@ -22,35 +22,17 @@ import {
 const About = () => {
   return (
     <main className="font-sans">
-      {/* 1. HeroBanner (Navy gradient) */}
       <HeroBanner hero={hero} />
-
-      {/* 2. StorySection (bg-white) */}
       <StorySection story={story} />
-
-      {/* 3. ServicesSection (bg-cream) */}
       <ServicesSection services={services} />
-
-      {/* 4. AudienceSection (bg-white) */}
       <AudienceSection audiences={audiences} />
-
-      {/* 5. ProcessSection (bg-background / cream) */}
       <ProcessSection data={process} />
-
-      {/* 6. FeatureGrid: whyStandOut (bg-white, numbered) */}
       <FeatureGrid data={whyStandOut} numbered bg="bg-white" />
-
-      {/* 7. TestimonialsSection (bg-background / cream) */}
-      <TestimonialsSection data={testimonials} />
-
-      {/* 8. FeatureGrid: commitment (bg-white) */}
+      <TestimonialsSection data={testimonials} tone="cream" />
       <FeatureGrid data={commitment} bg="bg-white" />
-
-      {/* 9. CtaBanner (dark/primary banner) */}
-      <CtaBanner data={cta} />
+      <CtaBanner data={cta} tone="navy" />
     </main>
   );
 };
 
 export default About;
-

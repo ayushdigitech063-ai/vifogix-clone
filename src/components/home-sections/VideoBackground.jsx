@@ -16,24 +16,12 @@ const VideoBackground = () => {
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      {reduceMotion ? (
+      {(
         <img src="/backgound-video/hero-poster.jpg" alt="" className="h-full w-full object-cover" />
-      ) : (
-        <video
-          ref={videoRef}
-          src="\backgound-video\background-video.mp4"
-          poster="heroposter"
-          className="h-full w-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        />
       )}
 
       {/* dark overlay so the white text stays readable on this bright clip */}
-      <div className="absolute inset-0 bg-fg/65" />
+      <div className="absolute inset-0 bg-navy-900/75" />
     </div>
   );
 };
