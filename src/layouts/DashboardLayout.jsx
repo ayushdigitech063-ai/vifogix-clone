@@ -56,10 +56,13 @@ const DashboardLayout = () => {
             className="flex items-center gap-2.5 focus-visible:outline-2 focus-visible:outline-primary rounded-md"
             title="Go to homepage"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-yellow font-black text-fg shadow-xs">
-              V
+            <div className="flex items-center rounded-lg bg-white p-1 shadow-xs border border-border">
+              <img
+                src="/images/logo.png"
+                alt="Logo"
+                className="h-6 w-auto object-contain"
+              />
             </div>
-            <span className="font-bold text-fg tracking-tight">Vefogix</span>
           </Link>
 
           <div className="w-8" aria-hidden="true" />
@@ -77,3 +80,4 @@ const DashboardLayout = () => {
 };
 
 export default DashboardLayout;
+

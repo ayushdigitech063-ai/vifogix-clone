@@ -35,12 +35,13 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
             className="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-accent-yellow rounded-md"
             title="Go to homepage"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-yellow font-black text-fg text-lg shadow-sm">
-              V
+            <div className="flex items-center rounded-lg bg-white p-1.5 shadow-xs">
+              <img
+                src="/images/logo.png"
+                alt="Logo"
+                className="h-6 w-auto object-contain"
+              />
             </div>
-            <span className="font-bold text-lg text-white tracking-tight">
-              Vefogix
-            </span>
           </Link>
 
           {/* Close button for mobile drawer */}
@@ -90,3 +91,4 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
 };
 
 export default DashboardSidebar;
+
