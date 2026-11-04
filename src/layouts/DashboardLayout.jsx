@@ -1,7 +1,7 @@
 import { useState, useEffect, Suspense } from "react";
-import { Outlet, Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Outlet } from "react-router-dom";
 import DashboardSidebar from "./DashboardSidebar";
+import { DashboardTopbar } from "../components/dashboard-sections";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -39,34 +39,8 @@ const DashboardLayout = () => {
 
       {/* Main wrapper shifted on desktop */}
       <div className="flex min-h-screen flex-col lg:pl-64">
-        {/* Mobile slim top bar */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="rounded-lg p-2 text-fg hover:bg-cream focus-visible:outline-2 focus-visible:outline-primary"
-            aria-label="Open menu"
-            aria-expanded={sidebarOpen}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 focus-visible:outline-2 focus-visible:outline-primary rounded-md"
-            title="Go to homepage"
-          >
-            <div className="flex items-center rounded-lg bg-white p-1 shadow-xs border border-border">
-              <img
-                src="/images/logo.png"
-                alt="Logo"
-                className="h-6 w-auto object-contain"
-              />
-            </div>
-          </Link>
-
-          <div className="w-8" aria-hidden="true" />
-        </header>
+        {/* Topbar for Desktop and Mobile */}
+        <DashboardTopbar onOpenSidebar={() => setSidebarOpen(true)} />
 
         {/* Scrollable content area */}
         <main className="flex-1 p-4 md:p-8">

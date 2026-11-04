@@ -1,15 +1,19 @@
-import { Link, NavLink } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, Zap, TrendingUp, X } from "lucide-react";
-import { navItems } from "../data/dashboard";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { LayoutDashboard, ShoppingBag, Zap, TrendingUp, Globe, X } from "lucide-react";
+import { navItems, buyerNavItems } from "../data/dashboard";
 
 const iconsMap = {
   LayoutDashboard,
   ShoppingBag,
   Zap,
   TrendingUp,
+  Globe,
 };
 
 const DashboardSidebar = ({ isOpen, onClose }) => {
+  const location = useLocation();
+  const isBuyer = location.pathname.startsWith("/buyer-dashboard");
+  const items = isBuyer ? buyerNavItems : navItems;
   return (
     <>
       {/* Mobile Drawer Overlay */}
@@ -38,7 +42,8 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
             <div className="flex items-center rounded-lg bg-white p-1.5 shadow-xs">
               <img
                 src="/images/logo.png"
-                alt="Logo"
+                alt="Sumit DevTech Logo"
+                title="Sumit DevTech Logo"
                 className="h-6 w-auto object-contain"
               />
             </div>
@@ -57,7 +62,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
 
         {/* Navigation items */}
         <nav aria-label="Dashboard navigation" className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5">
-          {navItems.map((item) => {
+          {items.map((item) => {
             const IconComponent = iconsMap[item.icon] || LayoutDashboard;
 
             return (
@@ -83,7 +88,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
 
         {/* Footer label */}
         <div className="p-4 border-t border-white/10 text-xs text-white/50 text-center">
-          Publisher Control Center
+          {isBuyer ? "Buyer Control Center" : "Publisher Control Center"}
         </div>
       </aside>
     </>

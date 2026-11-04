@@ -11,6 +11,12 @@ export const navItems = [
   { label: "Earnings", path: "/publisher-dashboard/earnings", icon: "TrendingUp" },
 ];
 
+export const buyerNavItems = [
+  { label: "Overview", path: "/buyer-dashboard", icon: "LayoutDashboard", end: true },
+  { label: "Marketplace", path: "/marketplace", icon: "Globe" },
+  { label: "My Orders", path: "/buyer-dashboard/orders", icon: "ShoppingBag" },
+];
+
 export const defaultStats = {
   netIncome: 0,
   totalOrders: 0,
@@ -64,3 +70,4 @@ export const sampleSeries = [
   { label: "W11", value: 60 },
   { label: "W12", value: 75 },
 ];
+
