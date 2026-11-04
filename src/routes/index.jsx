@@ -17,6 +17,14 @@ const Marketplace = lazy(() => import("../pages/Marketplace"));
 const LinkBuilding = lazy(() => import("../pages/Linkbuilding"));
 const WebsiteDetail = lazy(() => import("../pages/WebsiteDetail"));
 
+const DashboardLayout = lazy(() => import("../layouts/DashboardLayout"));
+const PublisherDashboard = lazy(() => import("../pages/dashboard/PublisherDashboard"));
+const DashboardOrders = lazy(() => import("../pages/dashboard/DashboardOrders"));
+const DashboardGigs = lazy(() => import("../pages/dashboard/DashboardGigs"));
+const DashboardEarnings = lazy(() => import("../pages/dashboard/DashboardEarnings"));
+const AddWebsite = lazy(() => import("../pages/dashboard/AddWebsite"));
+const CreateGig = lazy(() => import("../pages/dashboard/CreateGig"));
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -34,6 +42,19 @@ export const router = createBrowserRouter([
       { path: "signin", element: <SignIn /> },
       { path: "signup", element: <SignUp /> },
       { path: "faqs", element: <FaqSection /> },
+    ],
+  },
+  // TODO: protect this route group with auth
+  {
+    path: "/publisher-dashboard",
+    element: <DashboardLayout />,
+    children: [
+      { index: true, element: <PublisherDashboard /> },
+      { path: "orders", element: <DashboardOrders /> },
+      { path: "gigs", element: <DashboardGigs /> },
+      { path: "earnings", element: <DashboardEarnings /> },
+      { path: "websites/new", element: <AddWebsite /> },
+      { path: "gigs/new", element: <CreateGig /> },
     ],
   },
   ...adminRoutes,
