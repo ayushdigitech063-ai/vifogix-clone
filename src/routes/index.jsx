@@ -19,6 +19,7 @@ const WebsiteDetail = lazy(() => import("../pages/WebsiteDetail"));
 
 const DashboardLayout = lazy(() => import("../layouts/DashboardLayout"));
 const PublisherDashboard = lazy(() => import("../pages/dashboard/PublisherDashboard"));
+const BuyerDashboard = lazy(() => import("../pages/dashboard/BuyerDashboard"));
 const DashboardOrders = lazy(() => import("../pages/dashboard/DashboardOrders"));
 const DashboardGigs = lazy(() => import("../pages/dashboard/DashboardGigs"));
 const DashboardEarnings = lazy(() => import("../pages/dashboard/DashboardEarnings"));
@@ -45,6 +46,11 @@ export const router = createBrowserRouter([
     ],
   },
   // TODO: protect this route group with auth
+  {
+    path: "/buyer-dashboard",
+    element: <DashboardLayout />,
+    children: [{ index: true, element: <BuyerDashboard /> }],
+  },
   {
     path: "/publisher-dashboard",
     element: <DashboardLayout />,

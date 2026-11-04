@@ -1,6 +1,9 @@
 import { z } from "zod";
 
 export const signInSchema = z.object({
+  role: z.enum(["buyer", "seller"], {
+    errorMap: () => ({ message: "Please select whether you are a buyer or seller." }),
+  }),
   email: z
     .string()
     .trim()
@@ -14,6 +17,7 @@ export const signInSchema = z.object({
 });
 
 export const signUpSchema = z.object({
+  role: z.enum(["buyer", "seller"]).optional(),
   name: z
     .string()
     .trim()

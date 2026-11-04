@@ -36,7 +36,14 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
   const isSignup = mode === "signup";
   const toast = useToast();
 
-  const [form, setForm] = useState({ name: "", email: "", password: "", remember: false, terms: false });
+  const [form, setForm] = useState({
+    role: "buyer",
+    name: "",
+    email: "",
+    password: "",
+    remember: false,
+    terms: false,
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -91,6 +98,52 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="mt-7 space-y-4">
+        {/* Role Selector (Sign In & Sign Up) */}
+        <div>
+          <Label>I am a</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, role: "buyer" }))}
+              className={`flex items-center justify-center gap-2 rounded-lg border py-2.5 px-3 text-sm font-semibold transition ${
+                form.role === "buyer"
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border bg-surface text-muted hover:border-primary/40 hover:text-fg"
+              }`}
+            >
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  form.role === "buyer" ? "bg-primary" : "border border-muted"
+                }`}
+              />
+              <span>I am buyer</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, role: "seller" }))}
+              className={`flex items-center justify-center gap-2 rounded-lg border py-2.5 px-3 text-sm font-semibold transition ${
+                form.role === "seller"
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border bg-surface text-muted hover:border-primary/40 hover:text-fg"
+              }`}
+            >
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  form.role === "seller" ? "bg-primary" : "border border-muted"
+                }`}
+              />
+              <span>I am seller</span>
+            </button>
+          </div>
+          {errors.role && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-accent-red">
+              <ErrorAlertIcon />
+              <span>{errors.role}</span>
+            </p>
+          )}
+        </div>
+
         {/* Full Name (Sign Up only) */}
         {isSignup && (
           <div>
