@@ -41,8 +41,8 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
     role: "buyer",
     name: "",
     email: "",
-    socialPlatform: "linkedin",
-    socialMediaId: "",
+    platform: "LinkedIn",
+    username: "",
     password: "",
     remember: false,
     terms: false,
@@ -206,54 +206,54 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
         {/* Social Media Dropdown & ID (Sign Up only) */}
         {isSignup && (
           <div>
-            <Label htmlFor="socialMediaId">Social Media Profile</Label>
+            <Label htmlFor="username">Social Media Profile</Label>
             <div className="flex gap-2">
               {/* Dropdown for Platform */}
-              <div className="w-1/3 min-w-[120px]">
+              <div className="w-1/3 min-w-[125px]">
                 <select
-                  id="socialPlatform"
-                  value={form.socialPlatform}
-                  onChange={set("socialPlatform")}
+                  id="platform"
+                  value={form.platform}
+                  onChange={set("platform")}
                   className={`h-11 w-full rounded-lg border bg-surface px-3 text-sm font-medium text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.socialPlatform ? "border-accent-red" : "border-border"
+                    errors.platform ? "border-accent-red" : "border-border"
                   }`}
                   aria-label="Social media platform"
                 >
-                  <option value="linkedin">LinkedIn</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="instagram">Instagram</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="Instagram">Instagram</option>
                 </select>
               </div>
 
-              {/* Input for Social Media ID */}
+              {/* Input for Social Media Username / Profile link */}
               <div className="relative flex-1">
                 <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
                   <AtSignIcon />
                 </span>
                 <input
-                  id="socialMediaId"
+                  id="username"
                   type="text"
                   placeholder={
-                    form.socialPlatform === "linkedin"
-                      ? "linkedin.com/in/username"
-                      : form.socialPlatform === "facebook"
-                      ? "facebook.com/username"
-                      : "instagram.com/username or @handle"
+                    form.platform === "LinkedIn"
+                      ? "username or linkedin.com/in/..."
+                      : form.platform === "Facebook"
+                      ? "username or facebook.com/..."
+                      : "username or @handle"
                   }
-                  value={form.socialMediaId}
-                  onChange={set("socialMediaId")}
+                  value={form.username}
+                  onChange={set("username")}
                   className={`h-11 w-full rounded-lg border bg-surface pl-11 pr-4 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.socialMediaId ? "border-accent-red" : "border-border"
+                    errors.username ? "border-accent-red" : "border-border"
                   }`}
                 />
               </div>
             </div>
 
             {/* Error Messages */}
-            {(errors.socialPlatform || errors.socialMediaId) && (
+            {(errors.platform || errors.username) && (
               <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-accent-red">
                 <ErrorAlertIcon />
-                <span>{errors.socialPlatform || errors.socialMediaId}</span>
+                <span>{errors.platform || errors.username}</span>
               </p>
             )}
           </div>
