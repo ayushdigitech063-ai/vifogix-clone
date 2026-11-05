@@ -22,6 +22,21 @@ export const extractUsernameSlug = (input) => {
   return val;
 };
 
+export const buildSocialMediaUrl = (platform, input) => {
+  const slug = extractUsernameSlug(input);
+  if (!slug) return "";
+  switch (platform) {
+    case "LinkedIn":
+      return `https://linkedin.com/in/${slug}`;
+    case "Facebook":
+      return `https://facebook.com/${slug}`;
+    case "Instagram":
+      return `https://instagram.com/${slug}`;
+    default:
+      return slug;
+  }
+};
+
 // Base string with slug extraction transform layer
 const cleanSlug = z
   .string({ required_error: "Please enter your username or profile link." })
@@ -145,5 +160,9 @@ export const signUpSchema = z
         });
       }
     }
-  });
+  })
+  .transform((data) => ({
+    ...data,
+    socialMediaUrl: buildSocialMediaUrl(data.platform, data.username),
+  }));
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
 import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2, AtSign } from "lucide-react";
-import { signInSchema, signUpSchema } from "../../schemas";
+import { signInSchema, signUpSchema, buildSocialMediaUrl } from "../../schemas";
 
 // Icons using lucide-react
 const UserIcon = () => <User className="h-5 w-5 text-muted" aria-hidden="true" />;
@@ -73,13 +73,23 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
     setErrors(next);
     if (Object.keys(next).length) {
       toast.error("Please fill in the highlighted fields.");
+      console.log("Validation errors:", next);
       return;
     }
 
     setLoading(true);
     try {
-      await onSubmit?.(form);
+      // Build resolved social media URL if on signup mode
+      const payload = isSignup
+        ? {
+            ...form,
+            socialMediaUrl: buildSocialMediaUrl(form.platform, form.username),
+          }
+        : form;
+
+      await onSubmit?.(payload);
       toast.success(isSignup ? "Account created successfully!" : "Signed in successfully!");
+      console.log("Form submitted:", payload);
     } catch (err) {
       toast.error("User authentication failed. Please check your credentials and try again.");
     } finally {
