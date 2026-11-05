@@ -28,6 +28,14 @@ export const signUpSchema = z.object({
     .trim()
     .min(1, "Please enter your email.")
     .email("Enter a valid email address."),
+  socialPlatform: z.enum(["linkedin", "facebook", "instagram"], {
+    errorMap: () => ({ message: "Please select a social media platform." }),
+  }),
+  socialMediaId: z
+    .string()
+    .trim()
+    .min(1, "Please enter your social media ID or profile URL.")
+    .min(3, "Social media ID must be at least 3 characters."),
   password: z
     .string()
     .min(1, "Please enter your password.")

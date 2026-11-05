@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
-import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2, AtSign } from "lucide-react";
 import { signInSchema, signUpSchema } from "../../schemas";
 
 // Icons using lucide-react
 const UserIcon = () => <User className="h-5 w-5 text-muted" aria-hidden="true" />;
 const MailIcon = () => <Mail className="h-5 w-5 text-muted" aria-hidden="true" />;
 const LockIcon = () => <Lock className="h-5 w-5 text-muted" aria-hidden="true" />;
+const AtSignIcon = () => <AtSign className="h-5 w-5 text-muted" aria-hidden="true" />;
 const ErrorAlertIcon = () => <AlertCircle className="h-4 w-4 shrink-0 text-accent-red" aria-hidden="true" />;
 const EyeIcon = () => <Eye className="h-4 w-4 text-muted hover:text-fg" aria-hidden="true" />;
 const EyeSlashIcon = () => <EyeOff className="h-4 w-4 text-muted hover:text-fg" aria-hidden="true" />;
@@ -40,6 +41,8 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
     role: "buyer",
     name: "",
     email: "",
+    socialPlatform: "linkedin",
+    socialMediaId: "",
     password: "",
     remember: false,
     terms: false,
@@ -100,7 +103,7 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
       <form onSubmit={handleSubmit} noValidate className="mt-7 space-y-4">
         {/* Role Selector (Sign In & Sign Up) */}
         <div>
-          <Label>I am a</Label>
+          <Label>Select your role</Label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -199,6 +202,62 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
             </p>
           )}
         </div>
+
+        {/* Social Media Dropdown & ID (Sign Up only) */}
+        {isSignup && (
+          <div>
+            <Label htmlFor="socialMediaId">Social Media Profile</Label>
+            <div className="flex gap-2">
+              {/* Dropdown for Platform */}
+              <div className="w-1/3 min-w-[120px]">
+                <select
+                  id="socialPlatform"
+                  value={form.socialPlatform}
+                  onChange={set("socialPlatform")}
+                  className={`h-11 w-full rounded-lg border bg-surface px-3 text-sm font-medium text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                    errors.socialPlatform ? "border-accent-red" : "border-border"
+                  }`}
+                  aria-label="Social media platform"
+                >
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                </select>
+              </div>
+
+              {/* Input for Social Media ID */}
+              <div className="relative flex-1">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <AtSignIcon />
+                </span>
+                <input
+                  id="socialMediaId"
+                  type="text"
+                  placeholder={
+                    form.socialPlatform === "linkedin"
+                      ? "linkedin.com/in/username"
+                      : form.socialPlatform === "facebook"
+                      ? "facebook.com/username"
+                      : "instagram.com/username or @handle"
+                  }
+                  value={form.socialMediaId}
+                  onChange={set("socialMediaId")}
+                  className={`h-11 w-full rounded-lg border bg-surface pl-11 pr-4 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                    errors.socialMediaId ? "border-accent-red" : "border-border"
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Error Messages */}
+            {(errors.socialPlatform || errors.socialMediaId) && (
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-accent-red">
+                <ErrorAlertIcon />
+                <span>{errors.socialPlatform || errors.socialMediaId}</span>
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Password */}
         <div>
