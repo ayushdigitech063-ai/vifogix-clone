@@ -18,6 +18,7 @@ const DataPartner = ({ tone = "light", heading = "Data Integrated With:" }) => {
             <img
               src={logo}
               alt={name}
+              title={name}
               className="h-6 w-auto object-contain md:h-7"
             />
           </li>

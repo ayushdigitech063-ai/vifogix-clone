@@ -27,7 +27,8 @@ const CountriesSection = ({ tone = "default" }) => {
               >
                 <img
                   src={`https://flagcdn.com/w40/${code}.png`}
-                  alt=""
+                  alt="country flag"
+                  title={`${name} flag`}
                   loading="lazy"
                   className="h-4 w-6 rounded-sm object-cover"
                 />

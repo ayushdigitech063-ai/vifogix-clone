@@ -17,7 +17,7 @@ const VideoBackground = () => {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
       {(
-        <img src="/backgound-video/hero-poster.jpg" alt="" className="h-full w-full object-cover" />
+        <img src="/backgound-video/hero-poster.jpg" alt="hero-background" title="hero-background" className="h-full w-full object-cover" />
       )}
 
       {/* dark overlay so the white text stays readable on this bright clip */}

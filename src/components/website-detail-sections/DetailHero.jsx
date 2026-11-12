@@ -36,7 +36,7 @@ const DetailHero = ({ site }) => {
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-navy-800 via-navy-900 to-navy-950 pt-10 pb-20 text-white md:pt-14 md:pb-24">
       {/* Subtle dot grid */}
-      <div
+      {/* <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-20"
         style={{
@@ -45,7 +45,7 @@ const DetailHero = ({ site }) => {
           maskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
           WebkitMaskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
         }}
-      />
+      /> */}
 
       {/* Two soft blurred glows */}
       <div

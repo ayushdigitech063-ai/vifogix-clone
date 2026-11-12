@@ -27,16 +27,7 @@ const AuthSidePanel = ({
 
       {/* Desktop split-screen panel (lg and above) */}
       <section className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-navy-800 via-navy-900 to-navy-950 p-12 text-white lg:flex">
-        {/* Subtle dot-grid texture */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }}
-        />
-
+        
         {/* Soft yellow and blue glow blurs */}
         <div
           aria-hidden="true"
@@ -52,7 +43,8 @@ const AuthSidePanel = ({
           <div className="mb-6 inline-flex items-center rounded-lg bg-white p-2 shadow-sm">
             <img
               src="/images/logo.png"
-              alt="Vefogix"
+              alt="sumit devtech logo"
+              title="sumit devtech logo"
               className="h-8 w-auto object-contain"
             />
           </div>

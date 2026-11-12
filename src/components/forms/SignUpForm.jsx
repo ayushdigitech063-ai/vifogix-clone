@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
-import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
-import { signInSchema, signUpSchema } from "../../schemas";
+import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2, AtSign } from "lucide-react";
+import { signInSchema, signUpSchema, buildSocialMediaUrl, buildSocialProfiles } from "../../schemas";
 
 // Icons using lucide-react
 const UserIcon = () => <User className="h-5 w-5 text-muted" aria-hidden="true" />;
 const MailIcon = () => <Mail className="h-5 w-5 text-muted" aria-hidden="true" />;
 const LockIcon = () => <Lock className="h-5 w-5 text-muted" aria-hidden="true" />;
+const AtSignIcon = () => <AtSign className="h-5 w-5 text-muted" aria-hidden="true" />;
 const ErrorAlertIcon = () => <AlertCircle className="h-4 w-4 shrink-0 text-accent-red" aria-hidden="true" />;
 const EyeIcon = () => <Eye className="h-4 w-4 text-muted hover:text-fg" aria-hidden="true" />;
 const EyeSlashIcon = () => <EyeOff className="h-4 w-4 text-muted hover:text-fg" aria-hidden="true" />;
@@ -36,7 +37,16 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
   const isSignup = mode === "signup";
   const toast = useToast();
 
-  const [form, setForm] = useState({ name: "", email: "", password: "", remember: false, terms: false });
+  const [form, setForm] = useState({
+    role: "buyer",
+    name: "",
+    email: "",
+    platform: "LinkedIn",
+    username: "",
+    password: "",
+    remember: false,
+    terms: false,
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -63,15 +73,26 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
     setErrors(next);
     if (Object.keys(next).length) {
       toast.error("Please fill in the highlighted fields.");
+      console.log("Validation errors:", next);
       return;
     }
 
     setLoading(true);
     try {
-      await onSubmit?.(form);
-      toast.success(isSignup ? "Account created successfully!" : "Signed in successfully!");
+      // Build resolved social profiles payload matching backend requirement
+      const payload = isSignup
+        ? {
+            ...form,
+            role: form.role ? form.role.toUpperCase() : "SELLER",
+            socialProfiles: buildSocialProfiles(form.platform, form.username),
+            socialMediaUrl: buildSocialMediaUrl(form.platform, form.username),
+          }
+        : form;
+
+      await onSubmit?.(payload);
+      console.log("payload:", payload);
     } catch (err) {
-      toast.error("User authentication failed. Please check your credentials and try again.");
+      toast.error(err.message || "User authentication failed. Please check your credentials and try again.");
     } finally {
       setLoading(false);
     }
@@ -91,6 +112,52 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="mt-7 space-y-4">
+        {/* Role Selector (Sign In & Sign Up) */}
+        <div>
+          <Label>Select your role</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, role: "buyer" }))}
+              className={`flex items-center justify-center gap-2 rounded-lg border py-2.5 px-3 text-sm font-semibold transition ${
+                form.role === "buyer"
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border bg-surface text-muted hover:border-primary/40 hover:text-fg"
+              }`}
+            >
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  form.role === "buyer" ? "bg-primary" : "border border-muted"
+                }`}
+              />
+              <span>I am buyer</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, role: "seller" }))}
+              className={`flex items-center justify-center gap-2 rounded-lg border py-2.5 px-3 text-sm font-semibold transition ${
+                form.role === "seller"
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border bg-surface text-muted hover:border-primary/40 hover:text-fg"
+              }`}
+            >
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  form.role === "seller" ? "bg-primary" : "border border-muted"
+                }`}
+              />
+              <span>I am seller</span>
+            </button>
+          </div>
+          {errors.role && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-accent-red">
+              <ErrorAlertIcon />
+              <span>{errors.role}</span>
+            </p>
+          )}
+        </div>
+
         {/* Full Name (Sign Up only) */}
         {isSignup && (
           <div>
@@ -146,6 +213,62 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
             </p>
           )}
         </div>
+
+        {/* Social Media Dropdown & ID (Sign Up only) */}
+        {isSignup && form.role === "seller" && (
+          <div>
+            <Label htmlFor="username">Social Media Profile</Label>
+            <div className="flex gap-2">
+              {/* Dropdown for Platform */}
+              <div className="w-1/3 min-w-[125px]">
+                <select
+                  id="platform"
+                  value={form.platform}
+                  onChange={set("platform")}
+                  className={`h-11 w-full rounded-lg border bg-surface px-3 text-sm font-medium text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                    errors.platform ? "border-accent-red" : "border-border"
+                  }`}
+                  aria-label="Social media platform"
+                >
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="Instagram">Instagram</option>
+                </select>
+              </div>
+
+              {/* Input for Social Media Username / Profile link */}
+              <div className="relative flex-1">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                  <AtSignIcon />
+                </span>
+                <input
+                  id="username"
+                  type="text"
+                  placeholder={
+                    form.platform === "LinkedIn"
+                      ? "username or linkedin.com/in/..."
+                      : form.platform === "Facebook"
+                      ? "username or facebook.com/..."
+                      : "username or @handle"
+                  }
+                  value={form.username}
+                  onChange={set("username")}
+                  className={`h-11 w-full rounded-lg border bg-surface pl-11 pr-4 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                    errors.username ? "border-accent-red" : "border-border"
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Error Messages */}
+            {(errors.platform || errors.username) && (
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-accent-red">
+                <ErrorAlertIcon />
+                <span>{errors.platform || errors.username}</span>
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Password */}
         <div>

@@ -34,7 +34,8 @@ const Footer = () => {
           <Link to="/" className="inline-flex items-center rounded-lg bg-white p-2">
             <img
               src="/images/logo.png"
-              alt="Vefogix"
+              alt="sumit devtech"
+              title="Go to homepage"
               className="h-8 w-auto object-contain"
             />
           </Link>

@@ -1,10 +1,15 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useState, useLayoutEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/admin/layout/Sidebar";
 import Topbar from "../components/admin/layout/Topbar";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-background text-fg font-sans antialiased">
