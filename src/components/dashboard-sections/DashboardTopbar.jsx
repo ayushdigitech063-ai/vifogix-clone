@@ -16,16 +16,19 @@ import { useDashboardStats } from "../../hooks/useDashboardStats";
 const getPageTitle = (pathname) => {
   if (pathname.startsWith("/buyer-dashboard")) {
     if (pathname.includes("/orders")) return "My Orders";
+    if (pathname.includes("/projects")) return "Campaign Projects";
+    if (pathname.includes("/wallet")) return "Wallet & Billing";
     return "Buyer Dashboard";
   }
   if (pathname === "/publisher-dashboard" || pathname === "/publisher-dashboard/") {
     return "Publisher Dashboard";
   }
   if (pathname.includes("/orders")) return "Orders Management";
+  if (pathname.includes("/websites/new")) return "Add New Website";
+  if (pathname.includes("/websites")) return "My Websites";
   if (pathname.includes("/gigs/new")) return "Create New Gig";
   if (pathname.includes("/gigs")) return "Gigs & Services";
   if (pathname.includes("/earnings")) return "Earnings Details";
-  if (pathname.includes("/websites/new")) return "Add New Website";
   return "Dashboard";
 };
 
@@ -243,3 +246,4 @@ const DashboardTopbar = ({ onOpenSidebar }) => {
 };
 
 export default DashboardTopbar;
+

@@ -77,3 +77,4 @@ const PerformancePanel = ({ series = [] }) => {
 };
 
 export default PerformancePanel;
+

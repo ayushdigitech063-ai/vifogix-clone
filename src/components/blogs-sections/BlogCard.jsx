@@ -25,6 +25,7 @@ const BlogCard = ({ post }) => {
         <img
           src={post.image}
           alt={post.title}
+          title={post.title}
           loading="lazy"
           onError={(e) => {
             e.currentTarget.style.display = "none";

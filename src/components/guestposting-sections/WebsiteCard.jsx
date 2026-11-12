@@ -46,7 +46,8 @@ const WebsiteCard = ({ site }) => {
         <div className="mt-3 flex items-center gap-3">
           <img
             src={`https://www.google.com/s2/favicons?domain=${site.domain}&sz=64`}
-            alt=""
+            alt="website icon"
+            title={site.domain}
             width="40"
             height="40"
             className="rounded-lg bg-white p-1"

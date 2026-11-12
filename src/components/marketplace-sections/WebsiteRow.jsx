@@ -34,7 +34,8 @@ const WebsiteRow = ({site}) =>{
         >
           <img
             src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
-            alt=""
+            alt="Website icon"
+            title={domain}
             className="h-5 w-5"
           />
           {domain}

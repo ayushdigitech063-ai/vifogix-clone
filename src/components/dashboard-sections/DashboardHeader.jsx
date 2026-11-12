@@ -34,17 +34,10 @@ const DashboardHeader = ({ user }) => {
           <Plus className="h-4 w-4" />
           <span>Create New Gig</span>
         </Link>
-
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-bold text-white shadow-xs select-none"
-          title={user?.name || "Publisher"}
-          aria-label={user?.name || "Publisher profile"}
-        >
-          {initial}
-        </div>
       </div>
     </div>
   );
 };
 
 export default DashboardHeader;
+

@@ -1,16 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import SignUpForm from "../components/forms/SignUpForm";
 import AuthSidePanel from "../components/forms/AuthSidePanel";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/useToast";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const toast = useToast();
 
-  const handleSignUp = async (data) => {
-    if (data.role === "seller") {
-      navigate("/publisher-dashboard");
-    } else {
-      navigate("/buyer-dashboard");
-    }
+  const handleSignUp = async (formData) => {
+    // Prepare registration payload matching the backend
+    const registerPayload = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role ? formData.role.toUpperCase() : "SELLER",
+      socialProfiles: formData.socialProfiles || {
+        linkedin: null,
+        facebook: null,
+        instagram: null,
+      },
+    };
+
+    // Register via Auth context/services
+    await register(registerPayload);
+    navigate("/publisher-dashboard");
+    toast.success("Account created successfully!");
   };
 
   return (
@@ -33,4 +49,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-

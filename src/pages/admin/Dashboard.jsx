@@ -4,12 +4,12 @@ import PageHeader from "../../components/admin/layout/PageHeader";
 import StatsGrid from "../../components/admin/dashboard/StatsGrid";
 import RecentOrders from "../../components/admin/dashboard/RecentOrders";
 import { stats, recentOrders, quickActions, monthlyOrders } from "../../data/admin/dashboard";
-import { useAdminAuth } from "../../hooks/useAdminAuth";
+import {useAuth} from "../../hooks/useAuth";
 
 const months = ["May", "Jun", "Jul", "Aug", "Sep", "Oct"];
 
 const Dashboard = () => {
-  const { admin } = useAdminAuth();
+  const { admin } = useAuth();
   const adminFirstName = admin?.name ? admin.name.split(" ")[0] : "Admin";
 
   const maxOrderValue = Math.max(...monthlyOrders, 1);

@@ -1,10 +1,16 @@
-import { useState, useEffect, Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { useState, useEffect, useLayoutEffect, Suspense } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import DashboardSidebar from "./DashboardSidebar";
 import { DashboardTopbar } from "../components/dashboard-sections";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  // Scroll to top on dashboard page navigation
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   // Lock body scroll when mobile sidebar drawer is open
   useEffect(() => {

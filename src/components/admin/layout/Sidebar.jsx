@@ -13,7 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { adminNav } from "../../../data/admin/adminNav";
-import { useAdminAuth } from "../../../hooks/useAdminAuth";
+import { useAuth } from "../../../hooks/useAuth";
 
 const renderNavIcon = (name) => {
   const common = {
@@ -44,7 +44,7 @@ const renderNavIcon = (name) => {
 };
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const { admin, logout } = useAdminAuth();
+  const { admin, logout } = useAuth();
   const location = useLocation();
   const drawerRef = useRef(null);
 
@@ -93,12 +93,10 @@ const Sidebar = ({ isOpen, onClose }) => {
               <img
                 src="/images/logo.png"
                 alt="Sumit DevTech"
+                title="Sumit DevTech"
                 className="h-6 w-auto object-contain"
               />
             </div>
-            <span className="rounded bg-accent-yellow/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-yellow">
-              Admin
-            </span>
           </div>
           {/* Close button on mobile */}
           <button

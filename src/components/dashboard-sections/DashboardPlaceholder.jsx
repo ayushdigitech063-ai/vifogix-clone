@@ -15,3 +15,4 @@ const DashboardPlaceholder = ({ title = "Dashboard Section", description = "This
 };
 
 export default DashboardPlaceholder;
+

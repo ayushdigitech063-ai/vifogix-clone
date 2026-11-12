@@ -14,7 +14,8 @@ const PackageCard = ({ pkg }) => (
         {pkg.logoDomain ? (
           <img
             src={`https://www.google.com/s2/favicons?domain=${pkg.logoDomain}&sz=64`}
-            alt=""
+            alt="package logo"
+            title="package logo"
             width="32"
             height="32"
           />

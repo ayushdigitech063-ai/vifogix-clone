@@ -10,3 +10,4 @@ const DashboardEarnings = () => {
 };
 
 export default DashboardEarnings;
+

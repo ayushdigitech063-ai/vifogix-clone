@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
 import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2, AtSign } from "lucide-react";
-import { signInSchema, signUpSchema, buildSocialMediaUrl } from "../../schemas";
+import { signInSchema, signUpSchema, buildSocialMediaUrl, buildSocialProfiles } from "../../schemas";
 
 // Icons using lucide-react
 const UserIcon = () => <User className="h-5 w-5 text-muted" aria-hidden="true" />;
@@ -79,19 +79,20 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
 
     setLoading(true);
     try {
-      // Build resolved social media URL if on signup mode
+      // Build resolved social profiles payload matching backend requirement
       const payload = isSignup
         ? {
             ...form,
+            role: form.role ? form.role.toUpperCase() : "SELLER",
+            socialProfiles: buildSocialProfiles(form.platform, form.username),
             socialMediaUrl: buildSocialMediaUrl(form.platform, form.username),
           }
         : form;
 
       await onSubmit?.(payload);
-      toast.success(isSignup ? "Account created successfully!" : "Signed in successfully!");
-      console.log("Form submitted:", payload);
+      console.log("payload:", payload);
     } catch (err) {
-      toast.error("User authentication failed. Please check your credentials and try again.");
+      toast.error(err.message || "User authentication failed. Please check your credentials and try again.");
     } finally {
       setLoading(false);
     }
@@ -214,7 +215,7 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
         </div>
 
         {/* Social Media Dropdown & ID (Sign Up only) */}
-        {isSignup && (
+        {isSignup && form.role === "seller" && (
           <div>
             <Label htmlFor="username">Social Media Profile</Label>
             <div className="flex gap-2">

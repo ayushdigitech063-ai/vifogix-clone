@@ -124,6 +124,7 @@ const Navbar = () => {
           <img
             src="/images/logo.png"
             alt="sumitdevtech"
+            title="Go to homepage"
             className="h-10 w-auto object-contain"
           />
         </Link>
@@ -232,13 +233,23 @@ const Navbar = () => {
             <>
               <Link
                 to={authLinks.signIn.href}
-                className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-fg hover:border-primary hover:text-primary"
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+                  location.pathname === authLinks.signIn.href
+                    ? "bg-primary text-white hover:bg-primary-light"
+                    : "border border-border text-fg hover:border-primary hover:text-primary"
+                }`}
               >
                 {authLinks.signIn.label}
               </Link>
               <Link
                 to={authLinks.signUp.href}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+                  location.pathname === authLinks.signUp.href
+                    ? "bg-primary text-white hover:bg-primary-light"
+                    : location.pathname === authLinks.signIn.href
+                    ? "border border-border text-fg hover:border-primary hover:text-primary"
+                    : "bg-primary text-white hover:bg-primary-light"
+                }`}
               >
                 {authLinks.signUp.label}
               </Link>
@@ -341,14 +352,24 @@ const Navbar = () => {
                 <Link
                   to={authLinks.signIn.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg border border-border px-4 py-2 text-center text-sm font-semibold text-fg hover:border-primary hover:text-primary"
+                  className={`rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors ${
+                    location.pathname === authLinks.signIn.href
+                      ? "bg-primary text-white hover:bg-primary-light"
+                      : "border border-border text-fg hover:border-primary hover:text-primary"
+                  }`}
                 >
                   {authLinks.signIn.label}
                 </Link>
                 <Link
                   to={authLinks.signUp.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
+                  className={`rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors ${
+                    location.pathname === authLinks.signUp.href
+                      ? "bg-primary text-white hover:bg-primary-light"
+                      : location.pathname === authLinks.signIn.href
+                      ? "border border-border text-fg hover:border-primary hover:text-primary"
+                      : "bg-primary text-white hover:bg-primary-light"
+                  }`}
                 >
                   {authLinks.signUp.label}
                 </Link>

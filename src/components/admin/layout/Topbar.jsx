@@ -10,7 +10,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { adminNav } from "../../../data/admin/adminNav";
-import { useAdminAuth } from "../../../hooks/useAdminAuth";
+import { useAuth } from "../../../hooks/useAuth";
 
 const getPageTitle = (pathname) => {
   if (pathname === "/admin" || pathname === "/admin/") return "Dashboard";
@@ -23,7 +23,7 @@ const getPageTitle = (pathname) => {
 };
 
 const Topbar = ({ onOpenSidebar }) => {
-  const { admin, logout } = useAdminAuth();
+  const { admin, logout } = useAuth();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -71,7 +71,7 @@ const Topbar = ({ onOpenSidebar }) => {
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <h1 className="text-lg font-bold text-fg md:text-xl">{title}</h1>
+        <h2 className="text-lg font-bold text-fg md:text-xl">{title}</h2>
       </div>
 
       {/* Middle: Search (hidden below md) */}

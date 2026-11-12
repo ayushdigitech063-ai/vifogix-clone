@@ -52,3 +52,4 @@ const EarningsPanel = ({ earnings = [] }) => {
 };
 
 export default EarningsPanel;
+

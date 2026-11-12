@@ -22,6 +22,15 @@ export const extractUsernameSlug = (input) => {
   return val;
 };
 
+export const buildSocialProfiles = (platform, input) => {
+  const url = buildSocialMediaUrl(platform, input);
+  return {
+    linkedin: platform === "LinkedIn" ? url : null,
+    facebook: platform === "Facebook" ? url : null,
+    instagram: platform === "Instagram" ? url : null,
+  };
+};
+
 export const buildSocialMediaUrl = (platform, input) => {
   const slug = extractUsernameSlug(input);
   if (!slug) return "";
@@ -163,6 +172,7 @@ export const signUpSchema = z
   })
   .transform((data) => ({
     ...data,
+    socialProfiles: buildSocialProfiles(data.platform, data.username),
     socialMediaUrl: buildSocialMediaUrl(data.platform, data.username),
   }));
 

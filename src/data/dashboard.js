@@ -6,6 +6,7 @@ export const publisherUser = {
 
 export const navItems = [
   { label: "Overview", path: "/publisher-dashboard", icon: "LayoutDashboard", end: true },
+  { label: "My Websites", path: "/publisher-dashboard/websites", icon: "Globe" },
   { label: "Orders", path: "/publisher-dashboard/orders", icon: "ShoppingBag" },
   { label: "Gigs", path: "/publisher-dashboard/gigs", icon: "Zap" },
   { label: "Earnings", path: "/publisher-dashboard/earnings", icon: "TrendingUp" },
@@ -15,6 +16,8 @@ export const buyerNavItems = [
   { label: "Overview", path: "/buyer-dashboard", icon: "LayoutDashboard", end: true },
   { label: "Marketplace", path: "/marketplace", icon: "Globe" },
   { label: "My Orders", path: "/buyer-dashboard/orders", icon: "ShoppingBag" },
+  { label: "My Projects", path: "/buyer-dashboard/projects", icon: "FolderKanban" },
+  { label: "Wallet & Billing", path: "/buyer-dashboard/wallet", icon: "Wallet" },
 ];
 
 export const defaultStats = {

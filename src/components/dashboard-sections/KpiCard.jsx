@@ -23,3 +23,4 @@ const KpiCard = ({ label, value, hint, icon: Icon, accent = "primary" }) => {
 };
 
 export default KpiCard;
+

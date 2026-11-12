@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { useToast } from "../../hooks/useToast";
+import {useAuth} from "../../hooks/useAuth";
 
 const AdminLogin = () => {
-  const { isAuthenticated, login } = useAdminAuth();
+  const { isAuthenticated, login } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -53,10 +53,15 @@ const AdminLogin = () => {
     setLoading(true);
     setServerError("");
     try {
-      await login(form.email, form.password);
+      await login({email: form.email, password: form.password});
       toast.success("Welcome back, Administrator!");
-      const destination = location.state?.from?.pathname || "/admin";
+
+      const destination = location.state?.from?.pathname;
       navigate(destination, { replace: true });
+
+      console.log("pathname", location.state?.from?.pathname);
+      console.log("search", location);
+
     } catch (err) {
       const msg = err.message || "Failed to sign in.";
       setServerError(msg);

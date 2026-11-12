@@ -1,5 +1,14 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, Zap, TrendingUp, Globe, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Zap,
+  TrendingUp,
+  Globe,
+  FolderKanban,
+  Wallet,
+  X,
+} from "lucide-react";
 import { navItems, buyerNavItems } from "../data/dashboard";
 
 const iconsMap = {
@@ -8,6 +17,8 @@ const iconsMap = {
   Zap,
   TrendingUp,
   Globe,
+  FolderKanban,
+  Wallet,
 };
 
 const DashboardSidebar = ({ isOpen, onClose }) => {
