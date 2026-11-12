@@ -3,14 +3,14 @@ import { comparisonRows } from "../../data/linkbuilding";
 import SectionHeading from "../sheared/SectionHeading";
 
 const ComparisonSection = () => (
-  <section className="bg-background py-16 md:py-20">
+  <section className="bg-cream py-16 md:py-20">
     <div className="mx-auto max-w-5xl px-4">
       <SectionHeading
         eyebrow="Comparison"
         title="Vefogix vs Traditional Link Building Agencies"
         description="Choose a managed campaign, or use the marketplace when you want control over individual placements."
       />
-      <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+      <div className="overflow-x-auto rounded-xl border border-border bg-white">
         <table className="w-full min-w-[600px] text-left text-sm">
           <thead>
             <tr className="bg-background">

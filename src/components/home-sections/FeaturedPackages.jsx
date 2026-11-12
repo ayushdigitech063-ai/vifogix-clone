@@ -4,7 +4,7 @@ import BannerHeading from "../sheared/BannerHeading";
 import { packages } from "../../data/home";
 
 const FeaturedPackages = () => (
-  <section className="bg-surface py-16 md:py-20">
+  <section className="bg-cream py-16 md:py-20">
     <div className="mx-auto max-w-6xl px-4">
       <BannerHeading
         eyebrow="Featured Packages"
@@ -16,8 +16,8 @@ const FeaturedPackages = () => (
         {packages.map((p) => (
           <article
             key={p.name}
-            className={`relative flex flex-col rounded-2xl border bg-background p-7 ${
-              p.featured ? "border-primary shadow-lg" : "border-border"
+            className={`relative flex flex-col rounded-2xl border p-7 ${
+              p.featured ? "border-navy-900 bg-navy-900 text-white shadow-lg" : "border-border bg-white text-fg"
             }`}
           >
             {p.featured && (
@@ -26,13 +26,13 @@ const FeaturedPackages = () => (
               </span>
             )}
             <h3>{p.name}</h3>
-            <p className="mt-3 text-4xl font-bold text-fg">
+            <p className={`mt-3 text-4xl font-bold ${p.featured ? "text-accent-yellow" : "text-fg"}`}>
               {p.price} <span className="text-base font-medium text-muted">{p.note}</span>
             </p>
             <ul className="my-6 flex-1 space-y-3">
               {p.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-fg">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {f}
+                <li key={f} className={`flex items-start gap-2 text-sm ${p.featured ? "text-white/90" : "text-fg"}`}>
+                  <Check className={`mt-0.5 h-4 w-4 shrink-0 ${p.featured ? "text-accent-yellow" : "text-primary"}`} /> {f}
                 </li>
               ))}
             </ul>

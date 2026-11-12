@@ -8,10 +8,9 @@ const ContactUs = () => {
     <main className="font-sans">
       <HeroBanner hero={hero} />
       <AboutReach about={about} reach={reach} />
-      <ContactForm />
+      <ContactForm tone="navy-950" />
     </main>
   );
 };
 
 export default ContactUs;
-

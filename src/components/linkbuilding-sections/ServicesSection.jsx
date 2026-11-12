@@ -4,7 +4,7 @@ import SectionHeading from "../sheared/SectionHeading";
 import { services } from "../../data/linkbuilding";
 
 const ServicesSection = () => (
-  <section className="bg-surface py-16 md:py-20">
+  <section className="bg-white py-16 md:py-20">
     <div className="mx-auto max-w-7xl px-4">
       <SectionHeading
         eyebrow="Our Services"

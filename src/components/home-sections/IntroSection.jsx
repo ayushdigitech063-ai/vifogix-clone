@@ -10,8 +10,8 @@ const points = [
 ];
 
 const IntroSection = () => (
-  <section className="bg-surface py-16 md:py-20">
-    <div className="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-2">
+  <section className="bg-cream py-16 md:py-20">
+    <div className="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-2 lg:[&>*:first-child]:order-2 lg:[&>*:last-child]:order-1">
       <article className="rounded-2xl border border-border bg-background p-8">
         <BannerHeading
           as="h2"

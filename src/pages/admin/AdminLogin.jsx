@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertCircle, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
+import { useToast } from "../../hooks/useToast";
 
 const AdminLogin = () => {
   const { isAuthenticated, login } = useAdminAuth();
@@ -12,6 +13,7 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
 
   // If already authenticated, redirect immediately
@@ -43,16 +45,22 @@ const AdminLogin = () => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error("Please check your email and password.");
+      return;
+    }
 
     setLoading(true);
     setServerError("");
     try {
       await login(form.email, form.password);
+      toast.success("Welcome back, Administrator!");
       const destination = location.state?.from?.pathname || "/admin";
       navigate(destination, { replace: true });
     } catch (err) {
-      setServerError(err.message || "Failed to sign in.");
+      const msg = err.message || "Failed to sign in.";
+      setServerError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -63,9 +71,15 @@ const AdminLogin = () => {
       <div className="w-full max-w-md">
         {/* Brand strip */}
         <div className="mb-6 flex flex-col items-center justify-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-xl bg-[#101626] px-4 py-2 shadow-md">
-            <span className="font-bold tracking-tight text-white">Sumit DevTech</span>
-            <span className="rounded bg-accent-yellow/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-yellow">
+          <div className="inline-flex items-center gap-2.5 rounded-xl bg-navy-900 p-2 shadow-md">
+            <div className="flex items-center rounded-lg bg-white p-1.5 shadow-xs">
+              <img
+                src="/images/logo.png"
+                alt="Sumit DevTech"
+                className="h-6 w-auto object-contain"
+              />
+            </div>
+            <span className="mr-1 rounded bg-accent-yellow/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-yellow">
               Admin
             </span>
           </div>

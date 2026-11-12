@@ -1,9 +1,11 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Heart, Clock, TrendingUp, Link2, Layers } from "lucide-react";
+import { getWebsiteSlug } from "../../utils/websiteHelpers";
 
 const Metric = ({ label, value }) => (
-  <div className="rounded-lg bg-background px-3 py-2 text-center">
+  <div className="rounded-lg bg-cream px-3 py-2 text-center">
     <p className="text-lg font-bold text-fg">{value}</p>
     <p className="text-xs text-muted">{label}</p>
   </div>
@@ -27,7 +29,7 @@ const WebsiteCard = ({ site }) => {
     <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-shadow hover:shadow-lg">
       {/* Header */}
       <div className="relative bg-primary/5 p-5 pt-14">
-        <span className="absolute left-4 top-4 rounded-full bg-surface px-3 py-1 text-xs font-medium text-primary">
+        <span className="absolute left-4 top-4 rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary">
           {category}
         </span>
         <button
@@ -46,14 +48,12 @@ const WebsiteCard = ({ site }) => {
             className="h-10 w-10 rounded-lg bg-surface p-1"
           />
           <div className="min-w-0">
-            <a
-              href={`https://${domain}`}
-              target="_blank"
-              rel="noreferrer"
-              className="block truncate font-semibold text-fg hover:text-primary"
+            <Link
+              to={`/website/${getWebsiteSlug(site)}`}
+              className="block truncate font-semibold text-fg hover:text-primary transition"
             >
               {domain}
-            </a>
+            </Link>
             <p className="truncate text-xs text-muted">{country}</p>
           </div>
         </div>
@@ -73,7 +73,7 @@ const WebsiteCard = ({ site }) => {
           <Stat icon={Layers} label="Links" value={maxLinks} />
         </ul>
 
-        <div className="mt-auto flex items-center justify-between rounded-xl bg-background px-4 py-3">
+        <div className="mt-auto flex items-center justify-between rounded-xl bg-primary-50 px-4 py-3">
           <span className="flex items-center gap-2 text-sm text-fg">
             <Clock className="h-4 w-4 text-muted" />
             {turnaround}
@@ -87,7 +87,7 @@ const WebsiteCard = ({ site }) => {
           </span>
         </div>
 
-        <button className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-light">
+        <button className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light">
           Buy now · {deals} deals
         </button>
       </div>

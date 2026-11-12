@@ -5,7 +5,7 @@ import SectionHeading from "../sheared/SectionHeading";
 import { plans, singleLink } from "../../data/linkbuilding";
 
 const PricingSection = () => (
-  <section className="bg-background py-16 md:py-20">
+  <section className="bg-cream py-16 md:py-20">
     <div className="mx-auto max-w-7xl px-4">
       <SectionHeading
         eyebrow="Pricing"
@@ -17,8 +17,8 @@ const PricingSection = () => (
         {plans.map((plan) => (
           <article
             key={plan.name}
-            className={`relative flex flex-col rounded-xl border bg-surface p-6 ${
-              plan.featured ? "border-primary shadow-lg" : "border-border"
+            className={`relative flex flex-col rounded-xl border p-6 ${
+              plan.featured ? "border-navy-900 bg-navy-900 text-white shadow-lg" : "border-border bg-white text-fg"
             }`}
           >
             {plan.featured && (
@@ -26,17 +26,17 @@ const PricingSection = () => (
                 Most popular
               </span>
             )}
-            <p className="text-sm font-bold uppercase tracking-wider text-muted">{plan.name}</p>
-            <p className="mt-2 text-4xl font-bold text-fg">
+            <p className={`text-sm font-bold uppercase tracking-wider ${plan.featured ? "text-white/80" : "text-muted"}`}>{plan.name}</p>
+            <p className={`mt-2 text-4xl font-bold ${plan.featured ? "text-accent-yellow" : "text-fg"}`}>
               {plan.price}
-              <span className="text-base font-medium text-muted">{plan.period}</span>
+              <span className={`text-base font-medium ${plan.featured ? "text-white/70" : "text-muted"}`}>{plan.period}</span>
             </p>
-            <p className="mt-1 text-sm text-muted">{plan.audience}</p>
+            <p className={`mt-1 text-sm ${plan.featured ? "text-white/70" : "text-muted"}`}>{plan.audience}</p>
 
             <ul className="my-6 flex-1 space-y-3">
               {plan.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-fg">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {f}
+                <li key={f} className={`flex items-start gap-2 text-sm ${plan.featured ? "text-white/90" : "text-fg"}`}>
+                  <Check className={`mt-0.5 h-4 w-4 shrink-0 ${plan.featured ? "text-accent-yellow" : "text-primary"}`} /> {f}
                 </li>
               ))}
             </ul>

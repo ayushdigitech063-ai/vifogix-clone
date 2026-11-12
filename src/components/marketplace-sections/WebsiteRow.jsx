@@ -15,11 +15,11 @@ const WebsiteRow = ({site}) =>{
   } = site;
 
   return (
-    <tr className="align-top hover:bg-background/60">
+    <tr className="align-top hover:bg-primary-50">
       {/* Price */}
       <td className="px-4 py-4">
         <p className="font-medium text-fg">{domain}</p>
-        <button className="mt-2 rounded-md bg-accent-red px-3 py-1 text-xs font-semibold text-white hover:opacity-90">
+        <button className="mt-2 rounded-md bg-primary px-3 py-1 text-xs font-semibold text-white hover:bg-primary-light">
           Buy {price} USD
         </button>
       </td>
@@ -48,7 +48,7 @@ const WebsiteRow = ({site}) =>{
 
       {/* Category */}
       <td className="px-4 py-4">
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+        <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary">
           {category}
         </span>
       </td>

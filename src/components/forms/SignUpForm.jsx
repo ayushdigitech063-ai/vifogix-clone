@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
 import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { signInSchema, signUpSchema } from "../../schemas";
@@ -33,6 +34,7 @@ const getPasswordStrength = (pwd) => {
 
 const SignUpForm = ({ mode = "signin", onSubmit }) => {
   const isSignup = mode === "signup";
+  const toast = useToast();
 
   const [form, setForm] = useState({ name: "", email: "", password: "", remember: false, terms: false });
   const [showPassword, setShowPassword] = useState(false);
@@ -59,11 +61,17 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
-    if (Object.keys(next).length) return;
+    if (Object.keys(next).length) {
+      toast.error("Please fill in the highlighted fields.");
+      return;
+    }
 
     setLoading(true);
     try {
       await onSubmit?.(form);
+      toast.success(isSignup ? "Account created successfully!" : "Signed in successfully!");
+    } catch (err) {
+      toast.error("User authentication failed. Please check your credentials and try again.");
     } finally {
       setLoading(false);
     }

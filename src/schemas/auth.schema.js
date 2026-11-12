@@ -28,8 +28,8 @@ export const signUpSchema = z.object({
     .string()
     .min(1, "Please enter your password.")
     .min(8, "Password must be at least 8 characters."),
-  terms: z.literal(true, {
-    errorMap: () => ({ message: "You need to accept the terms to continue." }),
+  terms: z.boolean().refine((val) => val === true, {
+    message: "You need to accept the terms to continue.",
   }),
   remember: z.boolean().optional(),
 });

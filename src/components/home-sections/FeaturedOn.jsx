@@ -5,21 +5,21 @@ const FeaturedOn = () => {
   const loop = [...featuredOn, ...featuredOn]; // duplicated so the scroll loops seamlessly
 
   return (
-    <section className="overflow-hidden border-y border-border bg-background py-14">
+    <section className="overflow-hidden border-y border-border bg-white py-14">
       <BannerHeading title="Get Featured On" className="mb-8" />
       <div className="relative">
         <div className="flex w-max animate-marquee gap-4 hover:[animation-play-state:paused] motion-reduce:animate-none">
           {loop.map((name, i) => (
             <span
               key={i}
-              className="whitespace-nowrap rounded-xl border border-border bg-surface px-6 py-3 font-semibold text-muted"
+              className="whitespace-nowrap rounded-xl border border-border bg-surface px-6 py-3 font-semibold text-muted grayscale transition duration-200 hover:grayscale-0 hover:text-fg hover:border-primary/40"
             >
               {name}
             </span>
           ))}
         </div>
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-linear-to-r from-background to-transparent" />
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-linear-to-l from-background to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-linear-to-r from-white to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-linear-to-l from-white to-transparent" />
       </div>
     </section>
   );

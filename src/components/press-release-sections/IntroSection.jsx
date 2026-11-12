@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 
 const IntroSection = ({ data }) => (
-  <section className="bg-background py-12 md:py-16">
-    <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2">
+  <section className="bg-cream py-12 md:py-16">
+    <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:[&>*:first-child]:order-2 md:[&>*:last-child]:order-1">
       {/* Decorative illustration – swap for your own image if you have one */}
-      <div aria-hidden="true" className="rounded-2xl bg-gradient-to-br from-[#171f38] to-[#0a0e1a] p-8">
+      <div aria-hidden="true" className="rounded-2xl bg-gradient-to-br from-navy-800 to-navy-950 p-8">
         <div className="space-y-3 rounded-xl bg-white p-5">
           <div className="h-3 w-1/3 rounded bg-accent-yellow" />
           <div className="h-5 w-4/5 rounded bg-fg/80" />

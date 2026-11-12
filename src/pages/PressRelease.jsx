@@ -16,12 +16,12 @@ const PressRelease = () => (
     <HeroBanner data={hero} />
     <PackageListing packages={packages} />
     <IntroSection data={intro} />
-    <FeatureGrid data={benefits} />
+    <FeatureGrid data={benefits} bg="bg-white" />
     <ProcessSection data={process} />
-    <FeatureGrid data={features} />
-    <TestimonialsSection data={testimonials} />
-    <FaqSection items={faqs} />
-    <ContactForm data={contact} />
+    <FeatureGrid data={features} bg="bg-white" />
+    <TestimonialsSection data={testimonials} tone="cream" />
+    <FaqSection items={faqs} tone="white" />
+    <ContactForm data={contact} tone="navy-950" />
   </main>
 );
 

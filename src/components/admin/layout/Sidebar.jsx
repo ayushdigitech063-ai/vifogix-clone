@@ -84,12 +84,18 @@ const Sidebar = ({ isOpen, onClose }) => {
     : "AD";
 
   const navContent = (
-    <div className="flex h-full flex-col justify-between bg-[#101626] text-white">
+    <div className="flex h-full flex-col justify-between bg-navy-900 text-white">
       {/* Brand */}
       <div>
         <div className="flex h-16 items-center justify-between border-b border-white/10 px-6">
-          <div className="flex items-center gap-2">
-            <span className="font-bold tracking-tight text-white">Sumit DevTech</span>
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center rounded-lg bg-white p-1.5 shadow-xs">
+              <img
+                src="/images/logo.png"
+                alt="Sumit DevTech"
+                className="h-6 w-auto object-contain"
+              />
+            </div>
             <span className="rounded bg-accent-yellow/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-yellow">
               Admin
             </span>

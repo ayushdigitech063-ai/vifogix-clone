@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "../../hooks/useToast";
 import { Mail } from "lucide-react";
 
 const MailIcon = () => (
@@ -6,6 +7,7 @@ const MailIcon = () => (
 );
 
 const Sidebar = ({ tags = [], onTagClick, newsletter }) => {
+  const toast = useToast();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -14,10 +16,12 @@ const Sidebar = ({ tags = [], onTagClick, newsletter }) => {
     e.preventDefault();
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
       return;
     }
     setError("");
     setSubmitted(true);
+    toast.success("Subscribed successfully!");
     // TODO: Connect email newsletter subscription endpoint
   };
 

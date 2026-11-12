@@ -8,7 +8,7 @@ const IndustriesSection = ({ data }) => (
         {data.items.map((name) => (
           <li
             key={name}
-            className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-gray-700"
+            className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-primary-light hover:text-primary"
           >
             {name}
           </li>

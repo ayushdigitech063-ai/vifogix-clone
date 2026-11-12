@@ -26,7 +26,7 @@ const WebsitesTable = () =>{
   const visible = websites.slice(start, start + PAGE_SIZE);
 
   return (
-    <section className="bg-background pb-16">
+    <section className="bg-white pb-16 mt-17">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-6 text-center">
            <SectionHeading
@@ -42,7 +42,7 @@ const WebsitesTable = () =>{
 
         <div className="overflow-x-auto rounded-xl border border-border bg-surface">
           <table className="w-full min-w-[900px] text-left text-sm">
-            <thead className="bg-primary text-white">
+            <thead className="bg-primary-50 text-fg">
               <tr>
                 {headers.map((h) => (
                   <th key={h} scope="col" className="px-4 py-3 font-semibold">

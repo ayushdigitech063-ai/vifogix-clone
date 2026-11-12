@@ -3,7 +3,7 @@ const AboutReach = ({ about, reach }) => {
   const validItems = reach.items.filter((item) => item.value && item.value.trim());
 
   return (
-    <section className="bg-background py-12 md:py-16">
+    <section className="bg-cream py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-14">
           {/* Left Column: About Copy */}

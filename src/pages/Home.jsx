@@ -1,7 +1,7 @@
 import { testimonials } from "../data/linkbuilding";
 import { homeFaqs } from "../data/home";
 import HeroSearch from "../components/home-sections/HeroSearch";
-import StatsBar from "../components/home-sections/StatsBar";
+import LightHouseWebsites from "../components/home-sections/LightHouseWebsites";
 import WebsitesTable from "../components/home-sections/WebsitesTable";
 import PopularServices from "../components/home-sections/PopularServices";
 import FeaturedOn from "../components/home-sections/FeaturedOn";
@@ -20,7 +20,7 @@ import ContactForm from "../components/sheared/ContactForm";
 const Home = () => (
   <>
     <HeroSearch variant="video" />
-    <StatsBar />
+    <LightHouseWebsites />
     <WebsitesTable />
     <PopularServices />
     <FeaturedOn />
@@ -29,16 +29,17 @@ const Home = () => (
     <IntroSection />
     <WhyChooseUs />
     <FlexibleServices />
-    <CountriesSection />
-    <TestimonialsSection items={testimonials} />
-    <FaqSection title="Most Frequently Asked Questions" items={homeFaqs} />
+    <CountriesSection tone="cream" />
+    <TestimonialsSection items={testimonials} tone="white" />
+    <FaqSection title="Most Frequently Asked Questions" tone="cream" />
     <FeaturedBlogs />
     <CtaBanner
+      tone="navy"
       title="Link Building Services at Your Fingertips!"
       description="Join thousands of businesses growing their authority with Vefogix."
       primary={{ label: "Join Vefogix", to: "/signin" }}
     />
-    <ContactForm />
+    <ContactForm tone="navy-950" />
   </>
 );
 

@@ -3,13 +3,19 @@ import { Star } from "lucide-react";
 import SectionHeading from "./SectionHeading";
 import { testimonials as defaultTestimonials } from "../../data/linkbuilding";
 
-const TestimonialsSection = ({ data, items }) => {
+const TestimonialsSection = ({ data, items, tone = "default" }) => {
   // Support data={testimonials} or items={testimonials} or fallback
   const rawList = data?.items || items || (Array.isArray(data) ? data : defaultTestimonials);
   const title = data?.title || "What Clients Say";
+  const isWhite = tone === "white";
+  const isCream = tone === "cream";
 
   return (
-    <section className="bg-background py-16 md:py-20">
+    <section
+      className={`${
+        isWhite ? "bg-white" : isCream ? "bg-cream" : "bg-background"
+      } py-16 md:py-20`}
+    >
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeading title={title} />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -19,7 +25,12 @@ const TestimonialsSection = ({ data, items }) => {
             const text = item.text || item.quote || "";
 
             return (
-              <figure key={name + idx} className="rounded-xl border border-border bg-surface p-6">
+              <figure
+                key={name + idx}
+                className={`rounded-xl border border-border p-6 ${
+                  isWhite ? "bg-cream" : isCream ? "bg-white" : "bg-surface"
+                }`}
+              >
                 <div className="mb-3 flex gap-0.5 text-accent-yellow" aria-label="5 out of 5 stars">
                   {Array.from({ length: 5 }, (_, i) => (
                     <Star key={i} className="h-4 w-4 fill-current" />
