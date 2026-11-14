@@ -29,19 +29,81 @@ export const refreshAccessToken = () => {
   return refreshPromise;
 };
 
+let refreshSellerPromise = null;
+export const refreshSellerAccessToken = () => {
+  refreshSellerPromise ??= api
+    .post("v1/auth/seller/refresh-token")
+    .then(({ data }) => data)
+    .finally(() => {
+      refreshSellerPromise = null;
+    });
+  return refreshSellerPromise;
+};
+
+let refreshBuyerPromise = null;
+export const refreshBuyerAccessToken = () => {
+  refreshBuyerPromise ??= api
+    .post("v1/auth/buyer/refresh-token")
+    .then(({ data }) => data)
+    .finally(() => {
+      refreshBuyerPromise = null;
+    });
+  return refreshBuyerPromise;
+};
+
+let userRole = null;
+export const setUserRole = (role) => {
+  userRole = role ? String(role).toUpperCase() : null;
+};
+export const getUserRole = () => userRole;
+
 // If the access token expired (401), refresh once and retry the request
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
-    const isAuthCall = original?.url?.includes("v1/auth/");
+    const isAuthCall =
+      original?.url?.includes("v1/auth/seller/refresh-token") ||
+      original?.url?.includes("v1/auth/buyer/refresh-token") ||
+      original?.url?.includes("v1/admin/auth/refresh-token") ||
+      original?.url?.includes("v1/auth/register") ||
+      original?.url?.includes("v1/admin/auth/login")|| 
+      original?.url?.includes("v1/auth/login");
+
 
     if (error.response?.status === 401 && !original._retry && !isAuthCall) {
       original._retry = true;
       try {
-        const data = await refreshAccessToken();
-        setAccessToken(data.data.accessToken);
-        original.headers.Authorization = `Bearer ${data.data.accessToken}`;
+        // Determine whether to call refreshBuyerAccessToken, refreshSellerAccessToken, or refreshAccessToken
+        const isBuyerCall =
+          userRole === "BUYER" ||
+          original?.url?.includes("/buyer/") ||
+          original?.url?.includes("v1/buyer") ||
+          window.location.pathname.startsWith("/buyer-dashboard");
+
+        const isSellerCall =
+          userRole === "SELLER" ||
+          original?.url?.includes("/seller/") ||
+          original?.url?.includes("v1/seller") ||
+          window.location.pathname.startsWith("/publisher-dashboard");
+
+        let data;
+        if (isBuyerCall) {
+          data = await refreshBuyerAccessToken();
+        } else if (isSellerCall) {
+          data = await refreshSellerAccessToken();
+        } else {
+          data = await refreshAccessToken();
+        }
+
+        const newAccessToken =
+          data?.data?.accessToken || data?.accessToken || data?.data?.token;
+
+        if (newAccessToken) {
+          setAccessToken(newAccessToken);
+          original.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
+
         return api(original);
       } catch (refreshError) {
         setAccessToken(null);

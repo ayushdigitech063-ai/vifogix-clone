@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
 import { User, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2, AtSign } from "lucide-react";
-import { signInSchema, signUpSchema, buildSocialMediaUrl, buildSocialProfiles } from "../../schemas";
+import {
+  signInSchema,
+  buyerSignUpSchema,
+  sellerSignUpSchema,
+  buildSocialMediaUrl,
+  buildSocialProfiles,
+} from "../../schemas";
 
 // Icons using lucide-react
 const UserIcon = () => <User className="h-5 w-5 text-muted" aria-hidden="true" />;
@@ -55,8 +61,15 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
     setForm({ ...form, [key]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
 
   const validate = () => {
-    const schema = isSignup ? signUpSchema : signInSchema;
-    const result = schema.safeParse(form);
+    let result;
+    if (!isSignup) {
+      result = signInSchema.safeParse(form);
+    } else if (form.role === "buyer") {
+      result = buyerSignUpSchema.safeParse(form);
+    } else {
+      result = sellerSignUpSchema.safeParse(form);
+    }
+
     if (result.success) return {};
 
     const next = {};
@@ -79,15 +92,29 @@ const SignUpForm = ({ mode = "signin", onSubmit }) => {
 
     setLoading(true);
     try {
-      // Build resolved social profiles payload matching backend requirement
-      const payload = isSignup
-        ? {
-            ...form,
-            role: form.role ? form.role.toUpperCase() : "SELLER",
+      // Build resolved payload matching backend requirements for buyer vs seller
+      let payload;
+      if (isSignup) {
+        if (form.role === "buyer") {
+          payload = {
+            name: form.name,
+            email: form.email,
+            password: form.password,
+            role: "BUYER",
+          };
+        } else {
+          payload = {
+            name: form.name,
+            email: form.email,
+            password: form.password,
+            role: "SELLER",
             socialProfiles: buildSocialProfiles(form.platform, form.username),
             socialMediaUrl: buildSocialMediaUrl(form.platform, form.username),
-          }
-        : form;
+          };
+        }
+      } else {
+        payload = form;
+      }
 
       await onSubmit?.(payload);
       console.log("payload:", payload);

@@ -1,16 +1,26 @@
 import { useNavigate } from "react-router-dom";
 import SignUpForm from "../components/forms/SignUpForm";
 import AuthSidePanel from "../components/forms/AuthSidePanel";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/useToast";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const toast = useToast();
 
   const handleSignIn = async (data) => {
-    if (data.role === "seller") {
-      navigate("/publisher-dashboard");
-    } else {
-      navigate("/buyer-dashboard");
-    }
+    const loggedUser = await login({
+      email: data.email,
+      password: data.password,
+    });
+
+    const isBuyer =
+      loggedUser?.role?.toUpperCase() === "BUYER" ||
+      data.role?.toUpperCase() === "BUYER";
+
+    toast.success("Signed in successfully!");
+    navigate(isBuyer ? "/buyer-dashboard" : "/publisher-dashboard");
   };
 
   return (

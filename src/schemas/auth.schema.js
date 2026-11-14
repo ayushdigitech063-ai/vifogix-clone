@@ -127,9 +127,31 @@ export const signInSchema = z.object({
   remember: z.boolean().optional(),
 });
 
-export const signUpSchema = z
+export const buyerSignUpSchema = z.object({
+  role: z.literal("buyer").default("buyer"),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Please enter your name.")
+    .min(2, "Name must be at least 2 characters."),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Please enter your email.")
+    .email("Enter a valid email address."),
+  password: z
+    .string()
+    .min(1, "Please enter your password.")
+    .min(8, "Password must be at least 8 characters."),
+  terms: z.boolean().refine((val) => val === true, {
+    message: "You need to accept the terms to continue.",
+  }),
+  remember: z.boolean().optional(),
+});
+
+export const sellerSignUpSchema = z
   .object({
-    role: z.enum(["buyer", "seller"]).optional(),
+    role: z.literal("seller").default("seller"),
     name: z
       .string()
       .trim()
@@ -175,4 +197,9 @@ export const signUpSchema = z
     socialProfiles: buildSocialProfiles(data.platform, data.username),
     socialMediaUrl: buildSocialMediaUrl(data.platform, data.username),
   }));
+
+export const signUpSchema = z.discriminatedUnion("role", [
+  buyerSignUpSchema,
+  sellerSignUpSchema,
+]);
 
