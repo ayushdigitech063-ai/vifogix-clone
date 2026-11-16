@@ -7,6 +7,10 @@ import PageHeader from "../components/admin/layout/PageHeader";
 const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const AdminLogin = lazy(() => import("../pages/admin/AdminLogin"));
 const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
+const AdminWebsiteListing = lazy(() => import("../pages/admin/AdminWebsiteListing"));
+const AdminWebsiteDetail = lazy(() => import("../pages/admin/AdminWebsiteDetail"));
+const AdminProfile = lazy(() => import("../pages/admin/AdminProfile"));
+const AdminContactListing = lazy(() => import("../pages/admin/AdminContactListing"));
 
 const AdminLoadingFallback = () => (
   <div className="flex min-h-[50vh] items-center justify-center">
@@ -72,10 +76,17 @@ export const adminRoutes = [
           {
             path: "websites",
             element: (
-              <ComingSoonPage
-                title="Websites"
-                description="Manage publisher sites, metrics and pricing."
-              />
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminWebsiteListing />
+              </Suspense>
+            ),
+          },
+          {
+            path: "websites/:websiteId",
+            element: (
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminWebsiteDetail />
+              </Suspense>
             ),
           },
           {
@@ -108,10 +119,17 @@ export const adminRoutes = [
           {
             path: "enquiries",
             element: (
-              <ComingSoonPage
-                title="Enquiries"
-                description="View contact form submissions and sales leads."
-              />
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminContactListing />
+              </Suspense>
+            ),
+          },
+          {
+            path: "profile",
+            element: (
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminProfile />
+              </Suspense>
             ),
           },
           {

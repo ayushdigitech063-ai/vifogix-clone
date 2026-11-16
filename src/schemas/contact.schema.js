@@ -21,7 +21,10 @@ export const contactFormSchema = z.object({
       "Please enter a valid phone number."
     ),
   companySize: z.string().optional(),
-  goal: z.string().optional(),
+  goal: z
+    .string({ required_error: "Please select your primary goal." })
+    .trim()
+    .min(1, "Please select your primary goal."),
   message: z
     .string()
     .trim()

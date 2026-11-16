@@ -33,6 +33,7 @@ const DashboardEarnings = lazy(() => import("../pages/dashboard/DashboardEarning
 const AddWebsite = lazy(() => import("../pages/dashboard/AddWebsite"));
 const WebsiteListing = lazy(() => import("../pages/dashboard/WebsiteListing"));
 const CreateGig = lazy(() => import("../pages/dashboard/CreateGig"));
+const Profile = lazy(() => import("../pages/dashboard/Profile"));
 
 export const router = createBrowserRouter([
   {
@@ -63,11 +64,12 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout />,
         children: [
-      { index: true, element: <BuyerDashboard /> },
-      { path: "orders", element: <DashboardOrders /> },
-      { path: "orders/:orderId", element: <DashboardOrderDetail /> },
-      { path: "projects", element: <BuyerProjects /> },
-      { path: "wallet", element: <BuyerWallet /> },
+          { index: true, element: <BuyerDashboard /> },
+          { path: "orders", element: <DashboardOrders /> },
+          { path: "orders/:orderId", element: <DashboardOrderDetail /> },
+          { path: "projects", element: <BuyerProjects /> },
+          { path: "wallet", element: <BuyerWallet /> },
+          { path: "profile", element: <Profile /> },
         ]
       }
     ],
@@ -87,6 +89,7 @@ export const router = createBrowserRouter([
           { path: "earnings", element: <DashboardEarnings /> },
           { path: "websites/new", element: <AddWebsite /> },
           { path: "gigs/new", element: <CreateGig /> },
+          { path: "profile", element: <Profile /> },
         ],
       },
     ],

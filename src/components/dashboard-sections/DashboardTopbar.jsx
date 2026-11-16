@@ -7,12 +7,11 @@ import {
   ExternalLink,
   ChevronDown,
   User,
-  Settings,
   LogOut,
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { useDashboardStats } from "../../hooks/useDashboardStats";
+import { getMyProfile } from "../../services/authServices";
 
 const getPageTitle = (pathname) => {
   if (pathname.startsWith("/buyer-dashboard")) {
@@ -36,12 +35,41 @@ const getPageTitle = (pathname) => {
 const DashboardTopbar = ({ onOpenSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useDashboardStats();
-  const { logout } = useAuth();
+  const { user: authUser, logout } = useAuth();
+  const [profileUser, setProfileUser] = useState(authUser || null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const menuRef = useRef(null);
   const notifRef = useRef(null);
+
+  // Fetch fresh profile data via getMyProfile
+  useEffect(() => {
+    let ignore = false;
+    getMyProfile()
+      .then((res) => {
+        if (!ignore) {
+          const userData = res?.data?.user || res?.user || res?.data;
+          if (userData) {
+            setProfileUser(userData);
+          }
+        }
+      })
+      .catch((err) => {
+        void err;
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [authUser]);
+
+  const currentUser = profileUser || authUser;
+  const displayName = currentUser?.name || "User";
+  const displayEmail = currentUser?.email || "";
+  const initial =
+    currentUser?.initial ||
+    displayName.trim().charAt(0).toUpperCase() ||
+    "U";
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -188,14 +216,14 @@ const DashboardTopbar = ({ onOpenSidebar }) => {
             aria-expanded={userMenuOpen}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-xs text-white shadow-xs">
-              {user?.initial || "U"}
+              {initial}
             </div>
             <div className="hidden text-left xl:block">
               <p className="text-xs font-semibold text-fg leading-none">
-                {user?.name || "Alex Morgan"}
+                {displayName}
               </p>
               <p className="text-[10px] text-muted leading-tight mt-0.5">
-                {user?.email || "alex@example.com"}
+                {displayEmail}
               </p>
             </div>
             <ChevronDown className="hidden h-3.5 w-3.5 text-muted sm:block" />
@@ -203,40 +231,49 @@ const DashboardTopbar = ({ onOpenSidebar }) => {
 
           {userMenuOpen && (
             <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-surface py-1.5 shadow-xl animate-fade-in z-50">
-              <div className="border-b border-border px-4 py-2.5">
-                <p className="text-xs font-bold text-fg">{user?.name || "Alex Morgan"}</p>
-                <p className="text-[11px] text-muted">{user?.email || "alex@example.com"}</p>
+              <Link
+                to={isBuyer ? "/buyer-dashboard/profile" : "/publisher-dashboard/profile"}
+                onClick={() => setUserMenuOpen(false)}
+                className="block border-b border-border px-4 py-2.5 transition hover:bg-cream group"
+              >
+                <p className="text-xs font-bold text-fg group-hover:text-primary transition-colors">
+                  {displayName}
+                </p>
+                <p className="text-[11px] text-muted">{displayEmail}</p>
                 <div className="mt-2 inline-flex items-center gap-1 rounded bg-cream px-2 py-0.5 text-[10px] font-semibold text-primary">
-                  {roleLabel} Account
+                  {roleLabel} Account • View Profile
                 </div>
-              </div>
+              </Link>
 
               <div className="py-1">
                 <Link
-                  to={isBuyer ? "/buyer-dashboard" : "/publisher-dashboard"}
+                  to={isBuyer ? "/buyer-dashboard/profile" : "/publisher-dashboard/profile"}
+                  onClick={() => setUserMenuOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-xs text-fg hover:bg-cream"
                 >
-                  <User className="h-4 w-4 text-muted" />
+                  <User className="h-4 w-4 text-primary" />
+                  <span className="font-medium">My Profile</span>
+                </Link>
+
+                <Link
+                  to={isBuyer ? "/buyer-dashboard" : "/publisher-dashboard"}
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-xs text-fg hover:bg-cream"
+                >
+                  <Sparkles className="h-4 w-4 text-muted" />
                   <span>Dashboard Home</span>
                 </Link>
 
                 <Link
                   to={isBuyer ? "/publisher-dashboard" : "/buyer-dashboard"}
+                  onClick={() => setUserMenuOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-xs text-fg hover:bg-cream"
                 >
                   <Sparkles className="h-4 w-4 text-accent-yellow" />
                   <span>Switch to {isBuyer ? "Publisher" : "Buyer"}</span>
                 </Link>
-
-                <Link
-                  to="/"
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs text-fg hover:bg-cream"
-                >
-                  <Settings className="h-4 w-4 text-muted" />
-                  <span>Account Settings</span>
-                </Link>
               </div>
-
+            
               <div className="border-t border-border pt-1">
                 <button
                   type="button"

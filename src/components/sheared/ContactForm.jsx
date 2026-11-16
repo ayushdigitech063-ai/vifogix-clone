@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { useToast } from "../../hooks/useToast";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Globe } from "lucide-react";
+import { ShoppingBag, Globe, Loader2 } from "lucide-react";
 import { companySizes, buyerGoals } from "../../data/linkbuilding";
 import { contactFormSchema } from "../../schemas";
+import { submitContactInquiry } from "../../services/contactService";
 
 // TODO: move these next to buyerGoals in data/linkbuilding.js
 const publisherGoals = [
@@ -58,12 +59,13 @@ const AUDIENCES = [
   { id: "publisher", label: "For Publisher", Icon: PublisherIcon },
 ];
 
-const ContactForm = ({ tone = "default" }) => {
+const ContactForm = () => {
   const toast = useToast();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [audience, setAudience] = useState("buyer");
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const goals = audience === "buyer" ? buyerGoals : publisherGoals;
 
@@ -78,7 +80,7 @@ const ContactForm = ({ tone = "default" }) => {
     setValues((prev) => ({ ...prev, goal: "" })); // goal options differ per audience
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const result = contactFormSchema.safeParse(values);
     if (!result.success) {
@@ -93,12 +95,34 @@ const ContactForm = ({ tone = "default" }) => {
     }
 
     setErrors({});
-    // later: send to your backend
-    console.log({ audience, ...values });
-    setValues(initialValues);
-    setSent(true);
-    toast.success("Message sent successfully! Our strategy team will contact you shortly.");
-    setTimeout(() => setSent(false), 5000);
+    setLoading(true);
+
+    try {
+      const formattedPhone = values.phone?.trim()
+        ? `${values.countryCode.split(" ")[1] || ""} ${values.phone.trim()}`.trim()
+        : null;
+
+      const payload = {
+        inquiryType: audience === "publisher" ? "SELLER" : "BUYER",
+        name: values.name.trim(),
+        email: values.email.trim(),
+        phone: formattedPhone,
+        companySize: values.companySize || null,
+        goal: values.goal || (audience === "publisher" ? publisherGoals[0] : buyerGoals[0]),
+        message: values.message.trim(),
+      };
+
+      await submitContactInquiry(payload);
+
+      setValues(initialValues);
+      setSent(true);
+      toast.success("Message sent successfully! Our strategy team will contact you shortly.");
+      setTimeout(() => setSent(false), 5000);
+    } catch (err) {
+      toast.error(err.message || "Failed to submit inquiry. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -279,9 +303,11 @@ const ContactForm = ({ tone = "default" }) => {
             </p>
             <button
               type="submit"
-              className="rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-white transition hover:bg-primary-light"
+              disabled={loading}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-white transition hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit
+              {loading && <Loader2 className="h-4 w-4 animate-spin text-white" />}
+              <span>{loading ? "Submitting..." : "Submit"}</span>
             </button>
           </div>
 
