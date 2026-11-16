@@ -1,22 +1,25 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Globe,
   DollarSign,
   Clock,
   Link2,
-  ExternalLink,
   CheckCircle2,
   AlertCircle,
   Loader2,
   ArrowLeft,
   Sparkles,
   BarChart2,
+  Upload,
+  FileSpreadsheet,
+  Download,
+  X,
 } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
 import { useAuth } from "../../hooks/useAuth";
-import { createSingleListing } from "../../services/websiteService";
-import { addWebsiteSchema } from "../../schemas";
+import { createSingleListing, uploadBulkCsv } from "../../services/websiteService";
+import { addWebsiteSchema, csvWebsiteRowSchema } from "../../schemas";
 
 const categories = [
   "All",
@@ -51,6 +54,13 @@ const AddWebsite = () => {
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Bulk CSV Upload State
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvUploading, setCsvUploading] = useState(false);
+  const [csvResult, setCsvResult] = useState(null);
+  const [csvError, setCsvError] = useState("");
+  const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
     domain: "",
@@ -95,13 +105,133 @@ const AddWebsite = () => {
     return next;
   };
 
-  const cleanDomain = (raw) => {
-    return raw
-      .trim()
-      .toLowerCase()
-      .replace(/^https?:\/\//, "")
-      .replace(/^www\./, "")
-      .split("/")[0];
+  // CSV file change & client-side validation
+  const handleCsvChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset previous feedback
+    setCsvError("");
+    setCsvResult(null);
+
+    // Validate extension
+    const isCsv = file.name.toLowerCase().endsWith(".csv") || file.type === "text/csv" || file.type === "application/vnd.ms-excel";
+    if (!isCsv) {
+      const msg = "Please upload a valid .csv file format.";
+      setCsvError(msg);
+      toast.error(msg);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    // Validate size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      const msg = "CSV file size must not exceed 10MB.";
+      setCsvError(msg);
+      toast.error(msg);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    // Pre-validate first rows in browser using csvWebsiteRowSchema
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+      if (lines.length <= 1) {
+        const msg = "CSV file is empty or missing data rows.";
+        setCsvError(msg);
+        toast.error(msg);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
+      const headers = lines[0].split(",").map((h) => h.trim().replace(/^["']|["']$/g, ""));
+      const requiredHeaders = ["domain", "country", "price"];
+      const missing = requiredHeaders.filter(
+        (req) => !headers.some((h) => h.toLowerCase() === req.toLowerCase())
+      );
+
+      if (missing.length > 0) {
+        const msg = `CSV missing required columns: ${missing.join(", ")}`;
+        setCsvError(msg);
+        toast.error(msg);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
+      // Check first data row with csvWebsiteRowSchema
+      if (lines.length > 1) {
+        const firstValues = lines[1].split(",").map((v) => v.trim().replace(/^["']|["']$/g, ""));
+        const rowObj = {};
+        headers.forEach((h, idx) => {
+          rowObj[h] = firstValues[idx] ?? "";
+        });
+
+        const sampleResult = csvWebsiteRowSchema.safeParse(rowObj);
+        if (!sampleResult.success) {
+          const firstIssue = sampleResult.error.issues[0]?.message;
+          toast.warning(`Sample row warning: ${firstIssue}`);
+        }
+      }
+
+      setCsvFile(file);
+    } catch {
+      // Fallback: accept file if text parsing is unsupported
+      setCsvFile(file);
+    }
+  };
+
+  const handleUploadCsv = async () => {
+    if (!csvFile) {
+      toast.error("Please select a CSV file first.");
+      return;
+    }
+
+    setCsvUploading(true);
+    setCsvError("");
+    setCsvResult(null);
+
+    try {
+      const res = await uploadBulkCsv(csvFile);
+      const data = res?.data || res;
+      setCsvResult(data);
+
+      const inserted = data?.successfullyInserted ?? 0;
+      const failed = data?.failedOrSkipped ?? 0;
+
+      if (inserted > 0) {
+        toast.success(`Successfully uploaded ${inserted} website(s)!`);
+      }
+      if (failed > 0) {
+        toast.warning(`${failed} row(s) had errors or duplicates.`);
+      }
+
+      // Clear input
+      setCsvFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (err) {
+      const msg = err.message || "Failed to upload CSV file.";
+      setCsvError(msg);
+      toast.error(msg);
+    } finally {
+      setCsvUploading(false);
+    }
+  };
+
+  const downloadSampleCsv = () => {
+    const csvContent =
+      "domain,country,category,price,turnaroundDays,language,mozDA,ahrefsDR,semrushAS,monthlyTraffic,domainAge,samplePostUrl\n" +
+      "techcrunch.com,United States,Technology,250,3,English,92,90,88,10M+,15 years,https://techcrunch.com/sample\n" +
+      "searchengineland.com,United States,SEO & Marketing,180,2,English,85,82,80,500K,12 years,https://searchengineland.com/sample\n";
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "websites_sample_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleSubmit = async (e) => {
@@ -173,6 +303,158 @@ const AddWebsite = () => {
               List your verified domain. Our team verifies metrics before your listing goes live to buyers.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Bulk CSV Upload Card */}
+      <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/[0.02] p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <FileSpreadsheet className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-fg flex items-center gap-2">
+                Upload CSV
+                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                  Bulk Websites
+                </span>
+              </h2>
+              <p className="text-xs text-muted mt-0.5">
+                Upload multiple website listings at once using a CSV sheet.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={downloadSampleCsv}
+            className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:text-fg hover:border-primary/40 transition"
+          >
+            <Download className="h-3.5 w-3.5 text-primary" />
+            <span>Sample CSV Template</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+          <div className="sm:col-span-2">
+            <label
+              htmlFor="csv-upload-input"
+              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface/70 px-4 py-5 text-center cursor-pointer hover:border-primary/50 hover:bg-cream/40 transition group"
+            >
+              <Upload className="h-6 w-6 text-muted group-hover:text-primary transition mb-1.5" />
+              <span className="text-xs font-semibold text-fg">
+                {csvFile ? csvFile.name : "Click to choose CSV file or drag & drop"}
+              </span>
+              <span className="text-[11px] text-muted mt-0.5">
+                {csvFile
+                  ? `${(csvFile.size / 1024).toFixed(1)} KB — ready to upload`
+                  : "Supports .csv up to 10MB (Required headers: domain, country, price)"}
+              </span>
+              <input
+                id="csv-upload-input"
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,text/csv,application/vnd.ms-excel"
+                onChange={handleCsvChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              disabled={!csvFile || csvUploading}
+              onClick={handleUploadCsv}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-semibold text-white shadow-xs transition hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {csvUploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
+                  <span>Processing CSV...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" />
+                  <span>Upload & Import CSV</span>
+                </>
+              )}
+            </button>
+
+            {csvFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCsvFile(null);
+                  setCsvError("");
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="inline-flex items-center justify-center gap-1 text-[11px] font-semibold text-muted hover:text-accent-red transition"
+              >
+                <X className="h-3 w-3" />
+                <span>Remove selected file</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Error Feedback */}
+        {csvError && (
+          <div className="flex items-start gap-2 rounded-xl border border-accent-red/20 bg-accent-red/5 p-3 text-xs text-accent-red">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <span>{csvError}</span>
+          </div>
+        )}
+
+        {/* Success / Result Feedback */}
+        {csvResult && (
+          <div className="rounded-xl border border-border bg-surface p-4 text-xs space-y-2">
+            <div className="flex items-center gap-2 font-semibold text-fg">
+              <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+              <span>Bulk Processing Summary:</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center pt-1">
+              <div className="rounded-lg bg-cream/60 p-2">
+                <div className="text-[10px] text-muted font-medium">Total Rows</div>
+                <div className="text-sm font-bold text-fg">{csvResult.totalRowsInCsv ?? 0}</div>
+              </div>
+              <div className="rounded-lg bg-primary/10 p-2">
+                <div className="text-[10px] text-primary font-medium">Successfully Added</div>
+                <div className="text-sm font-bold text-primary">{csvResult.successfullyInserted ?? 0}</div>
+              </div>
+              <div className="rounded-lg bg-accent-yellow/10 p-2">
+                <div className="text-[10px] text-accent-yellow font-medium">Failed / Skipped</div>
+                <div className="text-sm font-bold text-accent-yellow">{csvResult.failedOrSkipped ?? 0}</div>
+              </div>
+            </div>
+
+            {csvResult.errors && csvResult.errors.length > 0 && (
+              <div className="mt-3 max-h-36 overflow-y-auto space-y-1 rounded-lg border border-border bg-cream/40 p-2">
+                <p className="font-semibold text-muted text-[11px]">Row Error Details:</p>
+                {csvResult.errors.map((errItem, idx) => (
+                  <div key={idx} className="text-[11px] text-accent-red flex items-start gap-1.5">
+                    <span>•</span>
+                    <span>
+                      {errItem.row ? `Row ${errItem.row}` : errItem.domain ? errItem.domain : "Row"}:{" "}
+                      {typeof errItem.errors === "object"
+                        ? Object.values(errItem.errors).join("; ")
+                        : String(errItem.errors || "Failed")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="relative flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative bg-background px-3 text-xs font-semibold uppercase tracking-wider text-muted">
+          Or Add Single Website Manually
         </div>
       </div>
 

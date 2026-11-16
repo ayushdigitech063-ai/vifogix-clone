@@ -5,7 +5,7 @@ import { useToast } from "../../hooks/useToast";
 import {useAuth} from "../../hooks/useAuth";
 
 const AdminLogin = () => {
-  const { isAuthenticated, login } = useAuth();
+  const { user, isAuthenticated, login } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,7 +17,11 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
 
   // If already authenticated, redirect immediately
-  if (isAuthenticated) {
+  const isAdmin =
+  user?.role?.toUpperCase() === "ADMIN" ||
+  user?.role?.toLowerCase() === "admin";
+
+  if (isAuthenticated && isAdmin) {
     return <Navigate to="/admin" replace />;
   }
 

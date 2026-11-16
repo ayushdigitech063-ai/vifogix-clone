@@ -58,3 +58,33 @@ export const userLogin = async ({ email, password }) => {
     throw toError(error, "Failed to sign in.");
   }
 };
+
+/**
+ * Fetch authenticated user profile
+ * Backend endpoint: /v1/auth/profile
+ */
+export const getUserProfile = async () => {
+  try {
+    const { data } = await api.get("v1/auth/profile");
+    return data; // { success, statusCode, message, data: { user } }
+  } catch (error) {
+    throw toError(error, "Failed to fetch profile.");
+  }
+};
+
+export const getMyProfile = getUserProfile;
+
+/**
+ * Fetch authenticated admin profile
+ * Backend endpoint: /v1/admin/profile
+ */
+export const getAdminProfile = async () => {
+  try {
+    const { data } = await api.get("v1/admin/profile");
+    return data; // { success, statusCode, message, data: { user } }
+  } catch (error) {
+    throw toError(error, "Failed to fetch admin profile.");
+  }
+};
+
+
