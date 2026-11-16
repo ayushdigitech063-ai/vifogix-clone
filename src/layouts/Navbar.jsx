@@ -222,14 +222,7 @@ const Navbar = () => {
 
         {/* Desktop Auth / Dashboard Buttons */}
         <div className="hidden items-center gap-3 lg:flex">
-          {isLoggedIn ? (
-            <Link
-              to={authLinks.dashboard.href}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
-            >
-              {authLinks.dashboard.label}
-            </Link>
-          ) : (
+          
             <>
               <Link
                 to={authLinks.signIn.href}
@@ -254,7 +247,7 @@ const Navbar = () => {
                 {authLinks.signUp.label}
               </Link>
             </>
-          )}
+          
         </div>
 
         {/* Mobile Menu Toggle Button */}

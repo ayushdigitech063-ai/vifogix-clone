@@ -14,6 +14,7 @@ import TermsAndConditions from "../pages/TermsAndConditions";
 import FaqSection from "../components/sheared/FaqSection";
 import SellerProtectedRoute from "./SellerProtectedRoute";
 import { adminRoutes } from "./AdminRoutes";
+import BuyerProtectedRoute from "./BuyerProtecdRoute";
 
 const Marketplace = lazy(() => import("../pages/Marketplace"));
 const LinkBuilding = lazy(() => import("../pages/Linkbuilding"));
@@ -57,13 +58,18 @@ export const router = createBrowserRouter([
   // TODO: protect this route group with auth
   {
     path: "/buyer-dashboard",
-    element: <DashboardLayout />,
+    element: <BuyerProtectedRoute />,
     children: [
+      {
+        element: <DashboardLayout />,
+        children: [
       { index: true, element: <BuyerDashboard /> },
       { path: "orders", element: <DashboardOrders /> },
       { path: "orders/:orderId", element: <DashboardOrderDetail /> },
       { path: "projects", element: <BuyerProjects /> },
       { path: "wallet", element: <BuyerWallet /> },
+        ]
+      }
     ],
   },
   {

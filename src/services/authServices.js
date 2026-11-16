@@ -1,4 +1,8 @@
-import api, { refreshAccessToken } from "./api";
+import api, {
+  refreshAccessToken,
+  refreshSellerAccessToken,
+  refreshBuyerAccessToken,
+} from "./api";
 
 // Turn axios errors into plain Errors with a readable message
 const toError = (error, fallback) => {
@@ -30,5 +34,27 @@ export const registerUser = async (userData) => {
 };
 
 export const refreshSession = refreshAccessToken;
+export const refreshSellerSession = refreshSellerAccessToken;
+export const refreshBuyerSession = refreshBuyerAccessToken;
 
 export const logoutRequest = () => api.post("v1/admin/auth/logout");
+
+/**
+ * Logout seller
+ * Backend endpoint: /v1/auth/seller/logout (clears seller_refreshToken cookie)
+ */
+export const logoutSellerRequest = () => api.post("v1/auth/seller/logout");
+
+// logout buyer
+export const logoutBuyerRequest = () => api.post("v1/auth/buyer/logout");
+
+// login buyer and seller 
+
+export const userLogin = async ({ email, password }) => {
+  try {
+    const { data } = await api.post("v1/auth/login", { email, password });
+    return data; // { success, message, data: { user, accessToken } }
+  } catch (error) {
+    throw toError(error, "Failed to sign in.");
+  }
+};

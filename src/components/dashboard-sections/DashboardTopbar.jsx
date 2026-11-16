@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
   Search,
@@ -11,6 +11,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 import { useDashboardStats } from "../../hooks/useDashboardStats";
 
 const getPageTitle = (pathname) => {
@@ -34,11 +35,19 @@ const getPageTitle = (pathname) => {
 
 const DashboardTopbar = ({ onOpenSidebar }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useDashboardStats();
+  const { logout } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const menuRef = useRef(null);
   const notifRef = useRef(null);
+
+  const handleLogout = async () => {
+    setUserMenuOpen(false);
+    await logout();
+    navigate("/signin", { replace: true });
+  };
 
   const isBuyer = location.pathname.startsWith("/buyer-dashboard");
   const roleLabel = isBuyer ? "Buyer" : "Publisher";
@@ -229,13 +238,14 @@ const DashboardTopbar = ({ onOpenSidebar }) => {
               </div>
 
               <div className="border-t border-border pt-1">
-                <Link
-                  to="/signin"
-                  className="flex w-full items-center gap-2.5 px-4 py-2 text-xs text-accent-red hover:bg-cream"
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2.5 px-4 py-2 text-xs text-accent-red hover:bg-cream transition-colors text-left"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Sign out</span>
-                </Link>
+                </button>
               </div>
             </div>
           )}

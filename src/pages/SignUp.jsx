@@ -10,22 +10,31 @@ const SignUp = () => {
   const toast = useToast();
 
   const handleSignUp = async (formData) => {
-    // Prepare registration payload matching the backend
-    const registerPayload = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      role: formData.role ? formData.role.toUpperCase() : "SELLER",
-      socialProfiles: formData.socialProfiles || {
-        linkedin: null,
-        facebook: null,
-        instagram: null,
-      },
-    };
+    const isBuyer = formData.role?.toUpperCase() === "BUYER";
+
+    // Prepare role-specific registration payload matching the backend
+    const registerPayload = isBuyer
+      ? {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: "BUYER",
+        }
+      : {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: "SELLER",
+          socialProfiles: formData.socialProfiles || {
+            linkedin: null,
+            facebook: null,
+            instagram: null,
+          },
+        };
 
     // Register via Auth context/services
     await register(registerPayload);
-    navigate("/publisher-dashboard");
+    navigate(isBuyer ? "/buyer-dashboard" : "/publisher-dashboard");
     toast.success("Account created successfully!");
   };
 
