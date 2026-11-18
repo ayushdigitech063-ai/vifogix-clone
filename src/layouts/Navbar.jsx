@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Heart, ShoppingCart } from "lucide-react";
 import { navLinks, authLinks } from "../data/navLinks";
+import {useAuth} from "../hooks/useAuth";
 
 const ChevronDownIcon = ({ className = "h-4 w-4" }) => (
   <ChevronDown className={className} aria-hidden="true" />
@@ -9,38 +10,31 @@ const ChevronDownIcon = ({ className = "h-4 w-4" }) => (
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
+  const [desktopDashboardOpen, setDesktopDashboardOpen] = useState(false);
   const [mobileAccordionOpen, setMobileAccordionOpen] = useState(false);
+  const [mobileDashboardAccordionOpen, setMobileDashboardAccordionOpen] = useState(false);
 
   const location = useLocation();
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
+  const dashboardDropdownRef = useRef(null);
+  const dashboardTriggerRef = useRef(null);
   const menuItemsRef = useRef([]);
   const timeoutRef = useRef(null);
+  const dashboardTimeoutRef = useRef(null);
 
-  // Check login state
-  useEffect(() => {
-    const checkAuth = () => {
-      const user =
-        localStorage.getItem("user") ||
-        localStorage.getItem("token") ||
-        localStorage.getItem("isLoggedIn");
-      setIsLoggedIn(!!user);
-    };
-
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
+  const { user, isAuthenticated } = useAuth();
+  const isLoggedIn = isAuthenticated && Boolean(user);
 
   // Close menus on route change
   useEffect(() => {
     setDesktopDropdownOpen(false);
+    setDesktopDashboardOpen(false);
     setOpen(false);
   }, [location.pathname]);
 
-  // Handle outside click & escape key to close desktop dropdown
+  // Handle outside click & escape key to close desktop dropdowns
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -51,11 +45,20 @@ const Navbar = () => {
       ) {
         setDesktopDropdownOpen(false);
       }
+      if (
+        dashboardDropdownRef.current &&
+        !dashboardDropdownRef.current.contains(e.target) &&
+        dashboardTriggerRef.current &&
+        !dashboardTriggerRef.current.contains(e.target)
+      ) {
+        setDesktopDashboardOpen(false);
+      }
     };
 
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         setDesktopDropdownOpen(false);
+        setDesktopDashboardOpen(false);
         triggerRef.current?.focus();
       }
     };
@@ -67,6 +70,18 @@ const Navbar = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  // Dashboard Hover handlers with 150ms delay
+  const handleDashboardMouseEnter = () => {
+    if (dashboardTimeoutRef.current) clearTimeout(dashboardTimeoutRef.current);
+    setDesktopDashboardOpen(true);
+  };
+
+  const handleDashboardMouseLeave = () => {
+    dashboardTimeoutRef.current = setTimeout(() => {
+      setDesktopDashboardOpen(false);
+    }, 150);
+  };
 
   // Hover handlers with 150ms delay
   const handleMouseEnter = () => {
@@ -222,7 +237,72 @@ const Navbar = () => {
 
         {/* Desktop Auth / Dashboard Buttons */}
         <div className="hidden items-center gap-3 lg:flex">
-          
+          {isLoggedIn ? (
+            <>
+              <Link
+                to={authLinks.wishlist.href}
+                className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-fg transition-colors hover:border-primary hover:text-primary"
+                title="Wishlist"
+                aria-label="Wishlist"
+              >
+                <Heart className="h-5 w-5" />
+              </Link>
+
+              <Link
+                to={authLinks.cart.href}
+                className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-fg transition-colors hover:border-primary hover:text-primary"
+                title="Cart"
+                aria-label="Cart"
+              >
+                <ShoppingCart className="h-5 w-5" />
+              </Link>
+
+              {/* Dashboard Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={handleDashboardMouseEnter}
+                onMouseLeave={handleDashboardMouseLeave}
+              >
+                <button
+                  ref={dashboardTriggerRef}
+                  type="button"
+                  onClick={() => setDesktopDashboardOpen((prev) => !prev)}
+                  className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
+                  aria-expanded={desktopDashboardOpen}
+                  aria-haspopup="true"
+                >
+                  Dashboard
+                  <ChevronDownIcon
+                    className={`h-4 w-4 transition-transform duration-200 ${
+                      desktopDashboardOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {desktopDashboardOpen && (
+                  <div
+                    ref={dashboardDropdownRef}
+                    className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-surface p-2 shadow-xl ring-1 ring-black/5"
+                  >
+                    <Link
+                      to="/buyer-dashboard"
+                      onClick={() => setDesktopDashboardOpen(false)}
+                      className="block rounded-lg px-3 py-2 text-sm font-medium text-fg transition-colors hover:bg-cream hover:text-primary"
+                    >
+                      Buyer Dashboard
+                    </Link>
+                    <Link
+                      to="/publisher-dashboard"
+                      onClick={() => setDesktopDashboardOpen(false)}
+                      className="block rounded-lg px-3 py-2 text-sm font-medium text-fg transition-colors hover:bg-cream hover:text-primary"
+                    >
+                      Publisher Dashboard
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
             <>
               <Link
                 to={authLinks.signIn.href}
@@ -247,7 +327,7 @@ const Navbar = () => {
                 {authLinks.signUp.label}
               </Link>
             </>
-          
+          )}
         </div>
 
         {/* Mobile Menu Toggle Button */}
@@ -333,13 +413,63 @@ const Navbar = () => {
           {/* Mobile Auth Buttons / Dashboard */}
           <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
             {isLoggedIn ? (
-              <Link
-                to={authLinks.dashboard.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
-              >
-                {authLinks.dashboard.label}
-              </Link>
+              <>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to={authLinks.wishlist.href}
+                    onClick={() => setOpen(false)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
+                  >
+                    <Heart className="h-4 w-4" />
+                    Wishlist
+                  </Link>
+
+                  <Link
+                    to={authLinks.cart.href}
+                    onClick={() => setOpen(false)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Cart
+                  </Link>
+                </div>
+
+                {/* Mobile Dashboard Accordion */}
+                <div className="flex flex-col">
+                  <button
+                    type="button"
+                    onClick={() => setMobileDashboardAccordionOpen((prev) => !prev)}
+                    className="flex w-full items-center justify-between rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
+                    aria-expanded={mobileDashboardAccordionOpen}
+                  >
+                    <span>Dashboard</span>
+                    <ChevronDownIcon
+                      className={`h-4 w-4 transition-transform duration-200 ${
+                        mobileDashboardAccordionOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {mobileDashboardAccordionOpen && (
+                    <div className="mt-2 flex flex-col space-y-1 rounded-xl border border-border bg-surface p-2">
+                      <Link
+                        to="/buyer-dashboard"
+                        onClick={() => setOpen(false)}
+                        className="rounded-lg px-3 py-2 text-sm font-medium text-fg hover:bg-cream hover:text-primary"
+                      >
+                        Buyer Dashboard
+                      </Link>
+                      <Link
+                        to="/publisher-dashboard"
+                        onClick={() => setOpen(false)}
+                        className="rounded-lg px-3 py-2 text-sm font-medium text-fg hover:bg-cream hover:text-primary"
+                      >
+                        Publisher Dashboard
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <>
                 <Link

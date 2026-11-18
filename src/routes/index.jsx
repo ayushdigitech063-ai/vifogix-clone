@@ -20,6 +20,11 @@ const Marketplace = lazy(() => import("../pages/Marketplace"));
 const LinkBuilding = lazy(() => import("../pages/Linkbuilding"));
 const WebsiteDetail = lazy(() => import("../pages/WebsiteDetail"));
 const BlogDetail = lazy(() => import("../pages/BlogDetail"));
+const Wishlist = lazy(() => import("../pages/Wishlist"));
+const Cart = lazy(() => import("../pages/Cart"));
+const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy"));
+const PaymentTerms = lazy(() => import("../pages/PaymentTerms"));
+const RefundPolicy = lazy(() => import("../pages/RefundPolicy"));
 
 const DashboardLayout = lazy(() => import("../layouts/DashboardLayout"));
 const PublisherDashboard = lazy(() => import("../pages/dashboard/PublisherDashboard"));
@@ -51,9 +56,14 @@ export const router = createBrowserRouter([
       { path: "about-us", element: <About /> },
       { path: "contact-us", element: <ContactUs /> },
       { path: "terms-and-conditions", element: <TermsAndConditions /> },
+      { path: "privacy-policy", element: <PrivacyPolicy /> },
+      { path: "payment-terms", element: <PaymentTerms /> },
+      { path: "refund-policy", element: <RefundPolicy /> },
       { path: "signin", element: <SignIn /> },
       { path: "signup", element: <SignUp /> },
       { path: "faqs", element: <FaqSection /> },
+      { path: "wishlist", element: <Wishlist /> },
+      { path: "cart", element: <Cart /> },
     ],
   },
   // TODO: protect this route group with auth
