@@ -18,4 +18,6 @@ export const authLinks = {
   signIn: { label: "Sign In", href: "/signin" },
   signUp: { label: "Sign Up", href: "/signup" },
   dashboard: { label: "Dashboard", href: "/dashboard" },
+  wishlist: { label: "Wishlist", href: "/wishlist" },
+  cart: { label: "Cart", href: "/cart" },
 };

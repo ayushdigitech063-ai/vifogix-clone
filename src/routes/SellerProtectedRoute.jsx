@@ -13,8 +13,7 @@ const SellerProtectedRoute = () => {
   const sellerId = user?._id || user?.id;
   const isSeller =
     user?.role?.toUpperCase() === "SELLER" ||
-    user?.role?.toLowerCase() === "seller" ||
-    Boolean(sellerId);
+    user?.role?.toLowerCase() === "seller";
 
   if (!isAuthenticated || !sellerId || !isSeller) {
     return <Navigate to="/signin" replace state={{ from: location }} />;

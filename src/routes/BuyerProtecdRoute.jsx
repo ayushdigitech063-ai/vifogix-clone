@@ -13,8 +13,7 @@ const BuyerProtectedRoute = () => {
   const buyerId = user?._id || user?.id;
   const isBuyer =
     user?.role?.toUpperCase() === "BUYER" ||
-    user?.role?.toLowerCase() === "buyer" ||
-    Boolean(buyerId);
+    user?.role?.toLowerCase() === "buyer";
 
   if (!isAuthenticated || !buyerId || !isBuyer) {
     return <Navigate to="/signin" replace state={{ from: location }} />;
