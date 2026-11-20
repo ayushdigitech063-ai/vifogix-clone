@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Globe,
@@ -18,23 +18,13 @@ import {
 } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
 import { useAuth } from "../../hooks/useAuth";
-import { createSingleListing, uploadBulkCsv } from "../../services/websiteService";
+import {
+  createSingleListing,
+  uploadBulkCsv,
+  getMainCategories,
+  getSubCategoriesByCategory,
+} from "../../services/websiteService";
 import { addWebsiteSchema, csvWebsiteRowSchema } from "../../schemas";
-
-const categories = [
-  "All",
-  "Technology",
-  "Business & Finance",
-  "Health & Wellness",
-  "SEO & Marketing",
-  "Travel & Tourism",
-  "Education",
-  "Lifestyle",
-  "Real Estate",
-  "Food & Beverage",
-  "News & Media",
-  "Crypto & Web3",
-];
 
 const languages = [
   "English",
@@ -55,6 +45,11 @@ const AddWebsite = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [subCategoriesList, setSubCategoriesList] = useState([]);
+  const [subCategoriesLoading, setSubCategoriesLoading] = useState(false);
+
   // Bulk CSV Upload State
   const [csvFile, setCsvFile] = useState(null);
   const [csvUploading, setCsvUploading] = useState(false);
@@ -64,7 +59,8 @@ const AddWebsite = () => {
 
   const [form, setForm] = useState({
     domain: "",
-    category: "All",
+    category: "",
+    subCategories: [],
     country: "",
     language: "English",
     // Metrics (can be null/empty)
@@ -80,16 +76,102 @@ const AddWebsite = () => {
     maxLinksAllowed: 2,
     linkType: "DoFollow",
     samplePostUrl: "",
+    noOfDeals: "",
+    semrushTraffic: "",
+    ahrefsTraffic: "",
+    followedBacklinks: "",
+    noFollowedBacklinks: "",
   });
+
+  // Fetch main categories on mount
+  useEffect(() => {
+    let mounted = true;
+    const fetchCategories = async () => {
+      setCategoriesLoading(true);
+      try {
+        const cats = await getMainCategories();
+        if (mounted) {
+          setCategoriesList(cats);
+        }
+      } catch (err) {
+        if (mounted) {
+          toast.error(err.message || "Failed to load categories.");
+        }
+      } finally {
+        if (mounted) {
+          setCategoriesLoading(false);
+        }
+      }
+    };
+
+    fetchCategories();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Fetch subcategories whenever selected category changes
+  useEffect(() => {
+    let mounted = true;
+    if (!form.category) {
+      return;
+    }
+
+    const fetchSubCategories = async () => {
+      setSubCategoriesLoading(true);
+      try {
+        const subs = await getSubCategoriesByCategory(form.category);
+        if (mounted) {
+          setSubCategoriesList(subs);
+        }
+      } catch (err) {
+        if (mounted) {
+          toast.error(err.message || "Failed to load subcategories.");
+        }
+      } finally {
+        if (mounted) {
+          setSubCategoriesLoading(false);
+        }
+      }
+    };
+
+    fetchSubCategories();
+    return () => {
+      mounted = false;
+    };
+  }, [form.category, toast]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "number" ? (value === "" ? "" : Number(value)) : value,
-    }));
+    setForm((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === "number" ? (value === "" ? "" : Number(value)) : value,
+      };
+      // Reset subcategories if category changes
+      if (name === "category" && value !== prev.category) {
+        updated.subCategories = [];
+      }
+      return updated;
+    });
+    if (name === "category" && !value) {
+      setSubCategoriesList([]);
+    }
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleSubCategoryToggle = (sub) => {
+    setForm((prev) => {
+      const exists = prev.subCategories.includes(sub);
+      const updatedSubs = exists
+        ? prev.subCategories.filter((item) => item !== sub)
+        : [...prev.subCategories, sub];
+      return { ...prev, subCategories: updatedSubs };
+    });
+    if (errors.subCategories) {
+      setErrors((prev) => ({ ...prev, subCategories: "" }));
     }
   };
 
@@ -251,7 +333,8 @@ const AddWebsite = () => {
       const payload = {
         sellerId: user?._id || user?.id,
         domain: form.domain,
-        category: form.category || "All",
+        category: form.category,
+        subCategories: form.subCategories,
         country: form.country.trim(),
         language: form.language || "English",
         mozDA: form.mozDA !== "" ? Number(form.mozDA) : null,
@@ -265,6 +348,11 @@ const AddWebsite = () => {
         maxLinksAllowed: Number(form.maxLinksAllowed) || 2,
         linkType: form.linkType || "DoFollow",
         samplePostUrl: form.samplePostUrl?.trim() || null,
+        totalDeals: form.noOfDeals !== "" ? Number(form.noOfDeals) : null,
+        semrushTraffic: form.semrushTraffic,
+        ahrefsTraffic:  form.ahrefsTraffic,
+        followedBacklinks: form.followedBacklinks,
+        noFollowedBacklinks: form.noFollowedBacklinks,
       };
 
       // Call backend API: router.post('/websites', validate(addWebsiteSchema), createSingleListing)
@@ -505,27 +593,120 @@ const AddWebsite = () => {
               )}
             </div>
 
-            {/* Category */}
+            {/* Category Dropdown */}
             <div>
               <label
                 htmlFor="category"
                 className="block text-xs font-semibold text-fg mb-1.5"
               >
-                Primary Category
+                Category <span className="text-accent-red">*</span>
               </label>
-              <select
-                id="category"
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-medium text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
+              <div className="relative">
+                <select
+                  id="category"
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  disabled={categoriesLoading}
+                  className={`w-full rounded-xl border bg-surface px-3 py-2.5 text-sm font-medium text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                    errors.category ? "border-accent-red" : "border-border"
+                  } ${categoriesLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                >
+                  <option value="">
+                    {categoriesLoading ? "Loading categories..." : "Select Category"}
                   </option>
-                ))}
-              </select>
+                  {categoriesList.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.category && (
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-accent-red font-medium">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>{errors.category}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Subcategories Dropdown / Multi-Select Chips */}
+            <div>
+              <label
+                htmlFor="subCategories"
+                className="block text-xs font-semibold text-fg mb-1.5"
+              >
+                Subcategory <span className="text-accent-red">*</span>
+              </label>
+              
+              {!form.category ? (
+                <div className="rounded-xl border border-dashed border-border bg-cream/40 p-3 text-xs text-muted">
+                  Please select a Category first to load subcategories.
+                </div>
+              ) : subCategoriesLoading ? (
+                <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-3 text-xs text-muted">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span>Loading subcategories...</span>
+                </div>
+              ) : subCategoriesList.length === 0 ? (
+                <div className="rounded-xl border border-border bg-surface p-3 text-xs text-muted">
+                  No subcategories found for {form.category}.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <select
+                      id="subCategories"
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleSubCategoryToggle(e.target.value);
+                        }
+                      }}
+                      className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-medium text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="">-- Add Subcategory from list --</option>
+                      {subCategoriesList
+                        .filter((sub) => !form.subCategories.includes(sub))
+                        .map((sub) => (
+                          <option key={sub} value={sub}>
+                            + {sub}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* Selected Subcategory Tags/Chips */}
+                  {form.subCategories.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {form.subCategories.map((sub) => (
+                        <span
+                          key={sub}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary"
+                        >
+                          {sub}
+                          <button
+                            type="button"
+                            onClick={() => handleSubCategoryToggle(sub)}
+                            className="rounded-full p-0.5 hover:bg-primary/20 text-primary transition"
+                            title="Remove subcategory"
+                            aria-label={`Remove ${sub}`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {errors.subCategories && (
+                <p className="mt-1.5 flex items-center gap-1 text-xs text-accent-red font-medium">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>{errors.subCategories}</span>
+                </p>
+              )}
             </div>
 
             {/* Target Country */}
@@ -744,6 +925,104 @@ const AddWebsite = () => {
                 className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
+
+            {/* no of deals */}
+
+             <div>
+              <label
+                htmlFor="noOfDeals"
+                className="block text-xs font-semibold text-fg mb-1.5"
+              >
+               No. of Deals
+              </label>
+              <input
+                id="noOfDeals"
+                name="noOfDeals"
+                type="text"
+                placeholder="e.g. 8"
+                value={form.noOfDeals}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+               
+               {/* semrush Traffic */}
+            
+             <div>
+              <label
+                htmlFor="semrushTraffic"
+                className="block text-xs font-semibold text-fg mb-1.5"
+              >
+               Semrush Traffic
+              </label>
+              <input
+                id="semrushTraffic"
+                name="semrushTraffic"
+                type="text"
+                placeholder="e.g. 8"
+                value={form.semrushTraffic}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            {/* Ahrefs Traffic */}
+            <div>
+              <label
+                htmlFor="ahrefsTraffic"
+                className="block text-xs font-semibold text-fg mb-1.5"
+              >
+               Ahrefs Traffic
+              </label>
+              <input
+                id="ahrefsTraffic"
+                name="ahrefsTraffic"
+                type="text"
+                placeholder="e.g. 8"
+                value={form.ahrefsTraffic}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          
+               {/* followed Backlinks */}
+               <div>
+              <label
+                htmlFor="followedBacklinks"
+                className="block text-xs font-semibold text-fg mb-1.5"
+              >
+               Followed Backlinks
+              </label>
+              <input
+                id="followedBacklinks"
+                name="followedBacklinks"
+                type="text"
+                placeholder="e.g. 8"
+                value={form.followedBacklinks}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            {/* No-Followed Backlinks */}
+            <div>
+              <label
+                htmlFor="noFollowedBacklinks"
+                className="block text-xs font-semibold text-fg mb-1.5"
+              >
+               No-Followed Backlinks
+              </label>
+              <input
+                id="noFollowedBacklinks"
+                name="noFollowedBacklinks"
+                type="text"
+                placeholder="e.g. 8"
+                value={form.noFollowedBacklinks}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
           </div>
         </div>
 

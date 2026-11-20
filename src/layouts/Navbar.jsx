@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, Heart, ShoppingCart } from "lucide-react";
 import { navLinks, authLinks } from "../data/navLinks";
-import {useAuth} from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
+import { useWishlist } from "../hooks/useWishlist";
 
 const ChevronDownIcon = ({ className = "h-4 w-4" }) => (
   <ChevronDown className={className} aria-hidden="true" />
@@ -25,6 +26,7 @@ const Navbar = () => {
   const dashboardTimeoutRef = useRef(null);
 
   const { user, isAuthenticated } = useAuth();
+  const { wishlistCount } = useWishlist();
   const isLoggedIn = isAuthenticated && Boolean(user);
 
   // Close menus on route change
@@ -246,6 +248,11 @@ const Navbar = () => {
                 aria-label="Wishlist"
               >
                 <Heart className="h-5 w-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white shadow-sm">
+                    {wishlistCount > 99 ? "99+" : wishlistCount}
+                  </span>
+                )}
               </Link>
 
               <Link
@@ -418,10 +425,17 @@ const Navbar = () => {
                   <Link
                     to={authLinks.wishlist.href}
                     onClick={() => setOpen(false)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
+                    className="relative flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
                   >
-                    <Heart className="h-4 w-4" />
-                    Wishlist
+                    <span className="relative flex items-center">
+                      <Heart className="h-4 w-4" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-2 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                          {wishlistCount > 99 ? "99+" : wishlistCount}
+                        </span>
+                      )}
+                    </span>
+                    <span>Wishlist</span>
                   </Link>
 
                   <Link

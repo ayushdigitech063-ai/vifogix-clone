@@ -13,6 +13,47 @@ const toError = (error, fallback = "Something went wrong.") => {
 };
 
 /**
+ * Fetch Public Marketplace Website Listings
+ * Maps to backend: router.get('/marketplace', validate(listWebsitesQuerySchema), getMarketplaceListings) -> /v1/seller/marketplace
+ *
+ * @param {Object} params - { page, limit, category, subCategory, country, search }
+ * @returns {Promise<Object>} { websites, pagination: { total, page, limit, totalPages } }
+ */
+export const getMarketplaceWebsites = async (params = {}) => {
+  try {
+    const { data } = await api.get("/v1/public/marketplace", { params });
+    return data; // { success, statusCode, message, data: { websites, pagination } }
+  } catch (error) {
+    throw toError(error, "Failed to fetch marketplace websites.");
+  }
+};
+
+/**
+ * Fetch Public Single Website Details by websiteId
+ * Maps to backend: router.use('/public', publicRoutes), router.get('/marketplace/:websiteId', validate(websiteIdParamSchema), getPublicWebsiteDetails)
+ * Full URL: /v1/public/marketplace/:websiteId
+ *
+ * @param {string} websiteId
+ * @returns {Promise<Object>} { success, statusCode, message, data: website }
+ */
+export const getPublicWebsiteDetails = async (websiteId) => {
+  try {
+    const { data } = await api.get(`/v1/public/marketplace/${websiteId}`);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await api.get(`/v1/marketplace/${websiteId}`);
+        return fallback.data;
+      } catch (err2) {
+        throw toError(err2, "Failed to fetch website details.");
+      }
+    }
+    throw toError(error, "Failed to fetch website details.");
+  }
+};
+
+/**
  * Creates a single website listing
  * Maps to backend: router.post('/websites', validate(addWebsiteSchema), createSingleListing)
  *
@@ -25,6 +66,40 @@ export const createSingleListing = async (websiteData) => {
     return data;
   } catch (error) {
     throw toError(error, "Failed to submit website listing.");
+  }
+};
+
+/**
+ * Fetch Main Categories List
+ * Maps to backend: router.get('/categories', getMainCategories) -> /v1/seller/categories
+ *
+ * @returns {Promise<Array<string>>}
+ */
+export const getMainCategories = async () => {
+  try {
+    const { data } = await api.get("/v1/seller/categories");
+    return data?.data?.categories || [];
+  } catch (error) {
+    throw toError(error, "Failed to load categories.");
+  }
+};
+
+/**
+ * Fetch Subcategories for a given category
+ * Maps to backend: router.get('/subcategories', validate(getSubCategoriesQuerySchema), getSubCategoriesByCategory) -> /v1/seller/subcategories?category={category}
+ *
+ * @param {string} category - Category name
+ * @returns {Promise<Array<string>>}
+ */
+export const getSubCategoriesByCategory = async (category) => {
+  try {
+    if (!category) return [];
+    const { data } = await api.get("/v1/seller/subcategories", {
+      params: { category },
+    });
+    return data?.data?.subCategories || [];
+  } catch (error) {
+    throw toError(error, "Failed to load subcategories.");
   }
 };
 

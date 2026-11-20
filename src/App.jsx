@@ -1,11 +1,14 @@
 import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
 import { ToastProvider } from "./context/ToastContext";
+import { WishlistProvider } from "./context/WishlistProvider";
 
 const App = () => {
   return (
     <ToastProvider>
-      <RouterProvider router={router} />
+      <WishlistProvider>
+        <RouterProvider router={router} />
+      </WishlistProvider>
     </ToastProvider>
   );
 };

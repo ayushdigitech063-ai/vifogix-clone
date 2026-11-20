@@ -8,6 +8,7 @@ export const adminNav = [
     items: [
       { label: "Blogs", href: "/admin/blogs", icon: "blogs" },
       { label: "Websites", href: "/admin/websites", icon: "globe" },
+      { label: "Press Release", href: "/admin/press-releases", icon: "newspaper" },
       { label: "Packages", href: "/admin/packages", icon: "package" },
     ],
   },

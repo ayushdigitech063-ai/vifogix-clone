@@ -7,6 +7,7 @@ export const publisherUser = {
 export const navItems = [
   { label: "Overview", path: "/publisher-dashboard", icon: "LayoutDashboard", end: true },
   { label: "My Websites", path: "/publisher-dashboard/websites", icon: "Globe" },
+  { label: "Press Release", path: "/publisher-dashboard/press-releases", icon: "Newspaper" },
   { label: "Orders", path: "/publisher-dashboard/orders", icon: "ShoppingBag" },
   { label: "Gigs", path: "/publisher-dashboard/gigs", icon: "Zap" },
   { label: "Earnings", path: "/publisher-dashboard/earnings", icon: "TrendingUp" },

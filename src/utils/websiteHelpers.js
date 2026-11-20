@@ -6,6 +6,7 @@ import { websites as defaultWebsites, defaultWebsiteDetail } from "../data/websi
  */
 export const getWebsiteSlug = (site) => {
   if (!site) return "";
+  if (site._id || site.id) return site._id || site.id;
   if (site.slug) return site.slug;
   return String(site.domain || "")
     .toLowerCase()
