@@ -7,6 +7,7 @@ import {
   Globe,
   FolderKanban,
   Wallet,
+  Newspaper,
   X,
 } from "lucide-react";
 import { navItems, buyerNavItems } from "../data/dashboard";
@@ -19,6 +20,7 @@ const iconsMap = {
   Globe,
   FolderKanban,
   Wallet,
+  Newspaper,
 };
 
 const DashboardSidebar = ({ isOpen, onClose }) => {

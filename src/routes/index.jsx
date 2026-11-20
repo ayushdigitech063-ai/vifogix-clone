@@ -37,6 +37,7 @@ const DashboardGigs = lazy(() => import("../pages/dashboard/DashboardGigs"));
 const DashboardEarnings = lazy(() => import("../pages/dashboard/DashboardEarnings"));
 const AddWebsite = lazy(() => import("../pages/dashboard/AddWebsite"));
 const WebsiteListing = lazy(() => import("../pages/dashboard/WebsiteListing"));
+const PressReleaseListing = lazy(() => import("../pages/dashboard/PressReleaseListing"));
 const CreateGig = lazy(() => import("../pages/dashboard/CreateGig"));
 const Profile = lazy(() => import("../pages/dashboard/Profile"));
 
@@ -93,6 +94,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <PublisherDashboard /> },
           { path: "websites", element: <WebsiteListing /> },
+          { path: "press-releases", element: <PressReleaseListing /> },
           { path: "orders", element: <DashboardOrders /> },
           { path: "orders/:orderId", element: <DashboardOrderDetail /> },
           { path: "gigs", element: <DashboardGigs /> },

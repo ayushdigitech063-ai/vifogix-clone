@@ -1,80 +1,127 @@
 // PricingSection.jsx
+import { useState, useEffect } from "react";
 import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "../sheared/SectionHeading";
 import { plans, singleLink } from "../../data/linkbuilding";
+import { listPublicPackages } from "../../services/packageService";
 
-const PricingSection = () => (
-  <section className="bg-cream py-16 md:py-20">
-    <div className="mx-auto max-w-7xl px-4">
-      <SectionHeading
-        eyebrow="Pricing"
-        title="Affordable Link Building Packages With Transparent Pricing"
-        description="Every plan includes a free SEO audit and 24/7 support. No setup fee. No contract."
-      />
+const PricingSection = () => {
+  const [packagePlans, setPackagePlans] = useState(plans);
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {plans.map((plan) => (
-          <article
-            key={plan.name}
-            className={`relative flex flex-col rounded-xl border p-6 ${
-              plan.featured ? "border-navy-900 bg-navy-900 text-white shadow-lg" : "border-border bg-white text-fg"
-            }`}
-          >
-            {plan.featured && (
-              <span className="absolute -top-3 left-6 rounded-full bg-accent-yellow px-3 py-0.5 text-xs font-bold text-fg">
-                Most popular
-              </span>
-            )}
-            <p className={`text-sm font-bold uppercase tracking-wider ${plan.featured ? "text-white/80" : "text-muted"}`}>{plan.name}</p>
-            <p className={`mt-2 text-4xl font-bold ${plan.featured ? "text-accent-yellow" : "text-fg"}`}>
-              {plan.price}
-              <span className={`text-base font-medium ${plan.featured ? "text-white/70" : "text-muted"}`}>{plan.period}</span>
-            </p>
-            <p className={`mt-1 text-sm ${plan.featured ? "text-white/70" : "text-muted"}`}>{plan.audience}</p>
+  useEffect(() => {
+    let active = true;
 
-            <ul className="my-6 flex-1 space-y-3">
-              {plan.features.map((f) => (
-                <li key={f} className={`flex items-start gap-2 text-sm ${plan.featured ? "text-white/90" : "text-fg"}`}>
-                  <Check className={`mt-0.5 h-4 w-4 shrink-0 ${plan.featured ? "text-accent-yellow" : "text-primary"}`} /> {f}
-                </li>
-              ))}
-            </ul>
+    const fetchPackages = async () => {
+      try {
+        const res = await listPublicPackages();
+        if (!active) return;
+        const list = res?.data?.packages || res?.data || (Array.isArray(res) ? res : []);
+        if (Array.isArray(list) && list.length > 0) {
+          const mapped = list
+            .filter((p) => p.isActive !== false)
+            .sort((a, b) => (a.displayOrder || 1) - (b.displayOrder || 1))
+            .map((p) => ({
+              name: p.name,
+              price: p.isCustomPrice
+                ? p.customPriceLabel || "Custom"
+                : typeof p.price === "number"
+                ? `$${p.price}`
+                : p.price || "$0",
+              period: p.isCustomPrice ? "" : p.billingCycle || "/mo",
+              audience: p.tagline || "",
+              featured: Boolean(p.isPopular),
+              features: Array.isArray(p.features) ? p.features : [],
+            }));
 
-            <a
-              href="#contact"
-              className={`rounded-lg px-4 py-2.5 text-center text-sm font-semibold ${
-                plan.featured
-                  ? "bg-primary text-white hover:bg-primary-light"
-                  : "border border-border text-fg hover:border-primary-light hover:text-primary"
+          if (mapped.length > 0) {
+            setPackagePlans(mapped);
+          }
+        }
+      } catch {
+        // Keep default plans on error
+      }
+    };
+
+    fetchPackages();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <section className="bg-cream py-16 md:py-20">
+      <div className="mx-auto max-w-7xl px-4">
+        <SectionHeading
+          eyebrow="Pricing"
+          title="Affordable Link Building Packages With Transparent Pricing"
+          description="Every plan includes a free SEO audit and 24/7 support. No setup fee. No contract."
+        />
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {packagePlans.map((plan) => (
+            <article
+              key={plan.name}
+              className={`relative flex flex-col rounded-xl border p-6 ${
+                plan.featured ? "border-navy-900 bg-navy-900 text-white shadow-lg" : "border-border bg-white text-fg"
               }`}
             >
-              Get Started
-            </a>
-          </article>
-        ))}
-      </div>
+              {plan.featured && (
+                <span className="absolute -top-3 left-6 rounded-full bg-accent-yellow px-3 py-0.5 text-xs font-bold text-fg">
+                  Most popular
+                </span>
+              )}
+              <p className={`text-sm font-bold uppercase tracking-wider ${plan.featured ? "text-white/80" : "text-muted"}`}>{plan.name}</p>
+              <p className={`mt-2 text-4xl font-bold ${plan.featured ? "text-accent-yellow" : "text-fg"}`}>
+                {plan.price}
+                <span className={`text-base font-medium ${plan.featured ? "text-white/70" : "text-muted"}`}>{plan.period}</span>
+              </p>
+              <p className={`mt-1 text-sm ${plan.featured ? "text-white/70" : "text-muted"}`}>{plan.audience}</p>
 
-      {/* Single link */}
-      <div className="mt-10 flex flex-col items-start gap-6 rounded-xl border border-border bg-surface p-6 md:flex-row md:items-center md:p-8">
-        <div className="rounded-xl bg-primary px-6 py-4 text-center text-white">
-          <p className="text-3xl font-bold">{singleLink.price}</p>
-          <p className="text-xs uppercase tracking-wide opacity-80">Starting price</p>
+              <ul className="my-6 flex-1 space-y-3">
+                {plan.features.map((f) => (
+                  <li key={f} className={`flex items-start gap-2 text-sm ${plan.featured ? "text-white/90" : "text-fg"}`}>
+                    <Check className={`mt-0.5 h-4 w-4 shrink-0 ${plan.featured ? "text-accent-yellow" : "text-primary"}`} /> {f}
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href="#contact"
+                className={`rounded-lg px-4 py-2.5 text-center text-sm font-semibold ${
+                  plan.featured
+                    ? "bg-primary text-white hover:bg-primary-light"
+                    : "border border-border text-fg hover:border-primary-light hover:text-primary"
+                }`}
+              >
+                Get Started
+              </a>
+            </article>
+          ))}
         </div>
-        <div className="flex-1">
-          <h3>{singleLink.title}</h3>
-          <p className="mt-1 text-sm text-muted">{singleLink.description}</p>
+
+        {/* Single link */}
+        <div className="mt-10 flex flex-col items-start gap-6 rounded-xl border border-border bg-surface p-6 md:flex-row md:items-center md:p-8">
+          <div className="rounded-xl bg-primary px-6 py-4 text-center text-white">
+            <p className="text-3xl font-bold">{singleLink.price}</p>
+            <p className="text-xs uppercase tracking-wide opacity-80">Starting price</p>
+          </div>
+          <div className="flex-1">
+            <h3>{singleLink.title}</h3>
+            <p className="mt-1 text-sm text-muted">{singleLink.description}</p>
+          </div>
+          <Link
+            to="/marketplace"
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-light"
+          >
+            Explore Marketplace
+          </Link>
         </div>
-        <Link
-          to="/marketplace"
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-light"
-        >
-          Explore Marketplace
-        </Link>
+        <p className="mt-4 text-center text-sm text-muted">{singleLink.bulk}</p>
       </div>
-      <p className="mt-4 text-center text-sm text-muted">{singleLink.bulk}</p>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default PricingSection;

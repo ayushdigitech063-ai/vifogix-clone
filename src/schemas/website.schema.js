@@ -4,6 +4,16 @@ import { z } from "zod";
  * Zod validation schema for Add Website form
  * Aligned with backend Mongoose websiteSchema constraints
  */
+
+
+const optionalNullableString = z
+    .string()
+    .trim()
+    .optional()
+    .nullable()
+    .transform((val) => (val && val.length > 0 ? val : null));
+
+    
 export const addWebsiteSchema = z.object({
   domain: z
     .string({ required_error: "Domain name is required." })
@@ -23,7 +33,13 @@ export const addWebsiteSchema = z.object({
       }
     ),
 
-  category: z.string().trim().default("All"),
+  category: z.string({ required_error: "Category is required." }).trim().min(1, "Please select a category."),
+
+  subCategories: z
+    .array(z.string().trim().min(1))
+    .min(1, "Please select at least 1 subcategory.")
+    .optional()
+    .default([]),
 
   country: z
     .string({ required_error: "Target country is required." })
@@ -129,7 +145,18 @@ export const addWebsiteSchema = z.object({
       },
       { message: "Please enter a valid URL (starting with http:// or https://)." }
     ),
+     totalDeals: z.coerce
+                .number()
+                .int()
+                .min(0, 'Total deals cannot be negative')
+                .optional()
+                .default(0),
+           semrushTraffic: optionalNullableString.default(null),
+            ahrefsTraffic: optionalNullableString.default(null),
+            followedBacklinks: optionalNullableString.default(null),
+            noFollowedBacklinks: optionalNullableString.default(null),
 });
+
 // csv bulk upload schema
 export const csvWebsiteRowSchema = z.object({
      domain: z

@@ -9,6 +9,7 @@ import {
   Users,
   Mail,
   Settings,
+  Newspaper,
   X,
   LogOut,
 } from "lucide-react";
@@ -28,6 +29,8 @@ const renderNavIcon = (name) => {
       return <BookOpen {...common} />;
     case "globe":
       return <Globe {...common} />;
+    case "newspaper":
+      return <Newspaper {...common} />;
     case "package":
       return <Package {...common} />;
     case "orders":

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { websites } from "../data/website";
 import {
@@ -6,6 +6,7 @@ import {
   getWebsiteDetail,
   getRelatedWebsites,
 } from "../utils/websiteHelpers";
+import { getPublicWebsiteDetails } from "../services/websiteService";
 
 import DetailHero from "../components/website-detail-sections/DetailHero";
 import MetricsStrip from "../components/website-detail-sections/MetricsStrip";
@@ -19,20 +20,76 @@ import OrderCard from "../components/website-detail-sections/OrderCard";
 import MobileOrderBar from "../components/website-detail-sections/MobileOrderBar";
 import RelatedWebsites from "../components/website-detail-sections/RelatedWebsites";
 import WebsiteNotFound from "../components/website-detail-sections/WebsiteNotFound";
+import { Loader2 } from "lucide-react";
 
 const WebsiteDetail = () => {
   const { slug } = useParams();
 
-  const site = useMemo(() => findWebsiteBySlug(websites, slug), [slug]);
-  const detail = useMemo(() => (site ? getWebsiteDetail(site) : null), [site]);
-  const related = useMemo(
-    () => (site ? getRelatedWebsites(websites, site, 3) : []),
-    [site]
-  );
+  const [site, setSite] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadSite = async () => {
+      setLoading(true);
+      // 1. If slug is a 24-character hexadecimal MongoDB ObjectId, call API
+      if (slug && /^[0-9a-fA-F]{24}$/.test(slug)) {
+        try {
+          const res = await getPublicWebsiteDetails(slug);
+          if (!active) return;
+          const apiSite = res?.data?.website || res?.data;
+          if (apiSite) {
+            // Normalize backend fields for components
+            const normalized = {
+              ...apiSite,
+              id: apiSite._id || apiSite.id,
+              dr: apiSite.ahrefsDR ?? apiSite.dr ?? 0,
+              da: apiSite.mozDA ?? apiSite.da ?? 0,
+              as: apiSite.semrushAS ?? apiSite.as ?? 0,
+              traffic: apiSite.ahrefsTraffic || apiSite.semrushTraffic || apiSite.monthlyTraffic || "—",
+              days: apiSite.turnaroundDays ? `${apiSite.turnaroundDays}` : "3",
+              turnaround: apiSite.turnaroundDays ? `${apiSite.turnaroundDays} Days` : "3 Days",
+              maxLinks: apiSite.maxLinksAllowed ?? 2,
+              linkType: apiSite.linkType || "DoFollow",
+              price: apiSite.price ?? 0,
+              categories: Array.isArray(apiSite.subCategories) && apiSite.subCategories.length > 0
+                ? [apiSite.category, ...apiSite.subCategories].filter(Boolean)
+                : apiSite.category
+                ? [apiSite.category]
+                : ["General"],
+              backlinks: {
+                followed: apiSite.followedBacklinks || "0",
+                noFollowed: apiSite.noFollowedBacklinks || "0",
+              },
+            };
+            setSite(normalized);
+            setLoading(false);
+            return;
+          }
+        } catch {
+          // If API call fails or 404, fallback to local match below
+        }
+      }
+
+      // 2. Check local mock dataset by slug or domain
+      const localSite = findWebsiteBySlug(websites, slug);
+      if (active) {
+        setSite(localSite || null);
+        setLoading(false);
+      }
+    };
+
+    loadSite();
+
+    return () => {
+      active = false;
+    };
+  }, [slug]);
 
   useEffect(() => {
     const originalTitle = document.title;
-    if (site) {
+    if (site?.domain) {
       document.title = `${site.domain} | Guest Post Details`;
     }
     return () => {
@@ -40,9 +97,21 @@ const WebsiteDetail = () => {
     };
   }, [site]);
 
-  if (!site || !detail) {
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-cream p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="mt-3 text-xs font-medium text-gray-500">Loading website details...</span>
+      </div>
+    );
+  }
+
+  if (!site) {
     return <WebsiteNotFound />;
   }
+
+  const detail = getWebsiteDetail(site);
+  const related = getRelatedWebsites(websites, site, 3);
 
   return (
     <main className="font-sans bg-cream pb-24 lg:pb-0">
@@ -82,4 +151,3 @@ const WebsiteDetail = () => {
 };
 
 export default WebsiteDetail;
-

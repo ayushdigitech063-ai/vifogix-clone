@@ -11,6 +11,9 @@ const AdminWebsiteListing = lazy(() => import("../pages/admin/AdminWebsiteListin
 const AdminWebsiteDetail = lazy(() => import("../pages/admin/AdminWebsiteDetail"));
 const AdminProfile = lazy(() => import("../pages/admin/AdminProfile"));
 const AdminContactListing = lazy(() => import("../pages/admin/AdminContactListing"));
+const AdminPackages = lazy(() => import("../pages/admin/AdminPackages"));
+const AdminUserListing = lazy(() => import("../pages/admin/AdminUserListing"));
+const AdminPressReleaseListing = lazy(() => import("../pages/admin/AdminPressReleaseListing"));
 
 const AdminLoadingFallback = () => (
   <div className="flex min-h-[50vh] items-center justify-center">
@@ -90,12 +93,19 @@ export const adminRoutes = [
             ),
           },
           {
+            path: "press-releases",
+            element: (
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminPressReleaseListing />
+              </Suspense>
+            ),
+          },
+          {
             path: "packages",
             element: (
-              <ComingSoonPage
-                title="Packages"
-                description="Configure guest posting and link building packages."
-              />
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminPackages />
+              </Suspense>
             ),
           },
           {
@@ -110,10 +120,9 @@ export const adminRoutes = [
           {
             path: "users",
             element: (
-              <ComingSoonPage
-                title="Users"
-                description="Manage registered clients, publishers and roles."
-              />
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminUserListing />
+              </Suspense>
             ),
           },
           {
