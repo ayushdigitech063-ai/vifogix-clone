@@ -19,6 +19,7 @@ import BuyerProtectedRoute from "./BuyerProtecdRoute";
 const Marketplace = lazy(() => import("../pages/Marketplace"));
 const LinkBuilding = lazy(() => import("../pages/Linkbuilding"));
 const WebsiteDetail = lazy(() => import("../pages/WebsiteDetail"));
+const PressReleaseDetail = lazy(() => import("../pages/PressReleaseDetail"));
 const BlogDetail = lazy(() => import("../pages/BlogDetail"));
 const Wishlist = lazy(() => import("../pages/Wishlist"));
 const Cart = lazy(() => import("../pages/Cart"));
@@ -52,6 +53,8 @@ export const router = createBrowserRouter([
       { path: "link-building-services", element: <LinkBuilding /> },
       { path: "guest-posting-services", element: <GuestPosting /> },
       { path: "press-release", element: <PressRelease /> },
+      { path: "press-release/:id", element: <PressReleaseDetail /> },
+      { path: "press-release/package/:id", element: <PressReleaseDetail /> },
       { path: "blogs", element: <Blogs /> },
       { path: "blogs/:slug", element: <BlogDetail /> },
       { path: "about-us", element: <About /> },

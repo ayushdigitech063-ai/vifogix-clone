@@ -102,6 +102,33 @@ export const updatePackage = async (packageId, packageData) => {
 };
 
 /**
+ * Change / Toggle package status
+ * Maps to backend: router.patch('/packages/:packageId/status', validate(togglePackageStatusSchema), changePackageStatus)
+ * Endpoint: /v1/admin/packages/:packageId/status (with fallback to /v1/packages/:packageId/status)
+ *
+ * @param {string} packageId
+ * @param {Object} [statusData] - Optional body e.g. { isActive }
+ * @returns {Promise<Object>}
+ */
+export const changePackageStatus = async (packageId, statusData = {}) => {
+  try {
+    const { data } = await api.patch(`/v1/admin/packages/${packageId}/status`, statusData);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await api.patch(`/v1/packages/${packageId}/status`, statusData);
+        return fallback.data;
+      } catch (err2) {
+        throw toError(err2, "Failed to change package status.");
+      }
+    }
+    throw toError(error, "Failed to change package status.");
+  }
+};
+
+
+/**
  * Delete a package
  * DELETE /v1/admin/packages/:packageId
  *

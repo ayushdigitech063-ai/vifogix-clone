@@ -14,6 +14,7 @@ const AdminContactListing = lazy(() => import("../pages/admin/AdminContactListin
 const AdminPackages = lazy(() => import("../pages/admin/AdminPackages"));
 const AdminUserListing = lazy(() => import("../pages/admin/AdminUserListing"));
 const AdminPressReleaseListing = lazy(() => import("../pages/admin/AdminPressReleaseListing"));
+const AdminSettings = lazy(() => import("../pages/admin/AdminSettings"));
 
 const AdminLoadingFallback = () => (
   <div className="flex min-h-[50vh] items-center justify-center">
@@ -144,10 +145,9 @@ export const adminRoutes = [
           {
             path: "settings",
             element: (
-              <ComingSoonPage
-                title="Settings"
-                description="Configure platform preferences, branding and security options."
-              />
+              <Suspense fallback={<AdminLoadingFallback />}>
+                <AdminSettings />
+              </Suspense>
             ),
           },
         ],
