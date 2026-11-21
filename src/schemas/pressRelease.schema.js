@@ -136,22 +136,27 @@ export const updatePressReleaseSchema = z
   });
 
 // 3. Admin: Approve / Reject / Suspend Press Release Validation
-export const reviewPressReleaseStatusSchema = z
-  .object({
-    status: z.enum(["ACTIVE", "REJECTED", "SUSPENDED"], {
-      errorMap: () => ({ message: "Status must be ACTIVE, REJECTED, or SUSPENDED" }),
+export const reviewPressReleaseStatusSchema = z.object({
+    params: z.object({
+        prId: z.string().regex(objectIdRegex, 'Invalid Press Release ID format')
     }),
-    adminReviewNotes: z.string().trim().max(500).nullable().optional(),
-  })
-  .refine(
-    (data) =>
-      data.status === "ACTIVE" ||
-      (typeof data.adminReviewNotes === "string" && data.adminReviewNotes.trim().length >= 3),
-    {
-      message: "Admin review notes are required when rejecting or suspending a press release",
-      path: ["adminReviewNotes"],
-    }
-  );
+    body: z
+        .object({
+            status: z.enum(['ACTIVE', 'REJECTED', 'SUSPENDED'], {
+                errorMap: () => ({ message: 'Status must be ACTIVE, REJECTED, or SUSPENDED' })
+            }),
+            adminReviewNotes: z.string().trim().max(500).nullable().optional()
+        })
+        .refine(
+            (data) =>
+                data.status === 'ACTIVE' ||
+                (typeof data.adminReviewNotes === 'string' && data.adminReviewNotes.trim().length >= 3),
+            {
+                message: 'Admin review notes are required when rejecting or suspending a press release',
+                path: ['adminReviewNotes']
+            }
+        )
+});
 
 // 4. Press Release ID Param Validation
 export const prIdParamSchema = z.object({

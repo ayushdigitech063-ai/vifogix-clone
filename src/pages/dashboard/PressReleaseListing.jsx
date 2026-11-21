@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Search,
   Eye,
+  Edit,
   Trash2,
   CheckCircle2,
   XCircle,
@@ -22,12 +23,13 @@ import {
   addPressRelease,
   getMyPressReleaseById,
   deleteMyPressRelease,
+  updateMyPressRelease,
 } from "../../services/pressReleaseService";
 import {
   getMainCategories,
   getSubCategoriesByCategory,
 } from "../../services/websiteService";
-import { createPressReleaseSchema } from "../../schemas/pressRelease.schema";
+import { createPressReleaseSchema, updatePressReleaseSchema } from "../../schemas/pressRelease.schema";
 import { useToast } from "../../hooks/useToast";
 
 const statuses = [
@@ -107,8 +109,9 @@ const PressReleaseListing = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  // Add PR Modal State
+  // Add/Edit PR Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingPRId, setEditingPRId] = useState(null);
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
 
@@ -189,13 +192,8 @@ const PressReleaseListing = () => {
     };
   }, []);
 
-  // Fetch Subcategories on Category Change
-  const handleCategorySelect = async (categoryName) => {
-    setFormData((prev) => ({
-      ...prev,
-      category: categoryName,
-      subCategories: [],
-    }));
+  // Fetch Subcategories Helper
+  const loadSubCategories = useCallback(async (categoryName) => {
     if (!categoryName) {
       setSubCategoriesList([]);
       return;
@@ -209,6 +207,16 @@ const PressReleaseListing = () => {
     } finally {
       setLoadingSubCats(false);
     }
+  }, []);
+
+  // Fetch Subcategories on Category Change
+  const handleCategorySelect = async (categoryName) => {
+    setFormData((prev) => ({
+      ...prev,
+      category: categoryName,
+      subCategories: [],
+    }));
+    await loadSubCategories(categoryName);
   };
 
   const handleSubCategoryToggle = (sub) => {
@@ -287,12 +295,100 @@ const PressReleaseListing = () => {
 
   // Open Add PR Form Modal
   const handleOpenAddModal = () => {
+    setEditingPRId(null);
     setFormData(initialForm);
     setFormErrors({});
     setIsAddModalOpen(true);
   };
 
-  // Submit Add PR Form
+  // Open Edit PR Form Modal
+  const handleOpenEditModal = async (pr) => {
+    const prId = pr._id || pr.id;
+    setEditingPRId(prId);
+    setFormErrors({});
+
+    // Populate with existing data immediately
+    const prepForm = {
+      title: pr.title || "",
+      packageDescription: pr.packageDescription || "",
+      image: pr.image || "",
+      outletDomain: pr.outletDomain || "",
+      outletsCount: pr.outletsCount || 1,
+      included: Array.isArray(pr.included) && pr.included.length > 0 ? pr.included : [""],
+      excluded: Array.isArray(pr.excluded) && pr.excluded.length > 0 ? pr.excluded : [""],
+      category: pr.category || "",
+      subCategories: Array.isArray(pr.subCategories) ? pr.subCategories : [],
+      country: pr.country || "United States",
+      otherCountriesCount: pr.otherCountriesCount || 0,
+      language: pr.language || "English",
+      mozDA: pr.mozDA !== undefined && pr.mozDA !== null ? pr.mozDA : "",
+      ahrefsDR: pr.ahrefsDR !== undefined && pr.ahrefsDR !== null ? pr.ahrefsDR : "",
+      semrushAS: pr.semrushAS !== undefined && pr.semrushAS !== null ? pr.semrushAS : "",
+      monthlyTraffic: pr.monthlyTraffic || "",
+      estimatedReach: pr.estimatedReach || "",
+      maxWordsAllowed: pr.maxWordsAllowed || 500,
+      extraWordPricePer100: pr.extraWordPricePer100 || 0,
+      maxLinksAllowed: pr.maxLinksAllowed !== undefined ? pr.maxLinksAllowed : 3,
+      linkType: pr.linkType || "NoFollow",
+      maxImagesAllowed: pr.maxImagesAllowed !== undefined ? pr.maxImagesAllowed : 2,
+      hasSponsoredTag: pr.hasSponsoredTag !== undefined ? Boolean(pr.hasSponsoredTag) : true,
+      price: pr.price !== undefined ? pr.price : "",
+      isPrWritingAvailable: Boolean(pr.isPrWritingAvailable),
+      prWritingPrice: pr.prWritingPrice || 0,
+      turnaroundDays: pr.turnaroundDays || 2,
+    };
+    setFormData(prepForm);
+    if (pr.category) {
+      loadSubCategories(pr.category);
+    }
+    setIsAddModalOpen(true);
+
+    // Optionally fetch fresh full details in background
+    if (prId) {
+      try {
+        const res = await getMyPressReleaseById(prId);
+        const fresh = res?.data?.pressRelease || res?.data;
+        if (fresh) {
+          setFormData({
+            title: fresh.title || "",
+            packageDescription: fresh.packageDescription || "",
+            image: fresh.image || "",
+            outletDomain: fresh.outletDomain || "",
+            outletsCount: fresh.outletsCount || 1,
+            included: Array.isArray(fresh.included) && fresh.included.length > 0 ? fresh.included : [""],
+            excluded: Array.isArray(fresh.excluded) && fresh.excluded.length > 0 ? fresh.excluded : [""],
+            category: fresh.category || "",
+            subCategories: Array.isArray(fresh.subCategories) ? fresh.subCategories : [],
+            country: fresh.country || "United States",
+            otherCountriesCount: fresh.otherCountriesCount || 0,
+            language: fresh.language || "English",
+            mozDA: fresh.mozDA !== undefined && fresh.mozDA !== null ? fresh.mozDA : "",
+            ahrefsDR: fresh.ahrefsDR !== undefined && fresh.ahrefsDR !== null ? fresh.ahrefsDR : "",
+            semrushAS: fresh.semrushAS !== undefined && fresh.semrushAS !== null ? fresh.semrushAS : "",
+            monthlyTraffic: fresh.monthlyTraffic || "",
+            estimatedReach: fresh.estimatedReach || "",
+            maxWordsAllowed: fresh.maxWordsAllowed || 500,
+            extraWordPricePer100: fresh.extraWordPricePer100 || 0,
+            maxLinksAllowed: fresh.maxLinksAllowed !== undefined ? fresh.maxLinksAllowed : 3,
+            linkType: fresh.linkType || "NoFollow",
+            maxImagesAllowed: fresh.maxImagesAllowed !== undefined ? fresh.maxImagesAllowed : 2,
+            hasSponsoredTag: fresh.hasSponsoredTag !== undefined ? Boolean(fresh.hasSponsoredTag) : true,
+            price: fresh.price !== undefined ? fresh.price : "",
+            isPrWritingAvailable: Boolean(fresh.isPrWritingAvailable),
+            prWritingPrice: fresh.prWritingPrice || 0,
+            turnaroundDays: fresh.turnaroundDays || 2,
+          });
+          if (fresh.category) {
+            loadSubCategories(fresh.category);
+          }
+        }
+      } catch {
+        // use fallback initial populate
+      }
+    }
+  };
+
+  // Submit Add or Edit PR Form
   const handleSubmitPR = async (e) => {
     e.preventDefault();
     setFormErrors({});
@@ -331,7 +427,8 @@ const PressReleaseListing = () => {
     };
 
     // Client-side Zod validation
-    const validation = createPressReleaseSchema.safeParse(payload);
+    const schemaToUse = editingPRId ? updatePressReleaseSchema : createPressReleaseSchema;
+    const validation = schemaToUse.safeParse(payload);
     if (!validation.success) {
       const fieldErrors = {};
       validation.error.issues.forEach((issue) => {
@@ -347,14 +444,27 @@ const PressReleaseListing = () => {
 
     try {
       setActionLoading(true);
-      const res = await addPressRelease(payload);
-      const created = res?.data?.pressRelease || res?.data || payload;
-      setPressReleases((prev) => [created, ...prev]);
-      toast.success(res?.message || "Press release created successfully!", "Success");
+      if (editingPRId) {
+        const res = await updateMyPressRelease(editingPRId, payload);
+        const updated = res?.data?.pressRelease || res?.data || { ...payload, _id: editingPRId };
+        setPressReleases((prev) =>
+          prev.map((item) => ((item._id || item.id) === editingPRId ? { ...item, ...updated } : item))
+        );
+        toast.success(res?.message || "Press release updated successfully!", "Updated");
+      } else {
+        const res = await addPressRelease(payload);
+        const created = res?.data?.pressRelease || res?.data || payload;
+        setPressReleases((prev) => [created, ...prev]);
+        toast.success(res?.message || "Press release created successfully!", "Success");
+      }
       setIsAddModalOpen(false);
+      setEditingPRId(null);
       fetchPRs();
     } catch (err) {
-      toast.error(err.message || "Failed to submit press release.", "Submission Failed");
+      toast.error(
+        err.message || (editingPRId ? "Failed to update press release." : "Failed to submit press release."),
+        editingPRId ? "Update Failed" : "Submission Failed"
+      );
     } finally {
       setActionLoading(false);
     }
@@ -610,6 +720,14 @@ const PressReleaseListing = () => {
                             </button>
                             <button
                               type="button"
+                              onClick={() => handleOpenEditModal(pr)}
+                              className="rounded-lg p-1.5 text-gray-500 hover:bg-cream hover:text-primary"
+                              title="Edit PR"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => handleDeletePR(prId)}
                               disabled={isDeleting}
                               className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
@@ -681,8 +799,14 @@ const PressReleaseListing = () => {
                   <Newspaper className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-fg">Add Press Release Package</h2>
-                  <p className="text-xs text-gray-500">Provide outlet details, pricing, and distribution rules.</p>
+                  <h2 className="text-lg font-bold text-fg">
+                    {editingPRId ? "Edit Press Release Package" : "Add Press Release Package"}
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    {editingPRId
+                      ? "Update outlet details, pricing, and distribution rules."
+                      : "Provide outlet details, pricing, and distribution rules."}
+                  </p>
                 </div>
               </div>
               <button
@@ -1220,7 +1344,7 @@ const PressReleaseListing = () => {
                   className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 font-semibold text-white shadow-xs hover:bg-primary-light disabled:opacity-50"
                 >
                   {actionLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  Create Press Release
+                  {editingPRId ? "Update Press Release" : "Create Press Release"}
                 </button>
               </div>
             </form>

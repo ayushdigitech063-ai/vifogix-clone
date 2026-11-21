@@ -69,3 +69,18 @@ export const updatePackageSchema = z
 export const packageIdParamSchema = z.object({
   packageId: z.string().regex(objectIdRegex, "Invalid Package ID format"),
 });
+
+// 4. Toggle Package Status Validation
+export const togglePackageStatusSchema = z.object({
+  params: z
+    .object({
+      packageId: z.string().regex(objectIdRegex, "Invalid Package ID format"),
+    })
+    .optional(),
+  body: z
+    .object({
+      isActive: z.boolean().optional(),
+    })
+    .optional(),
+});
+

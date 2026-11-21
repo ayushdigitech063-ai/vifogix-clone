@@ -184,7 +184,7 @@ const AdminPressReleaseListing = () => {
       adminReviewNotes: reviewNotes.trim() || undefined,
     };
 
-    // Client-side Zod validation
+    
     const validation = reviewPressReleaseStatusSchema.safeParse({
       params: { prId },
       body: payload,
