@@ -16,15 +16,21 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  Edit,
 } from "lucide-react";
 import PageHeader from "../../components/admin/layout/PageHeader";
 import {
   getAdminPackages,
   createPackage,
   updatePackage,
+  changePackageStatus,
   deletePackage,
 } from "../../services/packageService";
-import { createPackageSchema } from "../../schemas/package.schema";
+import {
+  createPackageSchema,
+  updatePackageSchema,
+  togglePackageStatusSchema,
+} from "../../schemas/package.schema";
 import { useToast } from "../../hooks/useToast";
 
 const initialFormState = {
@@ -72,8 +78,9 @@ const AdminPackages = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
 
-  // Modal State
+  // Modal State (Add/Edit)
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPackageId, setEditingPackageId] = useState(null);
   const [formData, setFormData] = useState(initialFormState);
   const [formErrors, setFormErrors] = useState({});
 
@@ -139,6 +146,7 @@ const AdminPackages = () => {
   };
 
   const handleOpenAddModal = () => {
+    setEditingPackageId(null);
     setFormData({
       ...initialFormState,
       displayOrder: packages.length + 1,
@@ -147,9 +155,31 @@ const AdminPackages = () => {
     setIsModalOpen(true);
   };
 
+  const handleOpenEditModal = (pkg) => {
+    const pkgId = pkg._id || pkg.id;
+    setEditingPackageId(pkgId);
+    setFormData({
+      name: pkg.name || "",
+      tagline: pkg.tagline || "",
+      price: pkg.price !== undefined && pkg.price !== null ? pkg.price : "",
+      isCustomPrice: Boolean(pkg.isCustomPrice),
+      customPriceLabel: pkg.customPriceLabel || "Custom",
+      billingCycle: pkg.billingCycle !== undefined && pkg.billingCycle !== null ? pkg.billingCycle : "/mo",
+      features: Array.isArray(pkg.features) && pkg.features.length > 0 ? pkg.features : [""],
+      isPopular: Boolean(pkg.isPopular),
+      badgeText: pkg.badgeText || "",
+      buttonText: pkg.buttonText || "Get Started",
+      displayOrder: pkg.displayOrder || 1,
+      isActive: pkg.isActive !== undefined ? Boolean(pkg.isActive) : true,
+    });
+    setFormErrors({});
+    setIsModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     if (actionLoading) return;
     setIsModalOpen(false);
+    setEditingPackageId(null);
     setFormErrors({});
   };
 
@@ -182,7 +212,8 @@ const AdminPackages = () => {
     };
 
     // Client-side Zod validation
-    const validation = createPackageSchema.safeParse(payload);
+    const schemaToUse = editingPackageId ? updatePackageSchema : createPackageSchema;
+    const validation = schemaToUse.safeParse(payload);
     if (!validation.success) {
       const fieldErrors = {};
       validation.error.issues.forEach((issue) => {
@@ -198,33 +229,62 @@ const AdminPackages = () => {
 
     try {
       setActionLoading(true);
-      const res = await createPackage(payload);
-      const created = res?.data?.package || res?.data || payload;
-      setPackages((prev) => [...prev, created]);
-      toast.success(res?.message || "Package added successfully!", "Success");
+      if (editingPackageId) {
+        const res = await updatePackage(editingPackageId, payload);
+        const updated = res?.data?.package || res?.data || { ...payload, _id: editingPackageId };
+        setPackages((prev) =>
+          prev.map((item) => ((item._id || item.id) === editingPackageId ? { ...item, ...updated } : item))
+        );
+        toast.success(res?.message || "Package updated successfully!", "Updated");
+      } else {
+        const res = await createPackage(payload);
+        const created = res?.data?.package || res?.data || payload;
+        setPackages((prev) => [...prev, created]);
+        toast.success(res?.message || "Package added successfully!", "Success");
+      }
       setIsModalOpen(false);
+      setEditingPackageId(null);
       fetchPackages();
     } catch (err) {
-      toast.error(err.message || "Failed to create package.", "Creation Error");
+      toast.error(
+        err.message || (editingPackageId ? "Failed to update package." : "Failed to create package."),
+        editingPackageId ? "Update Error" : "Creation Error"
+      );
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleToggleActive = async (pkg) => {
+  const handleToggleStatus = async (pkg) => {
     const pkgId = pkg._id || pkg.id;
     if (!pkgId) return;
 
+    const newStatus = !pkg.isActive;
+
+    // Validate params & body with togglePackageStatusSchema
+    const validation = togglePackageStatusSchema.safeParse({
+      params: { packageId: pkgId },
+      body: { isActive: newStatus },
+    });
+
+    if (!validation.success) {
+      const msg = validation.error.issues[0]?.message || "Invalid status payload";
+      toast.error(msg, "Validation Error");
+      return;
+    }
+
     try {
       setTogglingId(pkgId);
-      const updatedStatus = !pkg.isActive;
-      await updatePackage(pkgId, { isActive: updatedStatus });
+      const res = await changePackageStatus(pkgId, { isActive: newStatus });
       setPackages((prev) =>
         prev.map((item) =>
-          (item._id || item.id) === pkgId ? { ...item, isActive: updatedStatus } : item
+          (item._id || item.id) === pkgId ? { ...item, isActive: newStatus } : item
         )
       );
-      toast.success(`Package ${updatedStatus ? "activated" : "deactivated"} successfully.`);
+      if (selectedPackage && (selectedPackage._id || selectedPackage.id) === pkgId) {
+        setSelectedPackage((prev) => ({ ...prev, isActive: newStatus }));
+      }
+      toast.success(res?.message || `Package ${newStatus ? "activated" : "deactivated"} successfully.`);
     } catch (err) {
       toast.error(err.message || "Failed to update package status.");
     } finally {
@@ -466,7 +526,16 @@ const AdminPackages = () => {
 
                             <button
                               type="button"
-                              onClick={() => handleToggleActive(pkg)}
+                              onClick={() => handleOpenEditModal(pkg)}
+                              className="rounded-lg p-1.5 text-gray-500 hover:bg-cream hover:text-primary"
+                              title="Edit package"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStatus(pkg)}
                               disabled={isToggling}
                               className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors ${
                                 pkg.isActive
@@ -664,8 +733,14 @@ const AdminPackages = () => {
                   <Package className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-fg">Add New Package</h2>
-                  <p className="text-xs text-gray-500">Fill in package details and features.</p>
+                  <h2 className="text-lg font-bold text-fg">
+                    {editingPackageId ? "Edit Package" : "Add New Package"}
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    {editingPackageId
+                      ? "Update package details, pricing, and features."
+                      : "Fill in package details and features."}
+                  </p>
                 </div>
               </div>
               <button
@@ -933,7 +1008,7 @@ const AdminPackages = () => {
                   className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-primary-light disabled:opacity-50"
                 >
                   {actionLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  Save Package
+                  {editingPackageId ? "Update Package" : "Save Package"}
                 </button>
               </div>
             </form>

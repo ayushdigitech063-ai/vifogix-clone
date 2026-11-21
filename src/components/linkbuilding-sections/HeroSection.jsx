@@ -53,7 +53,7 @@ const HeroSection = () => (
 
         <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
           {heroPerks.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-2 text-sm text-fg">
+            <li key={text} className="flex items-center gap-2 text-sm text-white/90">
               <Icon className="h-4 w-4 text-primary" /> {text}
             </li>
           ))}

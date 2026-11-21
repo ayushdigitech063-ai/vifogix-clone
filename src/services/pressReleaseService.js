@@ -174,7 +174,7 @@ export const getPressReleaseByIdAdmin = async (prId) => {
   } catch (error) {
     if (error.response?.status === 404) {
       try {
-        const fallback = await api.get(`/v1/press-releases/admin/${prId}`);
+        const fallback = await api.get(`/v1/admin/press-releases/${prId}`);
         return fallback.data;
       } catch (err2) {
         throw toError(err2, "Failed to fetch press release details.");
@@ -209,4 +209,56 @@ export const reviewPressReleaseStatus = async (prId, reviewData) => {
     throw toError(error, "Failed to review press release status.");
   }
 };
+
+/**
+ * Fetch public press releases
+ * Maps to backend: router.get('/press-releases', getPublicPressReleases); under router.use('/public', publicRoutes)
+ * Endpoint: /v1/public/press-releases or fallback /v1/press-releases
+ *
+ * @param {Object} params - { page, limit, search, category, country }
+ * @returns {Promise<Object>}
+ */
+export const getPublicPressReleases = async (params = {}) => {
+  try {
+    const { data } = await api.get("/v1/public/press-releases", { params });
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await api.get("/v1/press-releases", { params });
+        return fallback.data;
+      } catch (err2) {
+        throw toError(err2, "Failed to fetch public press releases.");
+      }
+    }
+    throw toError(error, "Failed to fetch public press releases.");
+  }
+};
+
+/**
+ * Fetch public press release by ID
+ * Maps to backend: router.get('/press-releases/:prId', validate(prIdParamSchema), getPublicPressReleaseById); under router.use('/public', publicRoutes)
+ * Endpoint: /v1/public/press-releases/:prId or fallback /v1/press-releases/:prId
+ *
+ * @param {string} prId
+ * @returns {Promise<Object>}
+ */
+export const getPublicPressReleaseById = async (prId) => {
+  try {
+    const { data } = await api.get(`/v1/public/press-releases/${prId}`);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await api.get(`/v1/press-releases/${prId}`);
+        return fallback.data;
+      } catch (err2) {
+        throw toError(err2, "Failed to fetch press release details.");
+      }
+    }
+    throw toError(error, "Failed to fetch press release details.");
+  }
+};
+
+
 
