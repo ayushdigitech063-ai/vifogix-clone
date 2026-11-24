@@ -17,7 +17,7 @@ const MetricsStrip = ({ site }) => {
   ];
 
   return (
-    <div className="relative z-20 mx-auto -mt-12 max-w-7xl px-4">
+    <div className="relative z-20 mx-auto max-w-7xl">
       <div className="rounded-2xl border border-border bg-white p-5 shadow-lg md:p-7">
         <div className="grid grid-cols-2 gap-4 divide-y divide-border sm:divide-y-0 sm:divide-x md:grid-cols-4 md:gap-6">
           {metrics.map((m, idx) => (

@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import HeroBanner from "../components/press-release-sections/HeroBanner";
-import PackageListing from "../components/press-release-sections/PackageListing";
-import IntroSection from "../components/press-release-sections/IntroSection";
-import FeatureGrid from "../components/guestposting-sections/FeatureGrid";
-import ProcessSection from "../components/guestposting-sections/ProcessSection";
-import TestimonialsSection from "../components/sheared/TestimonialsSection";
-import FaqSection from "../components/sheared/FaqSection";
+import HeroBanner from "../../components/press-release-sections/HeroBanner";
+import PackageListing from "../../components/press-release-sections/PackageListing";
+import IntroSection from "../../components/press-release-sections/IntroSection";
+import FeatureGrid from "../../components/guestposting-sections/FeatureGrid";
+import ProcessSection from "../../components/guestposting-sections/ProcessSection";
+import TestimonialsSection from "../../components/sheared/TestimonialsSection";
+import FaqSection from "../../components/sheared/FaqSection";
 import {
   hero, packages as defaultPackages, intro, benefits, process,
   features, testimonials, faqs, contact,
-} from "../data/pressRelease";
-import ContactForm from "../components/sheared/ContactForm";
-import { getPublicPressReleases } from "../services/pressReleaseService";
+} from "../../data/pressRelease";
+import ContactForm from "../../components/sheared/ContactForm";
+import { getPublicPressReleases } from "../../services/pressReleaseService";
 
 const PressRelease = () => {
   const [prPackages, setPrPackages] = useState(defaultPackages);

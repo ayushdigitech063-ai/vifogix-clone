@@ -1,5 +1,5 @@
 import SectionHeading from "../sheared/SectionHeading";
-import WebsiteCard from "../guestposting-sections/WebsiteCard";
+import WebsiteCard from "../marketplace-sections/WebsiteCard";
 
 const RelatedWebsites = ({ websites = [] }) => {
   if (!websites || websites.length === 0) return null;

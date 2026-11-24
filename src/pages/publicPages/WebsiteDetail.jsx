@@ -1,25 +1,25 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { websites } from "../data/website";
+import { websites } from "../../data/website";
 import {
   findWebsiteBySlug,
   getWebsiteDetail,
   getRelatedWebsites,
-} from "../utils/websiteHelpers";
-import { getPublicWebsiteDetails } from "../services/websiteService";
+} from "../../utils/websiteHelpers";
+import { getPublicWebsiteDetails } from "../../services/websiteService";
 
-import DetailHero from "../components/website-detail-sections/DetailHero";
-import MetricsStrip from "../components/website-detail-sections/MetricsStrip";
-import SectionTabs from "../components/website-detail-sections/SectionTabs";
-import AboutSite from "../components/website-detail-sections/AboutSite";
-import MetricsBreakdown from "../components/website-detail-sections/MetricsBreakdown";
-import PublishingDetails from "../components/website-detail-sections/PublishingDetails";
-import Guidelines from "../components/website-detail-sections/Guidelines";
-import WebsiteFaq from "../components/website-detail-sections/WebsiteFaq";
-import OrderCard from "../components/website-detail-sections/OrderCard";
-import MobileOrderBar from "../components/website-detail-sections/MobileOrderBar";
-import RelatedWebsites from "../components/website-detail-sections/RelatedWebsites";
-import WebsiteNotFound from "../components/website-detail-sections/WebsiteNotFound";
+import DetailHero from "../../components/website-detail-sections/DetailHero";
+import MetricsStrip from "../../components/website-detail-sections/MetricsStrip";
+import SectionTabs from "../../components/website-detail-sections/SectionTabs";
+import AboutSite from "../../components/website-detail-sections/AboutSite";
+import MetricsBreakdown from "../../components/website-detail-sections/MetricsBreakdown";
+import PublishingDetails from "../../components/website-detail-sections/PublishingDetails";
+import Guidelines from "../../components/website-detail-sections/Guidelines";
+import WebsiteFaq from "../../components/website-detail-sections/WebsiteFaq";
+import OrderCard from "../../components/website-detail-sections/OrderCard";
+import MobileOrderBar from "../../components/website-detail-sections/MobileOrderBar";
+import RelatedWebsites from "../../components/website-detail-sections/RelatedWebsites";
+import WebsiteNotFound from "../../components/website-detail-sections/WebsiteNotFound";
 import { Loader2 } from "lucide-react";
 
 const WebsiteDetail = () => {
@@ -34,9 +34,11 @@ const WebsiteDetail = () => {
     const loadSite = async () => {
       setLoading(true);
       // 1. If slug is a 24-character hexadecimal MongoDB ObjectId, call API
-      if (slug && /^[0-9a-fA-F]{24}$/.test(slug)) {
+      if (slug) {
+        console.log("slug in detail page", slug);
         try {
           const res = await getPublicWebsiteDetails(slug);
+          console.log("API response for website details:", res);
           if (!active) return;
           const apiSite = res?.data?.website || res?.data;
           if (apiSite) {
@@ -44,6 +46,7 @@ const WebsiteDetail = () => {
             const normalized = {
               ...apiSite,
               id: apiSite._id || apiSite.id,
+              slug: apiSite._slug || apiSite.slug,
               dr: apiSite.ahrefsDR ?? apiSite.dr ?? 0,
               da: apiSite.mozDA ?? apiSite.da ?? 0,
               as: apiSite.semrushAS ?? apiSite.as ?? 0,
@@ -119,8 +122,6 @@ const WebsiteDetail = () => {
       <DetailHero site={site} />
 
       {/* Metrics strip overlapping hero */}
-      <MetricsStrip site={site} />
-
       {/* Two-column layout */}
       <div className="mx-auto max-w-7xl px-4 py-10 md:py-14">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -128,6 +129,7 @@ const WebsiteDetail = () => {
           <div className="space-y-6 lg:col-span-2">
             <SectionTabs />
             <AboutSite site={site} detail={detail} />
+            <MetricsStrip site={site} />
             <MetricsBreakdown site={site} />
             <PublishingDetails site={site} detail={detail} />
             <Guidelines detail={detail} />

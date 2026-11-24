@@ -12,10 +12,10 @@ import {
   Tag,
   ArrowRight,
 } from "lucide-react";
-import { posts, categories, popularTags } from "../data/blogs";
-import { formatDate } from "../utils/formatters";
-import NewsletterSection from "../components/blogs-sections/NewsletterSection";
-import { newsletter } from "../data/blogs";
+import { posts, categories, popularTags, newsletter } from "../../data/blogs";
+import { formatDate } from "../../utils/formatters";
+import NewsletterSection from "../../components/blogs-sections/NewsletterSection";
+
 
 const BlogDetail = () => {
   const { slug } = useParams();

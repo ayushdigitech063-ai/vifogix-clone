@@ -14,8 +14,8 @@ import {
   AlertCircle,
   HelpCircle,
 } from "lucide-react";
-import { getPublicPressReleaseById } from "../services/pressReleaseService";
-import { packages as mockPackages } from "../data/pressRelease";
+import { getPublicPressReleaseById } from "../../services/pressReleaseService";
+import { packages as mockPackages } from "../../data/pressRelease";
 
 const PressReleaseDetail = () => {
   const { id } = useParams();
@@ -322,7 +322,7 @@ const PressReleaseDetail = () => {
               <div className="border-b border-border pb-4">
                 <p className="text-xs font-semibold text-gray-400">Total Price</p>
                 <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold text-fg">${pr.price ?? 0}</span>
+                  <span className="text-3xl font-extrabold text-fg">₹{pr.price ?? 0}</span>
                   <span className="text-xs font-medium text-gray-500">/ release</span>
                 </div>
               </div>
@@ -334,7 +334,7 @@ const PressReleaseDetail = () => {
                     PR Writing Add-on Available
                   </p>
                   <p className="mt-1 text-gray-600">
-                    Professional press release writing for an additional <span className="font-bold text-fg">+${pr.prWritingPrice}</span>.
+                    Professional press release writing for an additional <span className="font-bold text-fg">+₹{pr.prWritingPrice}</span>.
                   </p>
                 </div>
               )}
@@ -344,7 +344,7 @@ const PressReleaseDetail = () => {
                   to="/signup"
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-white shadow-xs hover:bg-primary-light transition"
                 >
-                  Order Now · ${pr.price ?? 0}
+                  Order Now · ₹{pr.price ?? 0}
                 </Link>
                 <Link
                   to="/contact-us"

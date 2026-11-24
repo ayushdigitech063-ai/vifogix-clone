@@ -1,11 +1,11 @@
-import HeroBanner from "../components/about-sections/HeroBanner";
-import StorySection from "../components/about-sections/StorySection";
-import ServicesSection from "../components/about-sections/ServicesSection";
-import AudienceSection from "../components/about-sections/AudienceSection";
-import ProcessSection from "../components/guestposting-sections/ProcessSection";
-import FeatureGrid from "../components/guestposting-sections/FeatureGrid";
-import TestimonialsSection from "../components/sheared/TestimonialsSection";
-import CtaBanner from "../components/sheared/CtaBanner";
+import HeroBanner from "../../components/about-sections/HeroBanner";
+import StorySection from "../../components/about-sections/StorySection";
+import ServicesSection from "../../components/about-sections/ServicesSection";
+import AudienceSection from "../../components/about-sections/AudienceSection";
+import ProcessSection from "../../components/guestposting-sections/ProcessSection";
+import FeatureGrid from "../../components/guestposting-sections/FeatureGrid";
+import TestimonialsSection from "../../components/sheared/TestimonialsSection";
+import CtaBanner from "../../components/sheared/CtaBanner";
 
 import {
   hero,
@@ -17,7 +17,7 @@ import {
   commitment,
   testimonials,
   cta,
-} from "../data/about";
+} from "../../data/about";
 
 const About = () => {
   return (

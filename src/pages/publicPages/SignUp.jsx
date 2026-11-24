@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import SignUpForm from "../components/forms/SignUpForm";
-import AuthSidePanel from "../components/forms/AuthSidePanel";
-import { useAuth } from "../hooks/useAuth";
-import { useToast } from "../hooks/useToast";
+import SignUpForm from "../../components/forms/SignUpForm";
+import AuthSidePanel from "../../components/forms/AuthSidePanel";
+import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../hooks/useToast";
 
 const SignUp = () => {
   const navigate = useNavigate();

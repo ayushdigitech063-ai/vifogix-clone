@@ -461,7 +461,7 @@ const AdminPackages = () => {
                             <span className="font-bold text-fg">{pkg.customPriceLabel || "Custom"}</span>
                           ) : (
                             <span className="font-bold text-fg">
-                              ${pkg.price ?? 0}
+                              ₹{pkg.price ?? 0}
                               <span className="text-[11px] font-normal text-gray-400 ml-1">
                                 {pkg.billingCycle || "/mo"}
                               </span>
@@ -648,7 +648,7 @@ const AdminPackages = () => {
                   <p className="font-bold text-fg text-sm mt-0.5">
                     {selectedPackage.isCustomPrice
                       ? selectedPackage.customPriceLabel || "Custom"
-                      : `$${selectedPackage.price ?? 0} ${selectedPackage.billingCycle || "/mo"}`}
+                      : `₹${selectedPackage.price ?? 0} ${selectedPackage.billingCycle || "/mo"}`}
                   </p>
                 </div>
                 <div>

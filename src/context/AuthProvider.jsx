@@ -11,6 +11,10 @@ import {
   logoutSellerRequest,
   logoutBuyerRequest,
 } from "../services/authServices";
+import {
+  refreshPackageManagerSession,
+  packageManagerLogout,
+} from "../services/packageManagerService";
 import { setAccessToken, setUserRole } from "../services/api";
 
 // Helper to safely parse user JWT claims (without external dependencies)
@@ -53,13 +57,16 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     let cancelled = false;
 
-    // Check whether the user is visiting publisher (seller), buyer, or admin routes
+    // Check whether the user is visiting publisher (seller), buyer, package manager, or admin routes
     const isPublisherRoute = window.location.pathname.startsWith("/publisher-dashboard");
     const isBuyerRoute = window.location.pathname.startsWith("/buyer-dashboard");
+    const isPackageManagerRoute = window.location.pathname.startsWith("/package-manager");
     const isAdminRoute = window.location.pathname.startsWith("/admin");
 
     let refreshFn = refreshSession;
-    if (isPublisherRoute) {
+    if (isPackageManagerRoute) {
+      refreshFn = refreshPackageManagerSession;
+    } else if (isPublisherRoute) {
       refreshFn = refreshSellerSession;
     } else if (isBuyerRoute) {
       refreshFn = refreshBuyerSession;
@@ -75,7 +82,7 @@ const AuthProvider = ({ children }) => {
         const jwtClaims = token ? parseJwt(token) : null;
         const stored = getStoredUser();
 
-        let loggedUser = payload?.user || payload?.admin || payload?.seller || payload?.buyer;
+        let loggedUser = payload?.user || payload?.admin || payload?.seller || payload?.buyer || payload?.packageManager;
         if (!loggedUser || (!loggedUser._id && !loggedUser.id)) {
           if (jwtClaims && (jwtClaims._id || jwtClaims.id)) {
             loggedUser = {
@@ -84,7 +91,7 @@ const AuthProvider = ({ children }) => {
               role:
                 jwtClaims.role ||
                 stored?.role ||
-                (isPublisherRoute ? "SELLER" : isBuyerRoute ? "BUYER" : "USER"),
+                (isPackageManagerRoute ? "PACKAGE_MANAGER" : isPublisherRoute ? "SELLER" : isBuyerRoute ? "BUYER" : "USER"),
               name: stored?.name || "",
               ...stored,
             };
@@ -270,6 +277,9 @@ const AuthProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     try {
+      const isPackageManager =
+        user?.role?.toUpperCase() === "PACKAGE_MANAGER" ||
+        window.location.pathname.startsWith("/package-manager");
       const isBuyer =
         user?.role?.toUpperCase() === "BUYER" ||
         window.location.pathname.startsWith("/buyer-dashboard");
@@ -277,7 +287,9 @@ const AuthProvider = ({ children }) => {
         user?.role?.toUpperCase() === "SELLER" ||
         window.location.pathname.startsWith("/publisher-dashboard");
 
-      if (isBuyer) {
+      if (isPackageManager) {
+        await packageManagerLogout();
+      } else if (isBuyer) {
         await logoutBuyerRequest();
       } else if (isSeller) {
         await logoutSellerRequest();

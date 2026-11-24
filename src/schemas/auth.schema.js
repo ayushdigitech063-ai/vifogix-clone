@@ -127,6 +127,19 @@ export const signInSchema = z.object({
   remember: z.boolean().optional(),
 });
 
+export const loginSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .trim()
+    .min(1, "Please enter your email.")
+    .email("Enter a valid email address."),
+  password: z
+    .string({ required_error: "Password is required" })
+    .min(1, "Please enter your password.")
+    .min(6, "Password must be at least 6 characters."),
+  remember: z.boolean().optional(),
+});
+
 export const buyerSignUpSchema = z.object({
   role: z.literal("buyer").default("buyer"),
   name: z

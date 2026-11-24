@@ -23,7 +23,7 @@ const OrderCard = ({ site }) => {
             Starting at
           </p>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="text-4xl font-extrabold text-fg">${price}</span>
+            <span className="text-4xl font-extrabold text-fg">₹{price}</span>
             <span className="text-xs text-gray-400">/ placement</span>
           </div>
         </div>

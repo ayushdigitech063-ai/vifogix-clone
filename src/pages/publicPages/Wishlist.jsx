@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingBag, Trash2, ArrowRight, ExternalLink, Loader2 } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
-import { useToast } from "../hooks/useToast";
-import { useWishlist } from "../hooks/useWishlist";
-import { getMyWishlist, removeFromWishlist } from "../services/wishlistService";
-import { getWebsiteSlug } from "../utils/websiteHelpers";
+import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../hooks/useToast";
+import { useWishlist } from "../../hooks/useWishlist";
+import { getMyWishlist, removeFromWishlist } from "../../services/wishlistService";
+import { getWebsiteSlug } from "../../utils/websiteHelpers";
 
 const Wishlist = () => {
   const { isAuthenticated } = useAuth();

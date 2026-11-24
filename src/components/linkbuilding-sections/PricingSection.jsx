@@ -26,8 +26,8 @@ const PricingSection = () => {
               price: p.isCustomPrice
                 ? p.customPriceLabel || "Custom"
                 : typeof p.price === "number"
-                ? `$${p.price}`
-                : p.price || "$0",
+                ? `₹${p.price}`
+                : p.price || "₹0",
               period: p.isCustomPrice ? "" : p.billingCycle || "/mo",
               audience: p.tagline || "",
               featured: Boolean(p.isPopular),
