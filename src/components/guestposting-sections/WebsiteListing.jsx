@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { SlidersHorizontal, Loader2 } from "lucide-react";
 import SectionHeading from "../sheared/SectionHeading";
-import WebsiteCard from "./WebsiteCard";
+import WebsiteCard from "../marketplace-sections/WebsiteCard";
 import {
   getMarketplaceWebsites,
   getMainCategories,
@@ -293,12 +293,12 @@ const WebsiteListing = ({ data, websites: defaultWebsites, onFiltersClick }) => 
         ) : visible.length > 0 ? (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((site) => {
-              const websiteId = site._id || site.id;
+              const websiteSlug = site._slug || site.slug ;
               return (
                 <WebsiteCard
-                  key={websiteId || site.domain}
+                  key={websiteSlug}
                   site={site}
-                  isWishlisted={wishlistIds.has(websiteId)}
+                  isWishlisted={wishlistIds.has(websiteSlug)}
                   onWishlistToggle={handleWishlistToggle}
                 />
               );

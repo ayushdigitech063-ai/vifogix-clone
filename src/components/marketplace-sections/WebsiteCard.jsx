@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, Clock, TrendingUp, Link2, Layers } from "lucide-react";
-import { getWebsiteSlug } from "../../utils/websiteHelpers";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import { useWishlist } from "../../hooks/useWishlist";
@@ -33,7 +32,8 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
   const [saved, setSaved] = useState(isWishlisted);
   const [toggling, setToggling] = useState(false);
 
-  const websiteId = site._id || site.id;
+  const websiteSlug = site._slug || site.slug;
+
 
   const handleToggleWishlist = async (e) => {
     e.preventDefault();
@@ -50,18 +50,18 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
       return;
     }
 
-    if (!websiteId || !/^[0-9a-fA-F]{24}$/.test(websiteId)) {
+    if (!websiteSlug || !/^[0-9a-fA-F]{24}$/.test(websiteSlug)) {
       setSaved((prev) => !prev);
       return;
     }
 
     setToggling(true);
     try {
-      const res = toggleItem ? await toggleItem(websiteId) : await toggleWishlist(websiteId);
+      const res = toggleItem ? await toggleItem(websiteSlug) : await toggleWishlist(websiteSlug);
       const isNowWishlisted = res?.data?.isWishlisted ?? !saved;
       setSaved(isNowWishlisted);
       if (onWishlistToggle) {
-        onWishlistToggle(websiteId, isNowWishlisted);
+        onWishlistToggle(websiteSlug, isNowWishlisted);
       }
       if (isNowWishlisted) {
         toast.success(res?.message || `${domain || "Website"} added to your wishlist!`, "Wishlist Updated");
@@ -162,7 +162,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           />
           <div className="min-w-0">
             <Link
-              to={`/website/${getWebsiteSlug(site)}`}
+              to={`/website/${websiteSlug}`}
               className="block truncate font-semibold text-fg hover:text-primary transition"
             >
               {domain}
@@ -197,7 +197,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
               <span className="h-2 w-2 rounded-full bg-accent-yellow" />
               Starting at
             </span>
-            <span className="text-xl font-bold text-fg">${price}</span>
+            <span className="text-xl font-bold text-fg">₹{price}</span>
           </span>
         </div>
 

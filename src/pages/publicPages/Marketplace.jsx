@@ -1,8 +1,8 @@
-import HeroBanner from "../components/marketplace-sections/HeroBanner";
-import WebsiteListing from "../components/marketplace-sections/WebsiteListing";
-import CtaBanner from "../components/sheared/CtaBanner";
-import FaqSection from "../components/sheared/FaqSection";
-import TestimonialsSection from "../components/sheared/TestimonialsSection";
+import HeroBanner from "../../components/marketplace-sections/HeroBanner";
+import WebsiteListing from "../../components/marketplace-sections/WebsiteListing";
+import CtaBanner from "../../components/sheared/CtaBanner";
+import FaqSection from "../../components/sheared/FaqSection";
+import TestimonialsSection from "../../components/sheared/TestimonialsSection";
 
 const Marketplace = () => {
   return (

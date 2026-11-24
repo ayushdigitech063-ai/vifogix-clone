@@ -48,7 +48,7 @@ const PackageCard = ({ pkg }) => (
             Price
           </p>
           <p className="text-2xl font-extrabold text-fg">
-            ${pkg.price}
+            ₹{pkg.price}
             <span className="text-xs font-medium text-gray-500"> / release</span>
           </p>
         </div>

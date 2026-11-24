@@ -36,14 +36,14 @@ export const getMarketplaceWebsites = async (params = {}) => {
  * @param {string} websiteId
  * @returns {Promise<Object>} { success, statusCode, message, data: website }
  */
-export const getPublicWebsiteDetails = async (websiteId) => {
+export const getPublicWebsiteDetails = async (websiteSlug) => {
   try {
-    const { data } = await api.get(`/v1/public/marketplace/${websiteId}`);
+    const { data } = await api.get(`/v1/public/marketplace/${websiteSlug}`);
     return data;
   } catch (error) {
     if (error.response?.status === 404) {
       try {
-        const fallback = await api.get(`/v1/marketplace/${websiteId}`);
+        const fallback = await api.get(`/v1/marketplace/${websiteSlug}`);
         return fallback.data;
       } catch (err2) {
         throw toError(err2, "Failed to fetch website details.");

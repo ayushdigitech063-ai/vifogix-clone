@@ -2,30 +2,31 @@
 import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
-import Home from "../pages/Home";
-import GuestPosting from "../pages/GuestPosting";
-import PressRelease from "../pages/PressRelease";
-import SignIn from "../pages/SignIn";
-import SignUp from "../pages/SignUp";
-import Blogs from "../pages/Blogs";
-import About from "../pages/About";
-import ContactUs from "../pages/Contact-us";
-import TermsAndConditions from "../pages/TermsAndConditions";
+import Home from "../pages/publicPages/Home";
+import GuestPosting from "../pages/publicPages/GuestPosting";
+import PressRelease from "../pages/publicPages/PressRelease";
+import SignIn from "../pages/publicPages/SignIn";
+import SignUp from "../pages/publicPages/SignUp";
+import Blogs from "../pages/publicPages/Blogs";
+import About from "../pages/publicPages/About";
+import ContactUs from "../pages/publicPages/Contact-us";
+import TermsAndConditions from "../pages/publicPages/TermsAndConditions";
 import FaqSection from "../components/sheared/FaqSection";
 import SellerProtectedRoute from "./SellerProtectedRoute";
 import { adminRoutes } from "./AdminRoutes";
+import { packageManagerRoutes } from "./PackageManagerRoutes";
 import BuyerProtectedRoute from "./BuyerProtecdRoute";
 
-const Marketplace = lazy(() => import("../pages/Marketplace"));
-const LinkBuilding = lazy(() => import("../pages/Linkbuilding"));
-const WebsiteDetail = lazy(() => import("../pages/WebsiteDetail"));
-const PressReleaseDetail = lazy(() => import("../pages/PressReleaseDetail"));
-const BlogDetail = lazy(() => import("../pages/BlogDetail"));
-const Wishlist = lazy(() => import("../pages/Wishlist"));
-const Cart = lazy(() => import("../pages/Cart"));
-const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy"));
-const PaymentTerms = lazy(() => import("../pages/PaymentTerms"));
-const RefundPolicy = lazy(() => import("../pages/RefundPolicy"));
+const Marketplace = lazy(() => import("../pages/publicPages/Marketplace"));
+const LinkBuilding = lazy(() => import("../pages/publicPages/Linkbuilding"));
+const WebsiteDetail = lazy(() => import("../pages/publicPages/WebsiteDetail"));
+const PressReleaseDetail = lazy(() => import("../pages/publicPages/PressReleaseDetail"));
+const BlogDetail = lazy(() => import("../pages/publicPages/BlogDetail"));
+const Wishlist = lazy(() => import("../pages/publicPages/Wishlist"));
+const Cart = lazy(() => import("../pages/publicPages/Cart"));
+const PrivacyPolicy = lazy(() => import("../pages/publicPages/PrivacyPolicy"));
+const PaymentTerms = lazy(() => import("../pages/publicPages/PaymentTerms"));
+const RefundPolicy = lazy(() => import("../pages/publicPages/RefundPolicy"));
 
 const DashboardLayout = lazy(() => import("../layouts/DashboardLayout"));
 const PublisherDashboard = lazy(() => import("../pages/dashboard/PublisherDashboard"));
@@ -110,4 +111,5 @@ export const router = createBrowserRouter([
     ],
   },
   ...adminRoutes,
+  ...packageManagerRoutes,
 ]);

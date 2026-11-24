@@ -91,7 +91,7 @@ export const plans = [
 ];
 
 export const singleLink = {
-  price: "$2",
+  price: "₹2",
   title: "Need an Individual Backlink?",
   description:
     "Choose a publisher from the marketplace and purchase a single placement with no monthly commitment. Pay only for that placement.",

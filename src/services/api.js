@@ -51,6 +51,23 @@ export const refreshBuyerAccessToken = () => {
   return refreshBuyerPromise;
 };
 
+let refreshPackageManagerPromise = null;
+export const refreshPackageManagerAccessToken = () => {
+  refreshPackageManagerPromise ??= api
+    .post("v1/package/auth/refresh-token")
+    .then(({ data }) => data)
+    .catch((err) => {
+      if (err.response?.status === 404) {
+        return api.post("v1/auth/refresh-token").then(({ data }) => data);
+      }
+      throw err;
+    })
+    .finally(() => {
+      refreshPackageManagerPromise = null;
+    });
+  return refreshPackageManagerPromise;
+};
+
 let userRole = null;
 export const setUserRole = (role) => {
   userRole = role ? String(role).toUpperCase() : null;
@@ -63,18 +80,26 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
     const isAuthCall =
+      original?.url?.includes("v1/package/auth/refresh-token") ||
       original?.url?.includes("v1/auth/seller/refresh-token") ||
       original?.url?.includes("v1/auth/buyer/refresh-token") ||
       original?.url?.includes("v1/admin/auth/refresh-token") ||
+      original?.url?.includes("v1/auth/refresh-token") ||
       original?.url?.includes("v1/auth/register") ||
       original?.url?.includes("v1/admin/auth/login")|| 
+      original?.url?.includes("v1/package/auth/login")|| 
       original?.url?.includes("v1/auth/login");
 
 
     if (error.response?.status === 401 && !original._retry && !isAuthCall) {
       original._retry = true;
       try {
-        // Determine whether to call refreshBuyerAccessToken, refreshSellerAccessToken, or refreshAccessToken
+        const isPackageManagerCall =
+          userRole === "PACKAGE_MANAGER" ||
+          original?.url?.includes("/package/") ||
+          original?.url?.includes("v1/package") ||
+          window.location.pathname.startsWith("/package-manager");
+
         const isBuyerCall =
           userRole === "BUYER" ||
           original?.url?.includes("/buyer/") ||
@@ -88,7 +113,9 @@ api.interceptors.response.use(
           window.location.pathname.startsWith("/publisher-dashboard");
 
         let data;
-        if (isBuyerCall) {
+        if (isPackageManagerCall) {
+          data = await refreshPackageManagerAccessToken();
+        } else if (isBuyerCall) {
           data = await refreshBuyerAccessToken();
         } else if (isSellerCall) {
           data = await refreshSellerAccessToken();

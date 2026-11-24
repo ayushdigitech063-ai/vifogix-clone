@@ -1,15 +1,14 @@
 import { useState } from "react";
-import HeroBanner from "../components/blogs-sections/HeroBanner";
-import FeaturedPost from "../components/blogs-sections/FeaturedPost";
-import BlogListing from "../components/blogs-sections/BlogListing";
-import NewsletterSection from "../components/blogs-sections/NewsletterSection";
+import HeroBanner from "../../components/blogs-sections/HeroBanner";
+import BlogListing from "../../components/blogs-sections/BlogListing";
+import NewsletterSection from "../../components/blogs-sections/NewsletterSection";
 import {
   hero,
   categories,
   posts,
   popularTags,
   newsletter,
-} from "../data/blogs";
+} from "../../data/blogs";
 
 const Blogs = () => {
   const [searchQuery, setSearchQuery] = useState("");
