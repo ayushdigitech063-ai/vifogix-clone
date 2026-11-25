@@ -123,10 +123,10 @@ const Topbar = ({ onOpenSidebar }) => {
             className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-primary"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-              {initials}
+            A
             </div>
             <span className="hidden text-xs font-semibold text-fg sm:inline-block">
-              {admin?.name || "Admin"}
+              Admin
             </span>
             <ChevronDown
               className={`h-4 w-4 text-gray-400 transition-transform ${menuOpen ? "rotate-180" : ""}`}
@@ -147,7 +147,7 @@ const Topbar = ({ onOpenSidebar }) => {
                   className="block group"
                 >
                   <p className="truncate text-xs font-semibold text-fg group-hover:text-primary transition-colors">
-                    {admin?.name || "Admin"}
+                   Admin
                   </p>
                   <p className="truncate text-[11px] text-gray-500">{admin?.email}</p>
                 </Link>

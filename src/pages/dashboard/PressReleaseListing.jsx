@@ -689,10 +689,10 @@ const PressReleaseListing = () => {
 
                         {/* Price */}
                         <td className="px-5 py-3.5 whitespace-nowrap font-bold text-fg">
-                          ${pr.price ?? 0}
+                          ₹{pr.price ?? 0}
                           {pr.isPrWritingAvailable && (
                             <span className="block text-[10px] font-normal text-gray-400">
-                              +${pr.prWritingPrice} Writing
+                              +₹{pr.prWritingPrice} Writing
                             </span>
                           )}
                         </td>
@@ -1172,7 +1172,7 @@ const PressReleaseListing = () => {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div>
                     <label htmlFor={priceId} className="block font-bold text-fg">
-                      Publishing Price ($) *
+                      Publishing Price (₹) *
                     </label>
                     <input
                       id={priceId}
@@ -1207,7 +1207,7 @@ const PressReleaseListing = () => {
 
                   <div>
                     <label htmlFor={extraWordsPriceId} className="block font-bold text-fg">
-                      Extra Word Price / 100 words ($)
+                      Extra Word Price / 100 words (₹)
                     </label>
                     <input
                       id={extraWordsPriceId}
@@ -1236,7 +1236,7 @@ const PressReleaseListing = () => {
                   {formData.isPrWritingAvailable && (
                     <div className="mt-3 max-w-xs">
                       <label htmlFor={prWritingPriceId} className="block font-bold text-fg">
-                        PR Writing Price ($) *
+                        PR Writing Price (₹) *
                       </label>
                       <input
                         id={prWritingPriceId}
@@ -1394,7 +1394,7 @@ const PressReleaseListing = () => {
                 <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-gray-50/50 p-3">
                   <div>
                     <span className="text-gray-400 font-medium">Publishing Price</span>
-                    <p className="font-bold text-fg text-sm mt-0.5">${selectedPR.price ?? 0}</p>
+                    <p className="font-bold text-fg text-sm mt-0.5">₹{selectedPR.price ?? 0}</p>
                   </div>
                   <div>
                     <span className="text-gray-400 font-medium">Status</span>

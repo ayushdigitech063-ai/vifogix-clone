@@ -40,7 +40,7 @@ const RecentOrders = ({ orders = [] }) => {
                 <td className="px-6 py-4 font-medium text-fg">{order.customer}</td>
                 <td className="px-6 py-4 text-gray-500">{order.service}</td>
                 <td className="px-6 py-4 font-semibold text-fg">
-                  {formatCurrency(order.amount)}
+                  ₹{order.amount}
                 </td>
                 <td className="px-6 py-4">
                   <StatusBadge status={order.status} />
@@ -63,7 +63,7 @@ const RecentOrders = ({ orders = [] }) => {
             <div className="text-sm font-semibold text-fg">{order.customer}</div>
             <div className="text-xs text-gray-500">{order.service}</div>
             <div className="flex items-center justify-between pt-1">
-              <span className="text-sm font-bold text-fg">{formatCurrency(order.amount)}</span>
+              <span className="text-sm font-bold text-fg">₹{order.amount}</span>
               <span className="text-xs text-gray-500">{formatDate(order.date)}</span>
             </div>
           </div>

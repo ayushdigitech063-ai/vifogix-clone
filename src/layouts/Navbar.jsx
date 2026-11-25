@@ -28,6 +28,7 @@ const Navbar = () => {
   const { user, isAuthenticated } = useAuth();
   const { wishlistCount } = useWishlist();
   const isLoggedIn = isAuthenticated && Boolean(user);
+  console.log( "user", user , "isAuthenticated", isAuthenticated, "isLoggedIn", isLoggedIn, "wishlistCount", wishlistCount);
 
   // Close menus on route change
   useEffect(() => {

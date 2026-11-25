@@ -171,7 +171,7 @@ const Wishlist = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="block text-[11px] text-muted">Price</span>
-                        <span className="text-lg font-extrabold text-fg">${price}</span>
+                        <span className="text-lg font-extrabold text-fg">₹{price}</span>
                       </div>
                       <Link
                         to={`/website/${getWebsiteSlug(item)}`}

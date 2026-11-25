@@ -1045,11 +1045,11 @@ const AddWebsite = () => {
                 htmlFor="price"
                 className="block text-xs font-semibold text-fg mb-1.5"
               >
-                Guest Post Publishing Price ($ USD) <span className="text-accent-red">*</span>
+                Guest Post Publishing Price (₹) <span className="text-accent-red">*</span>
               </label>
               <div className="relative">
                 <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted text-sm font-semibold">
-                  $
+                  ₹
                 </span>
                 <input
                   id="price"
@@ -1079,11 +1079,11 @@ const AddWebsite = () => {
                 htmlFor="contentWritingPrice"
                 className="block text-xs font-semibold text-fg mb-1.5"
               >
-                Article Writing Addon Price ($ USD)
+                Article Writing Addon Price (₹)
               </label>
               <div className="relative">
                 <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted text-sm font-semibold">
-                  $
+                  ₹
                 </span>
                 <input
                   id="contentWritingPrice"

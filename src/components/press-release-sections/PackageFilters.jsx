@@ -8,7 +8,7 @@ const PackageFilters = ({ price, maxPrice, onPrice, outlets, selected, onToggle,
     </div>
 
     <div>
-      <h4 className="text-sm font-semibold text-fg">Price ($)</h4>
+      <h4 className="text-sm font-semibold text-fg">Price (₹)</h4>
       <input
         type="range"
         min="0"
