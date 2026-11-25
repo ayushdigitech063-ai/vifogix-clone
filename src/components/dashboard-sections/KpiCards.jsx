@@ -4,7 +4,7 @@ import KpiCard from "./KpiCard";
 const formatPrice = (val) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "IND",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(val || 0);

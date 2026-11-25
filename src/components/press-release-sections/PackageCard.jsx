@@ -65,7 +65,7 @@ const PackageCard = ({ pkg }) => (
           to="/signup"
           className="rounded-lg bg-primary py-2 text-center text-sm font-semibold text-white transition hover:opacity-90"
         >
-          Buy now · ${pkg.price}
+          Buy now · ₹{pkg.price}
         </Link>
       </div>
     </div>

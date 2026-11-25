@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./AuthContext";
+
 import {
   adminLogin,
   userLogin,
@@ -11,29 +12,45 @@ import {
   logoutSellerRequest,
   logoutBuyerRequest,
 } from "../services/authServices";
+
 import {
   refreshPackageManagerSession,
   packageManagerLogout,
 } from "../services/packageManagerService";
+
 import { setAccessToken, setUserRole } from "../services/api";
 
-// Helper to safely parse user JWT claims (without external dependencies)
+// --------------------------------------------------
+// Helper: safely parse JWT payload
+// --------------------------------------------------
 const parseJwt = (token) => {
   try {
     const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+    const base64 = base64Url
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .map(
+          (c) =>
+            "%" +
+            ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+        )
         .join("")
     );
+
     return JSON.parse(jsonPayload);
   } catch {
     return null;
   }
 };
 
+// --------------------------------------------------
+// Get previously stored user
+// --------------------------------------------------
 const getStoredUser = () => {
   try {
     const raw = localStorage.getItem("user");
@@ -43,249 +60,455 @@ const getStoredUser = () => {
   }
 };
 
+// --------------------------------------------------
+// Auth Provider
+// --------------------------------------------------
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // true until the first session check finishes
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sync role to API service whenever user state changes
+  // ------------------------------------------------
+  // Keep API service role in sync with current user
+  // ------------------------------------------------
   useEffect(() => {
-    setUserRole(user?.role);
+    setUserRole(user?.role || null);
   }, [user]);
 
-  // Restore the session on page load: the in-memory token is gone after a refresh,
-  // but the httpOnly cookie is still there.
+  // ------------------------------------------------
+  // Restore authentication session on page load
+  // ------------------------------------------------
   useEffect(() => {
     let cancelled = false;
 
-    // Check whether the user is visiting publisher (seller), buyer, package manager, or admin routes
-    const isPublisherRoute = window.location.pathname.startsWith("/publisher-dashboard");
-    const isBuyerRoute = window.location.pathname.startsWith("/buyer-dashboard");
-    const isPackageManagerRoute = window.location.pathname.startsWith("/package-manager");
-    const isAdminRoute = window.location.pathname.startsWith("/admin");
+    const restoreSession = async () => {
+      const pathname = window.location.pathname;
 
-    let refreshFn = refreshSession;
-    if (isPackageManagerRoute) {
-      refreshFn = refreshPackageManagerSession;
-    } else if (isPublisherRoute) {
-      refreshFn = refreshSellerSession;
-    } else if (isBuyerRoute) {
-      refreshFn = refreshBuyerSession;
-    }
+      // --------------------------------------------
+      // Detect protected application areas
+      // --------------------------------------------
+      const isAdminRoute =
+        pathname.startsWith("/admin");
 
-    refreshFn()
-      .then((res) => {
+      const isSellerRoute =
+        pathname.startsWith("/publisher-dashboard");
+
+      const isBuyerRoute =
+        pathname.startsWith("/buyer-dashboard");
+
+      const isPackageManagerRoute =
+        pathname.startsWith("/package-manager");
+
+      // --------------------------------------------
+      // IMPORTANT:
+      // Public routes do NOT need refresh API.
+      //
+      // Example:
+      // /
+      // /products
+      // /packages
+      // /about
+      //
+      // Don't call admin/buyer/seller/package-manager
+      // refresh APIs on these routes.
+      // --------------------------------------------
+     const isPublicRoute =
+  !isAdminRoute &&
+  !isSellerRoute &&
+  !isBuyerRoute &&
+  !isPackageManagerRoute;
+
+let refreshFn = null;
+
+// Homepage should try to restore BUYER session
+if (pathname === "/") {
+  refreshFn = refreshBuyerSession;
+} else if (isAdminRoute) {
+  refreshFn = refreshSession;
+} else if (isSellerRoute) {
+  refreshFn = refreshSellerSession;
+} else if (isBuyerRoute) {
+  refreshFn = refreshBuyerSession;
+} else if (isPackageManagerRoute) {
+  refreshFn = refreshPackageManagerSession;
+}
+
+// Other public routes don't need refresh
+if (!refreshFn && isPublicRoute) {
+  if (!cancelled) {
+    setIsLoading(false);
+  }
+
+  return;
+}
+
+      try {
+        // ------------------------------------------
+        // Restore existing authenticated session
+        // ------------------------------------------
+        const res = await refreshFn();
+
         if (cancelled) return;
-        const payload = res?.data?.data || res?.data || res;
-        const token = payload?.accessToken || payload?.token;
 
-        // Backend returns only { accessToken }. Decode claims or recover stored user:
-        const jwtClaims = token ? parseJwt(token) : null;
+        const payload =
+          res?.data?.data ||
+          res?.data ||
+          res;
+
+        const token =
+          payload?.accessToken ||
+          payload?.token;
+
+        // ------------------------------------------
+        // Try to get user from API response
+        // ------------------------------------------
+        let loggedUser =
+          payload?.user ||
+          payload?.admin ||
+          payload?.seller ||
+          payload?.buyer ||
+          payload?.packageManager;
+
+        // ------------------------------------------
+        // Stored user is only fallback identity data.
+        // It should NOT override trusted JWT/API data.
+        // ------------------------------------------
         const stored = getStoredUser();
 
-        let loggedUser = payload?.user || payload?.admin || payload?.seller || payload?.buyer || payload?.packageManager;
-        if (!loggedUser || (!loggedUser._id && !loggedUser.id)) {
-          if (jwtClaims && (jwtClaims._id || jwtClaims.id)) {
+        // ------------------------------------------
+        // Decode JWT if backend only returns token
+        // ------------------------------------------
+        const jwtClaims = token
+          ? parseJwt(token)
+          : null;
+
+        if (
+          !loggedUser ||
+          (!loggedUser._id && !loggedUser.id)
+        ) {
+          if (
+            jwtClaims &&
+            (jwtClaims._id || jwtClaims.id)
+          ) {
             loggedUser = {
-              _id: jwtClaims._id || jwtClaims.id,
-              email: jwtClaims.email || stored?.email,
+              ...stored,
+
+              _id:
+                jwtClaims._id ||
+                jwtClaims.id,
+
+              email:
+                jwtClaims.email ||
+                stored?.email,
+
               role:
                 jwtClaims.role ||
                 stored?.role ||
-                (isPackageManagerRoute ? "PACKAGE_MANAGER" : isPublisherRoute ? "SELLER" : isBuyerRoute ? "BUYER" : "USER"),
-              name: stored?.name || "",
-              ...stored,
+                getRoleFromRoute({
+                  isAdminRoute,
+                  isSellerRoute,
+                  isBuyerRoute,
+                  isPackageManagerRoute,
+                }),
+
+              name:
+                jwtClaims.name ||
+                stored?.name ||
+                "",
             };
           } else if (stored) {
             loggedUser = stored;
           }
         }
 
-        if (token) setAccessToken(token);
+        // ------------------------------------------
+        // Save new access token
+        // ------------------------------------------
+        if (token) {
+          setAccessToken(token);
+        }
+
+        // ------------------------------------------
+        // Update React authentication state
+        // ------------------------------------------
         if (loggedUser) {
           setUser(loggedUser);
-          setUserRole(loggedUser.role);
+
+          setUserRole(
+            loggedUser.role ||
+              getRoleFromRoute({
+                isAdminRoute,
+                isSellerRoute,
+                isBuyerRoute,
+                isPackageManagerRoute,
+              })
+          );
+
           try {
-            localStorage.setItem("user", JSON.stringify(loggedUser));
+            localStorage.setItem(
+              "user",
+              JSON.stringify(loggedUser)
+            );
           } catch (err) {
             void err;
           }
         }
-      })
-      .catch(async () => {
-        // Fallback: on public routes (e.g. marketplace, home), try buyer or seller if admin fails
-        if (!cancelled && !isPublisherRoute && !isBuyerRoute && !isAdminRoute) {
+      } catch (error) {
+        // ------------------------------------------
+        // IMPORTANT:
+        // A refresh failure on a protected route
+        // means session could not be restored.
+        //
+        // Do NOT try another role's refresh API.
+        // ------------------------------------------
+
+        if (!cancelled) {
+          setUser(null);
+          setUserRole(null);
+
+          setAccessToken(null);
+
           try {
-            // First try buyer session
-            const fallbackRes = await refreshBuyerSession();
-            if (cancelled) return;
-            const payload = fallbackRes?.data?.data || fallbackRes?.data || fallbackRes;
-            const token = payload?.accessToken || payload?.token;
-            const jwtClaims = token ? parseJwt(token) : null;
-            const stored = getStoredUser();
-
-            let loggedUser = payload?.user || payload?.buyer;
-            if (!loggedUser || (!loggedUser._id && !loggedUser.id)) {
-              if (jwtClaims && (jwtClaims._id || jwtClaims.id)) {
-                loggedUser = {
-                  _id: jwtClaims._id || jwtClaims.id,
-                  email: jwtClaims.email || stored?.email,
-                  role: jwtClaims.role || stored?.role || "BUYER",
-                  name: stored?.name || "",
-                  ...stored,
-                };
-              } else if (stored) {
-                loggedUser = stored;
-              }
-            }
-
-            if (token) setAccessToken(token);
-            if (loggedUser) {
-              setUser(loggedUser);
-              setUserRole(loggedUser.role);
-              try {
-                localStorage.setItem("user", JSON.stringify(loggedUser));
-              } catch (err) {
-                void err;
-              }
-            }
-          } catch {
-            // Then try seller session if buyer is not logged in
-            if (!cancelled) {
-              try {
-                const sellerRes = await refreshSellerSession();
-                if (cancelled) return;
-                const payload = sellerRes?.data?.data || sellerRes?.data || sellerRes;
-                const token = payload?.accessToken || payload?.token;
-                const jwtClaims = token ? parseJwt(token) : null;
-                const stored = getStoredUser();
-
-                let loggedUser = payload?.user || payload?.seller;
-                if (!loggedUser || (!loggedUser._id && !loggedUser.id)) {
-                  if (jwtClaims && (jwtClaims._id || jwtClaims.id)) {
-                    loggedUser = {
-                      _id: jwtClaims._id || jwtClaims.id,
-                      email: jwtClaims.email || stored?.email,
-                      role: jwtClaims.role || stored?.role || "SELLER",
-                      name: stored?.name || "",
-                      ...stored,
-                    };
-                  } else if (stored) {
-                    loggedUser = stored;
-                  }
-                }
-
-                if (token) setAccessToken(token);
-                if (loggedUser) {
-                  setUser(loggedUser);
-                  setUserRole(loggedUser.role);
-                  try {
-                    localStorage.setItem("user", JSON.stringify(loggedUser));
-                  } catch (err) {
-                    void err;
-                  }
-                }
-              } catch {
-                // Not logged in to either
-              }
-            }
+            localStorage.removeItem("user");
+          } catch (err) {
+            void err;
           }
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
 
-    return () => { cancelled = true; };
+          console.error(
+            "Failed to restore authentication session:",
+            error
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // the axios interceptor fires this when a refresh fails
+  // ------------------------------------------------
+  // Handle logout event fired by Axios interceptor
+  // ------------------------------------------------
   useEffect(() => {
     const onLogout = () => {
       setUser(null);
       setUserRole(null);
+      setAccessToken(null);
+
       try {
         localStorage.removeItem("user");
       } catch (err) {
         void err;
       }
     };
-    window.addEventListener("auth:logout", onLogout);
-    return () => window.removeEventListener("auth:logout", onLogout);
+
+    window.addEventListener(
+      "auth:logout",
+      onLogout
+    );
+
+    return () => {
+      window.removeEventListener(
+        "auth:logout",
+        onLogout
+      );
+    };
   }, []);
 
+  // ------------------------------------------------
+  // Normal login
+  // ------------------------------------------------
   const login = useCallback(async (credentials) => {
-    // If explicit admin credentials or admin route, invoke adminLogin; otherwise userLogin
-    const isAdminRoute = window.location.pathname.startsWith("/admin");
+    const pathname = window.location.pathname;
+
+    const isAdminRoute =
+      pathname.startsWith("/admin");
+
     const res = isAdminRoute
       ? await adminLogin(credentials)
       : await userLogin(credentials);
 
-    const payload = res?.data?.data || res?.data || res;
-    const token = payload?.accessToken || payload?.token;
-    const loggedUser = payload?.user || payload?.admin || payload;
+    const payload =
+      res?.data?.data ||
+      res?.data ||
+      res;
 
-    if (token) setAccessToken(token);
-    setUser(loggedUser);
-    setUserRole(loggedUser?.role || (isAdminRoute ? "ADMIN" : "SELLER"));
+    const token =
+      payload?.accessToken ||
+      payload?.token;
+
+    const loggedUser =
+      payload?.user ||
+      payload?.admin ||
+      payload;
+
+    if (token) {
+      setAccessToken(token);
+    }
+
     if (loggedUser) {
+      const role =
+        loggedUser.role ||
+        (isAdminRoute
+          ? "ADMIN"
+          : "SELLER");
+
+      const finalUser = {
+        ...loggedUser,
+        role,
+      };
+
+      setUser(finalUser);
+      setUserRole(role);
+
       try {
-        localStorage.setItem("user", JSON.stringify(loggedUser));
+        localStorage.setItem(
+          "user",
+          JSON.stringify(finalUser)
+        );
       } catch (err) {
         void err;
       }
+
+      return finalUser;
     }
-    return loggedUser;
+
+    return null;
   }, []);
 
-  const loginUserAccount = useCallback(async (credentials) => {
-    const res = await userLogin(credentials);
-    const payload = res?.data?.data || res?.data || res;
-    const token = payload?.accessToken || payload?.token;
-    const loggedUser = payload?.user || payload;
+  // ------------------------------------------------
+  // Buyer/user login
+  // ------------------------------------------------
+  const loginUserAccount = useCallback(
+    async (credentials) => {
+      const res = await userLogin(credentials);
 
-    if (token) setAccessToken(token);
-    if (loggedUser) {
-      setUser(loggedUser);
-      setUserRole(loggedUser?.role);
-      try {
-        localStorage.setItem("user", JSON.stringify(loggedUser));
-      } catch (err) {
-        void err;
+      const payload =
+        res?.data?.data ||
+        res?.data ||
+        res;
+
+      const token =
+        payload?.accessToken ||
+        payload?.token;
+
+      const loggedUser =
+        payload?.user ||
+        payload;
+
+      if (token) {
+        setAccessToken(token);
       }
-    }
-    return loggedUser;
-  }, []);
 
-  const register = useCallback(async (userData) => {
-    const res = await registerUser(userData);
-    const payload = res?.data?.data || res?.data || res;
-    const token = payload?.accessToken || payload?.token;
-    const registeredUser = payload?.user || payload;
+      if (loggedUser) {
+        setUser(loggedUser);
+        setUserRole(loggedUser.role);
 
-    if (token) setAccessToken(token);
-    if (registeredUser) {
-      setUser(registeredUser);
-      setUserRole(registeredUser.role || userData.role || "SELLER");
-      try {
-        localStorage.setItem("user", JSON.stringify(registeredUser));
-      } catch (err) {
-        void err;
+        try {
+          localStorage.setItem(
+            "user",
+            JSON.stringify(loggedUser)
+          );
+        } catch (err) {
+          void err;
+        }
       }
-    }
-    return registeredUser;
-  }, []);
 
+      return loggedUser;
+    },
+    []
+  );
+
+  // ------------------------------------------------
+  // Register
+  // ------------------------------------------------
+  const register = useCallback(
+    async (userData) => {
+      const res =
+        await registerUser(userData);
+
+      const payload =
+        res?.data?.data ||
+        res?.data ||
+        res;
+
+      const token =
+        payload?.accessToken ||
+        payload?.token;
+
+      const registeredUser =
+        payload?.user ||
+        payload;
+
+      if (token) {
+        setAccessToken(token);
+      }
+
+      if (registeredUser) {
+        const role =
+          registeredUser.role ||
+          userData.role ||
+          "SELLER";
+
+        const finalUser = {
+          ...registeredUser,
+          role,
+        };
+
+        setUser(finalUser);
+        setUserRole(role);
+
+        try {
+          localStorage.setItem(
+            "user",
+            JSON.stringify(finalUser)
+          );
+        } catch (err) {
+          void err;
+        }
+
+        return finalUser;
+      }
+
+      return null;
+    },
+    []
+  );
+
+  // ------------------------------------------------
+  // Logout
+  // ------------------------------------------------
   const logout = useCallback(async () => {
     try {
+      const currentRole =
+        user?.role?.toUpperCase();
+
+      const pathname =
+        window.location.pathname;
+
       const isPackageManager =
-        user?.role?.toUpperCase() === "PACKAGE_MANAGER" ||
-        window.location.pathname.startsWith("/package-manager");
+        currentRole === "PACKAGE_MANAGER" ||
+        pathname.startsWith(
+          "/package-manager"
+        );
+
       const isBuyer =
-        user?.role?.toUpperCase() === "BUYER" ||
-        window.location.pathname.startsWith("/buyer-dashboard");
+        currentRole === "BUYER" ||
+        pathname.startsWith(
+          "/buyer-dashboard"
+        );
+
       const isSeller =
-        user?.role?.toUpperCase() === "SELLER" ||
-        window.location.pathname.startsWith("/publisher-dashboard");
+        currentRole === "SELLER" ||
+        pathname.startsWith(
+          "/publisher-dashboard"
+        );
 
       if (isPackageManager) {
         await packageManagerLogout();
@@ -302,6 +525,7 @@ const AuthProvider = ({ children }) => {
       setAccessToken(null);
       setUserRole(null);
       setUser(null);
+
       try {
         localStorage.removeItem("user");
       } catch (err) {
@@ -310,21 +534,69 @@ const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
+  // ------------------------------------------------
+  // Context value
+  // ------------------------------------------------
   const value = useMemo(
     () => ({
       user,
+
+      // Existing compatibility
       admin: user,
+
       isLoading,
-      isAuthenticated: Boolean(user),
+
+      isAuthenticated:
+        Boolean(user),
+
       login,
       loginUserAccount,
       register,
       logout,
     }),
-    [user, isLoading, login, loginUserAccount, register, logout]
+    [
+      user,
+      isLoading,
+      login,
+      loginUserAccount,
+      register,
+      logout,
+    ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// --------------------------------------------------
+// Route → role fallback
+// --------------------------------------------------
+const getRoleFromRoute = ({
+  isAdminRoute,
+  isSellerRoute,
+  isBuyerRoute,
+  isPackageManagerRoute,
+}) => {
+  if (isAdminRoute) {
+    return "ADMIN";
+  }
+
+  if (isSellerRoute) {
+    return "SELLER";
+  }
+
+  if (isBuyerRoute) {
+    return "BUYER";
+  }
+
+  if (isPackageManagerRoute) {
+    return "PACKAGE_MANAGER";
+  }
+
+  return null;
 };
 
 export default AuthProvider;

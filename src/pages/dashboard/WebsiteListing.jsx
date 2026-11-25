@@ -389,11 +389,11 @@ const WebsiteListing = () => {
                       {/* Pricing */}
                       <td className="py-4 px-4">
                         <div className="font-bold text-fg">
-                          ${Number(site.price || 0).toFixed(2)}
+                          ₹{Number(site.price || 0).toFixed(2)}
                         </div>
                         {Number(site.contentWritingPrice) > 0 && (
                           <p className="text-[10px] text-muted">
-                            +${Number(site.contentWritingPrice).toFixed(2)} writing
+                            +₹{Number(site.contentWritingPrice).toFixed(2)} writing
                           </p>
                         )}
                       </td>

@@ -40,7 +40,7 @@ const EarningsPanel = ({ earnings = [] }) => {
                   </div>
                 </div>
                 <div className="text-sm font-semibold text-fg">
-                  {formatPrice(row.amount)}
+                  ₹{row.amount}
                 </div>
               </div>
             );

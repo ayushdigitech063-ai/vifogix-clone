@@ -150,11 +150,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="border-t border-white/10 p-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-            {initials}
+              A
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-white">
-              {admin?.name || "Administrator"}
+            Administrator
             </p>
             <p className="truncate text-xs text-gray-400">{admin?.email}</p>
           </div>
