@@ -4,6 +4,11 @@ import { ToastProvider } from "./context/ToastContext";
 import { WishlistProvider } from "./context/WishlistProvider";
 
 const App = () => {
+const pathname = window.location.pathname;
+const isAdminOrPackageManager = 
+  pathname.startsWith("/admin") || 
+  pathname.startsWith("/package-manager");
+if (!isAdminOrPackageManager) {
   return (
     <ToastProvider>
       <WishlistProvider>
@@ -11,6 +16,13 @@ const App = () => {
       </WishlistProvider>
     </ToastProvider>
   );
+} else {
+  return (
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
+  );
+}
 };
 
 export default App;

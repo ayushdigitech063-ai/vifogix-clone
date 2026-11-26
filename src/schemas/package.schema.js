@@ -1,7 +1,7 @@
 // src/schemas/package.schema.js
-import { z } from "zod";
+import { string, z } from "zod";
 
-export const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+export const objectIdRegex = string;
 
 // 1. Create Single Package Validation
 export const createPackageSchema = z
@@ -67,19 +67,19 @@ export const updatePackageSchema = z
 
 // 3. Package ID Param Validation
 export const packageIdParamSchema = z.object({
-  packageId: z.string().regex(objectIdRegex, "Invalid Package ID format"),
+  packageId: z.string(),
 });
 
 // 4. Toggle Package Status Validation
 export const togglePackageStatusSchema = z.object({
   params: z
     .object({
-      packageId: z.string().regex(objectIdRegex, "Invalid Package ID format"),
+      packageId: z.string(),
     })
-    .optional(),
+    .optional(),  
   body: z
     .object({
-      isActive: z.boolean().optional(),
+      status : z.string().optional(),
     })
     .optional(),
 });

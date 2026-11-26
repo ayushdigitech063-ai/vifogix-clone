@@ -88,14 +88,6 @@ const LightHouseWebsites = () => {
 
           {/* Slider Controls */}
           <div className="flex items-center gap-3 self-start md:self-auto">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="p-2.5 rounded-full border border-border bg-white text-muted hover:text-fg hover:border-primary/40 transition-colors shadow-xs"
-              title={isPlaying ? "Pause auto-scroll" : "Play auto-scroll"}
-              aria-label={isPlaying ? "Pause auto-scroll" : "Play auto-scroll"}
-            >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </button>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handlePrev}

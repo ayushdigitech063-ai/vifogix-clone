@@ -529,8 +529,7 @@ const AdminWebsiteListing = () => {
                       {/* Price */}
                       <td className="px-4 py-4 font-semibold text-fg">
                         <span className="inline-flex items-center text-sm">
-                          <DollarSign className="h-3.5 w-3.5 text-gray-400 -mr-0.5" />
-                          {w.price}
+                          ₹{w.price}
                         </span>
                       </td>
 

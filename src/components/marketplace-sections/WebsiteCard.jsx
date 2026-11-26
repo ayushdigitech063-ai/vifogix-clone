@@ -32,7 +32,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
   const [saved, setSaved] = useState(isWishlisted);
   const [toggling, setToggling] = useState(false);
 
-  const websiteSlug = site._slug || site.slug;
+  const websiteSlug = site._id || site.id;
 
 
   const handleToggleWishlist = async (e) => {
@@ -50,18 +50,18 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
       return;
     }
 
-    if (!websiteSlug || !/^[0-9a-fA-F]{24}$/.test(websiteSlug)) {
+    if (!websiteSlug) {
       setSaved((prev) => !prev);
       return;
     }
 
     setToggling(true);
     try {
-      const res = toggleItem ? await toggleItem(websiteSlug) : await toggleWishlist(websiteSlug);
+      const res = await toggleWishlist(websiteSlug);
       const isNowWishlisted = res?.data?.isWishlisted ?? !saved;
       setSaved(isNowWishlisted);
       if (onWishlistToggle) {
-        onWishlistToggle(websiteSlug, isNowWishlisted);
+        onWishlistToggle(websiteSlug);
       }
       if (isNowWishlisted) {
         toast.success(res?.message || `${domain || "Website"} added to your wishlist!`, "Wishlist Updated");
@@ -115,9 +115,6 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
     : site.turnaroundDays 
     ? `${site.turnaroundDays} Days` 
     : "3 Days";
-
-  // Total Deals
-  const deals = site.totalDeals ?? site.deals ?? 0;
 
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-shadow hover:shadow-lg">
@@ -202,7 +199,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
         </div>
 
         <button className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light">
-          Buy now · {deals} deals
+          Buy now
         </button>
       </div>
     </article>

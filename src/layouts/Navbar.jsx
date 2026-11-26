@@ -14,7 +14,7 @@ const Navbar = () => {
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
   const [desktopDashboardOpen, setDesktopDashboardOpen] = useState(false);
   const [mobileAccordionOpen, setMobileAccordionOpen] = useState(false);
-  const [mobileDashboardAccordionOpen, setMobileDashboardAccordionOpen] = useState(false);
+  
 
   const location = useLocation();
   const dropdownRef = useRef(null);
@@ -23,12 +23,12 @@ const Navbar = () => {
   const dashboardTriggerRef = useRef(null);
   const menuItemsRef = useRef([]);
   const timeoutRef = useRef(null);
-  const dashboardTimeoutRef = useRef(null);
-
-  const { user, isAuthenticated } = useAuth();
+  
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { wishlistCount } = useWishlist();
-  const isLoggedIn = isAuthenticated && Boolean(user);
-  console.log( "user", user , "isAuthenticated", isAuthenticated, "isLoggedIn", isLoggedIn, "wishlistCount", wishlistCount);
+  const isLoggedIn = !isLoading && isAuthenticated && Boolean(user);
+  const isBuyer = user?.role?.toUpperCase() === "BUYER";
+  const isSeller = user?.role?.toUpperCase() === "SELLER";
 
   // Close menus on route change
   useEffect(() => {
@@ -73,18 +73,6 @@ const Navbar = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  // Dashboard Hover handlers with 150ms delay
-  const handleDashboardMouseEnter = () => {
-    if (dashboardTimeoutRef.current) clearTimeout(dashboardTimeoutRef.current);
-    setDesktopDashboardOpen(true);
-  };
-
-  const handleDashboardMouseLeave = () => {
-    dashboardTimeoutRef.current = setTimeout(() => {
-      setDesktopDashboardOpen(false);
-    }, 150);
-  };
 
   // Hover handlers with 150ms delay
   const handleMouseEnter = () => {
@@ -240,76 +228,55 @@ const Navbar = () => {
 
         {/* Desktop Auth / Dashboard Buttons */}
         <div className="hidden items-center gap-3 lg:flex">
-          {isLoggedIn ? (
-            <>
-              <Link
-                to={authLinks.wishlist.href}
-                className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-fg transition-colors hover:border-primary hover:text-primary"
-                title="Wishlist"
-                aria-label="Wishlist"
-              >
-                <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white shadow-sm">
-                    {wishlistCount > 99 ? "99+" : wishlistCount}
-                  </span>
-                )}
-              </Link>
-
-              <Link
-                to={authLinks.cart.href}
-                className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-fg transition-colors hover:border-primary hover:text-primary"
-                title="Cart"
-                aria-label="Cart"
-              >
-                <ShoppingCart className="h-5 w-5" />
-              </Link>
-
-              {/* Dashboard Dropdown */}
-              <div
-                className="relative"
-                onMouseEnter={handleDashboardMouseEnter}
-                onMouseLeave={handleDashboardMouseLeave}
-              >
-                <button
-                  ref={dashboardTriggerRef}
-                  type="button"
-                  onClick={() => setDesktopDashboardOpen((prev) => !prev)}
-                  className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
-                  aria-expanded={desktopDashboardOpen}
-                  aria-haspopup="true"
+          {isLoading ? null : isLoggedIn ? (
+            isBuyer ? (
+              <>
+                <Link
+                  to="/buyer-dashboard"
+                  className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
                 >
                   Dashboard
-                  <ChevronDownIcon
-                    className={`h-4 w-4 transition-transform duration-200 ${
-                      desktopDashboardOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+                </Link>
 
-                {desktopDashboardOpen && (
-                  <div
-                    ref={dashboardDropdownRef}
-                    className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-surface p-2 shadow-xl ring-1 ring-black/5"
-                  >
-                    <Link
-                      to="/buyer-dashboard"
-                      onClick={() => setDesktopDashboardOpen(false)}
-                      className="block rounded-lg px-3 py-2 text-sm font-medium text-fg transition-colors hover:bg-cream hover:text-primary"
-                    >
-                      Buyer Dashboard
-                    </Link>
-                    <Link
-                      to="/publisher-dashboard"
-                      onClick={() => setDesktopDashboardOpen(false)}
-                      className="block rounded-lg px-3 py-2 text-sm font-medium text-fg transition-colors hover:bg-cream hover:text-primary"
-                    >
-                      Publisher Dashboard
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </>
+                <Link
+                  to={authLinks.wishlist.href}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-fg transition-colors hover:border-primary hover:text-primary"
+                  title="Wishlist"
+                  aria-label="Wishlist"
+                >
+                  <Heart className="h-5 w-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white shadow-sm">
+                      {wishlistCount > 99 ? "99+" : wishlistCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
+                  to={authLinks.cart.href}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-fg transition-colors hover:border-primary hover:text-primary"
+                  title="Cart"
+                  aria-label="Cart"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                </Link>
+              </>
+            ) : isSeller ? (
+              <Link
+                to="/publisher-dashboard"
+                className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              /* Fallback for other logged in roles (e.g. admin) */
+              <Link
+                to={user?.role?.toUpperCase() === "PACKAGE_MANAGER" ? "/package-manager/packages" : "/admin"}
+                className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-light"
+              >
+                Dashboard
+              </Link>
+            )
           ) : (
             <>
               <Link
@@ -420,71 +387,61 @@ const Navbar = () => {
 
           {/* Mobile Auth Buttons / Dashboard */}
           <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-            {isLoggedIn ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <Link
-                    to={authLinks.wishlist.href}
-                    onClick={() => setOpen(false)}
-                    className="relative flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
-                  >
-                    <span className="relative flex items-center">
-                      <Heart className="h-4 w-4" />
-                      {wishlistCount > 0 && (
-                        <span className="absolute -top-2 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
-                          {wishlistCount > 99 ? "99+" : wishlistCount}
-                        </span>
-                      )}
-                    </span>
-                    <span>Wishlist</span>
-                  </Link>
+            {isLoading ? null : isLoggedIn ? (
+              isBuyer ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={authLinks.wishlist.href}
+                      onClick={() => setOpen(false)}
+                      className="relative flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
+                    >
+                      <span className="relative flex items-center">
+                        <Heart className="h-4 w-4" />
+                        {wishlistCount > 0 && (
+                          <span className="absolute -top-2 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                            {wishlistCount > 99 ? "99+" : wishlistCount}
+                          </span>
+                        )}
+                      </span>
+                      <span>Wishlist</span>
+                    </Link>
+
+                    <Link
+                      to={authLinks.cart.href}
+                      onClick={() => setOpen(false)}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Cart
+                    </Link>
+                  </div>
 
                   <Link
-                    to={authLinks.cart.href}
+                    to="/buyer-dashboard"
                     onClick={() => setOpen(false)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-semibold text-fg transition-colors hover:border-primary hover:text-primary"
+                    className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
                   >
-                    <ShoppingCart className="h-4 w-4" />
-                    Cart
+                    Dashboard
                   </Link>
-                </div>
-
-                {/* Mobile Dashboard Accordion */}
-                <div className="flex flex-col">
-                  <button
-                    type="button"
-                    onClick={() => setMobileDashboardAccordionOpen((prev) => !prev)}
-                    className="flex w-full items-center justify-between rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
-                    aria-expanded={mobileDashboardAccordionOpen}
-                  >
-                    <span>Dashboard</span>
-                    <ChevronDownIcon
-                      className={`h-4 w-4 transition-transform duration-200 ${
-                        mobileDashboardAccordionOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {mobileDashboardAccordionOpen && (
-                    <div className="mt-2 flex flex-col space-y-1 rounded-xl border border-border bg-surface p-2">
-                      <Link
-                        to="/buyer-dashboard"
-                        onClick={() => setOpen(false)}
-                        className="rounded-lg px-3 py-2 text-sm font-medium text-fg hover:bg-cream hover:text-primary"
-                      >
-                        Buyer Dashboard
-                      </Link>
-                      <Link
-                        to="/publisher-dashboard"
-                        onClick={() => setOpen(false)}
-                        className="rounded-lg px-3 py-2 text-sm font-medium text-fg hover:bg-cream hover:text-primary"
-                      >
-                        Publisher Dashboard
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </>
+                </>
+              ) : isSeller ? (
+                <Link
+                  to="/publisher-dashboard"
+                  onClick={() => setOpen(false)}
+                  className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  to={user?.role?.toUpperCase() === "PACKAGE_MANAGER" ? "/package-manager/packages" : "/admin"}
+                  onClick={() => setOpen(false)}
+                  className="flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light"
+                >
+                  Dashboard
+                </Link>
+              )
             ) : (
               <>
                 <Link

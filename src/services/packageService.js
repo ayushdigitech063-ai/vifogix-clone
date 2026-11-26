@@ -112,7 +112,7 @@ export const updatePackage = async (packageId, packageData) => {
  */
 export const changePackageStatus = async (packageId, statusData = {}) => {
   try {
-    const { data } = await api.patch(`/v1/admin/packages/${packageId}/status`, statusData);
+    const { data } = await api.patch(`/v1/admin/packages/${packageId}/review`, statusData);
     return data;
   } catch (error) {
     if (error.response?.status === 404) {

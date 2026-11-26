@@ -45,7 +45,7 @@ const WebsiteListing = ({ data, websites: defaultWebsites, onFiltersClick }) => 
   const [wishlistIds, setWishlistIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
-  // Fetch wishlisted IDs if logged in as buyer
+ // Fetch wishlisted IDs if logged in as buyer
   useEffect(() => {
     let mounted = true;
     if (isAuthenticated && user?.role?.toUpperCase() === "BUYER") {
@@ -294,11 +294,12 @@ const WebsiteListing = ({ data, websites: defaultWebsites, onFiltersClick }) => 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((site) => {
               const websiteSlug = site._slug || site.slug ;
+              const websiteId = site._id;
               return (
                 <WebsiteCard
                   key={websiteSlug}
                   site={site}
-                  isWishlisted={wishlistIds.has(websiteSlug)}
+                  isWishlisted={wishlistIds.has(websiteId)}
                   onWishlistToggle={handleWishlistToggle}
                 />
               );
