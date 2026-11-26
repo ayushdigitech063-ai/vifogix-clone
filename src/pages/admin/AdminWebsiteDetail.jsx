@@ -377,13 +377,13 @@ const AdminWebsiteDetail = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="rounded-xl border border-border bg-cream/30 p-3.5">
                 <p className="text-[11px] font-semibold text-gray-500">Publishing Price</p>
-                <p className="text-lg font-bold text-emerald-700 mt-1">${website.price}</p>
+                <p className="text-lg font-bold text-emerald-700 mt-1">₹{website.price}</p>
               </div>
 
               <div className="rounded-xl border border-border bg-cream/30 p-3.5">
                 <p className="text-[11px] font-semibold text-gray-500">Content Writing</p>
                 <p className="text-lg font-bold text-fg mt-1">
-                  ${website.contentWritingPrice ?? 0}
+                  ₹{website.contentWritingPrice ?? 0}
                 </p>
               </div>
 

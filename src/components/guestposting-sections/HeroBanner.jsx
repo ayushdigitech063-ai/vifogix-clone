@@ -12,23 +12,11 @@ const HeroBanner = ({ data }) => (
       /> */}
     </div>
 
-    <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-14 text-left md:py-24">
-      <nav className="mb-3 text-sm text-gray-400">
-        {data.breadcrumb.map((b, i) => (
-          <span key={b.label}>
-            {i > 0 && <span className="mx-1">/</span>}
-            {b.href ? (
-              <a href={b.href} className="hover:text-white">{b.label}</a>
-            ) : (
-              <span className="font-medium text-white">{b.label}</span>
-            )}
-          </span>
-        ))}
-      </nav>
-
+    <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-14 md:py-24">
+      
       <BannerHeading
         as="h1"
-        align="left"
+        align="center"
         maxWidth="md"
         title={
           <>
@@ -56,7 +44,7 @@ const HeroBanner = ({ data }) => (
         </div>
       </BannerHeading>
 
-      <dl className="mx-auto mt-10 ml-0.5 grid max-w-4xl grid-cols-2 gap-6 md:grid-cols-4">
+      <dl className="mx-80 mt-10 grid max-w-4xl grid-cols-2  gap-5 md:grid-cols-4">
         {data.stats.map((s) => (
           <div key={s.label}>
             <dt className="text-2xl font-extrabold text-accent-yellow md:text-3xl">{s.value}</dt>

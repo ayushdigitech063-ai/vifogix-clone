@@ -15,7 +15,7 @@ const toError = (error, fallback = "Wishlist operation failed.") => {
  * Toggle Website in Wishlist (Add if not present, Remove if present)
  * Maps to backend: POST /v1/wishlist/toggle
  *
- * @param {string} websiteId - 24-character hexadecimal MongoDB ObjectId
+ * @param {string} websiteSId - 24-character hexadecimal MongoDB ObjectId
  * @returns {Promise<Object>} { success, statusCode, message, data: { websiteId, isWishlisted, action } }
  */
 export const toggleWishlist = async (websiteId) => {

@@ -255,16 +255,14 @@ const AdminPackages = () => {
     }
   };
 
-  const handleToggleStatus = async (pkg) => {
-    const pkgId = pkg._id || pkg.id;
-    if (!pkgId) return;
-
-    const newStatus = !pkg.isActive;
+  const handleStatusChange = async (pkg, newStatus) => {
+    const pkgSlug = pkg._slug || pkg.slug || pkg._id || pkg.id;
+    if (!pkgSlug) return;
 
     // Validate params & body with togglePackageStatusSchema
     const validation = togglePackageStatusSchema.safeParse({
-      params: { packageId: pkgId },
-      body: { isActive: newStatus },
+      params: { packageId: pkgSlug },
+      body: { status: newStatus },
     });
 
     if (!validation.success) {
@@ -274,15 +272,64 @@ const AdminPackages = () => {
     }
 
     try {
-      setTogglingId(pkgId);
-      const res = await changePackageStatus(pkgId, { isActive: newStatus });
+      setTogglingId(pkg._id || pkg.id || pkgSlug);
+      const res = await changePackageStatus(pkgSlug, { status: newStatus });
       setPackages((prev) =>
         prev.map((item) =>
-          (item._id || item.id) === pkgId ? { ...item, isActive: newStatus } : item
+          (item._id || item.id) === (pkg._id || pkg.id) || item.slug === pkgSlug
+            ? { ...item, status: newStatus, isActive: newStatus === "ACTIVE" }
+            : item
         )
       );
-      if (selectedPackage && (selectedPackage._id || selectedPackage.id) === pkgId) {
-        setSelectedPackage((prev) => ({ ...prev, isActive: newStatus }));
+      if (
+        selectedPackage &&
+        ((selectedPackage._id || selectedPackage.id) === (pkg._id || pkg.id) ||
+          selectedPackage.slug === pkgSlug)
+      ) {
+        setSelectedPackage((prev) => ({
+          ...prev,
+          status: newStatus,
+          isActive: newStatus === "ACTIVE",
+        }));
+      }
+      toast.success(res?.message || `Package status updated to ${newStatus}.`);
+    } catch (err) {
+      toast.error(err.message || "Failed to update package status.");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const handleToggleStatus = async (pkg) => {
+    const pkgSlug = pkg._slug || pkg.slug;
+    console.log("new slug" , pkgSlug)
+    if (!pkgSlug) return;
+
+    const newStatus = !pkg.isActive;
+    const status = pkg.status;
+
+    // Validate params & body with togglePackageStatusSchema
+    const validation = togglePackageStatusSchema.safeParse({
+      params: { packageId: pkgSlug },
+      body: { status: status },
+    });
+
+    if (!validation.success) {
+      const msg = validation.error.issues[0]?.message || "Invalid status payload";
+      toast.error(msg, "Validation Error");
+      return;
+    }
+
+    try {
+      setTogglingId(pkgSlug);
+      const res = await changePackageStatus(pkgSlug, {  status: status});
+      setPackages((prev) =>
+        prev.map((item) =>
+          (item._id || item.id) === pkgSlug ? { ...item, status: status} : item
+        )
+      );
+      if (selectedPackage && (selectedPackage._id || selectedPackage.id) === pkgSlug) {
+        setSelectedPackage((prev) => ({ ...prev, status: status }));
       }
       toast.success(res?.message || `Package ${newStatus ? "activated" : "deactivated"} successfully.`);
     } catch (err) {
@@ -488,25 +535,27 @@ const AdminPackages = () => {
 
                         {/* Status */}
                         <td className="px-5 py-3.5 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                              pkg.isActive
-                                ? "bg-emerald-50 text-emerald-700"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {pkg.isActive ? (
-                              <>
-                                <CheckCircle2 className="h-3 w-3" />
-                                Active
-                              </>
-                            ) : (
-                              <>
-                                <XCircle className="h-3 w-3" />
-                                Inactive
-                              </>
+                          <div className="relative inline-flex items-center">
+                            <select
+                              value={pkg.status || (pkg.isActive ? "ACTIVE" : "SUSPENDED")}
+                              onChange={(e) => handleStatusChange(pkg, e.target.value)}
+                              disabled={isToggling}
+                              className={`rounded-lg border px-2.5 py-1 text-xs font-semibold focus:outline-hidden transition-colors cursor-pointer ${
+                                (pkg.status || (pkg.isActive ? "ACTIVE" : "SUSPENDED")) === "ACTIVE"
+                                  ? "border-emerald-200 bg-emerald-50 text-emerald-700 focus:border-emerald-500"
+                                  : (pkg.status || "") === "REJECTED"
+                                  ? "border-rose-200 bg-rose-50 text-rose-700 focus:border-rose-500"
+                                  : "border-amber-200 bg-amber-50 text-amber-700 focus:border-amber-500"
+                              } disabled:opacity-50`}
+                            >
+                              <option value="ACTIVE">ACTIVE</option>
+                              <option value="REJECTED">REJECTED</option>
+                              <option value="SUSPENDED">SUSPENDED</option>
+                            </select>
+                            {isToggling && (
+                              <Loader2 className="ml-1.5 h-3.5 w-3.5 animate-spin text-gray-500" />
                             )}
-                          </span>
+                          </div>
                         </td>
 
                         {/* Actions */}
@@ -533,7 +582,7 @@ const AdminPackages = () => {
                               <Edit className="h-4 w-4" />
                             </button>
 
-                            <button
+                            {/* <button
                               type="button"
                               onClick={() => handleToggleStatus(pkg)}
                               disabled={isToggling}
@@ -551,7 +600,7 @@ const AdminPackages = () => {
                               ) : (
                                 "Activate"
                               )}
-                            </button>
+                            </button> */}
 
                             <button
                               type="button"

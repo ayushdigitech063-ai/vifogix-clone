@@ -209,11 +209,12 @@ const WebsiteListing = () => {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((site) => {
               const websiteSlug = site._slug|| site.slug;
+              const websiteId  = site._id;
               return (
                 <WebsiteCard
                   key={websiteSlug}
                   site={site}
-                  isWishlisted={wishlistIds.has(websiteSlug)}
+                  isWishlisted={wishlistIds.has(websiteId)}
                   onWishlistToggle={handleWishlistToggle}
                 />
               );

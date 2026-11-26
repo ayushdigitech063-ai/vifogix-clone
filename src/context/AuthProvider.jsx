@@ -111,44 +111,14 @@ const AuthProvider = ({ children }) => {
       // Don't call admin/buyer/seller/package-manager
       // refresh APIs on these routes.
       // --------------------------------------------
-     const isPublicRoute =
-  !isAdminRoute &&
-  !isSellerRoute &&
-  !isBuyerRoute &&
-  !isPackageManagerRoute;
+      const isPublicRoute =
+        !isAdminRoute &&
+        !isSellerRoute &&
+        !isBuyerRoute &&
+        !isPackageManagerRoute;
 
-let refreshFn = null;
-
-// Homepage should try to restore BUYER session
-if (pathname === "/") {
-  refreshFn = refreshBuyerSession;
-} else if (isAdminRoute) {
-  refreshFn = refreshSession;
-} else if (isSellerRoute) {
-  refreshFn = refreshSellerSession;
-} else if (isBuyerRoute) {
-  refreshFn = refreshBuyerSession;
-} else if (isPackageManagerRoute) {
-  refreshFn = refreshPackageManagerSession;
-}
-
-// Other public routes don't need refresh
-if (!refreshFn && isPublicRoute) {
-  if (!cancelled) {
-    setIsLoading(false);
-  }
-
-  return;
-}
-
-      try {
-        // ------------------------------------------
-        // Restore existing authenticated session
-        // ------------------------------------------
-        const res = await refreshFn();
-
-        if (cancelled) return;
-
+      // Helper to process session restoration response
+      const processSessionResponse = (res, forcedRole = null) => {
         const payload =
           res?.data?.data ||
           res?.data ||
@@ -158,9 +128,6 @@ if (!refreshFn && isPublicRoute) {
           payload?.accessToken ||
           payload?.token;
 
-        // ------------------------------------------
-        // Try to get user from API response
-        // ------------------------------------------
         let loggedUser =
           payload?.user ||
           payload?.admin ||
@@ -168,15 +135,8 @@ if (!refreshFn && isPublicRoute) {
           payload?.buyer ||
           payload?.packageManager;
 
-        // ------------------------------------------
-        // Stored user is only fallback identity data.
-        // It should NOT override trusted JWT/API data.
-        // ------------------------------------------
         const stored = getStoredUser();
 
-        // ------------------------------------------
-        // Decode JWT if backend only returns token
-        // ------------------------------------------
         const jwtClaims = token
           ? parseJwt(token)
           : null;
@@ -201,6 +161,7 @@ if (!refreshFn && isPublicRoute) {
                 stored?.email,
 
               role:
+                forcedRole ||
                 jwtClaims.role ||
                 stored?.role ||
                 getRoleFromRoute({
@@ -220,21 +181,20 @@ if (!refreshFn && isPublicRoute) {
           }
         }
 
-        // ------------------------------------------
-        // Save new access token
-        // ------------------------------------------
+        if (forcedRole && loggedUser) {
+          loggedUser = { ...loggedUser, role: forcedRole };
+        }
+
         if (token) {
           setAccessToken(token);
         }
 
-        // ------------------------------------------
-        // Update React authentication state
-        // ------------------------------------------
         if (loggedUser) {
           setUser(loggedUser);
 
           setUserRole(
-            loggedUser.role ||
+            forcedRole ||
+              loggedUser.role ||
               getRoleFromRoute({
                 isAdminRoute,
                 isSellerRoute,
@@ -252,6 +212,60 @@ if (!refreshFn && isPublicRoute) {
             void err;
           }
         }
+      };
+
+      if (isPublicRoute) {
+        try {
+          const [buyerResult, sellerResult] = await Promise.allSettled([
+            refreshBuyerSession(),
+            refreshSellerSession(),
+          ]);
+
+          if (cancelled) return;
+
+          if (buyerResult.status === "fulfilled") {
+            processSessionResponse(buyerResult.value, "BUYER");
+          } else if (sellerResult.status === "fulfilled") {
+            processSessionResponse(sellerResult.value, "SELLER");
+          } else {
+            setUser(null);
+            setUserRole(null);
+            setAccessToken(null);
+            try {
+              localStorage.removeItem("user");
+            } catch (err) {
+              void err;
+            }
+          }
+        } finally {
+          if (!cancelled) {
+            setIsLoading(false);
+          }
+        }
+        return;
+      }
+
+      let refreshFn = null;
+
+      if (isAdminRoute) {
+        refreshFn = refreshSession;
+      } else if (isSellerRoute) {
+        refreshFn = refreshSellerSession;
+      } else if (isBuyerRoute) {
+        refreshFn = refreshBuyerSession;
+      } else if (isPackageManagerRoute) {
+        refreshFn = refreshPackageManagerSession;
+      }
+
+      try {
+        // ------------------------------------------
+        // Restore existing authenticated session
+        // ------------------------------------------
+        const res = await refreshFn();
+
+        if (cancelled) return;
+
+        processSessionResponse(res);
       } catch (error) {
         // ------------------------------------------
         // IMPORTANT:
