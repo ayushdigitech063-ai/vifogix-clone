@@ -40,7 +40,7 @@ const PopularServices = () => (
           <h3 className="text-xl">Manage every order from one dashboard</h3>
           <p className="mt-1 text-sm text-muted">Track placements, reports and payments in one place.</p>
         </div>
-        <Link to="/signin" className="rounded-lg bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-light">
+        <Link to="/buyer-dashboard" className="rounded-lg bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-light">
           Dashboard
         </Link>
       </div>

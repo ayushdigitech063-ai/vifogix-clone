@@ -10,14 +10,16 @@ const SignIn = () => {
   const toast = useToast();
 
   const handleSignIn = async (data) => {
+    const normalizedRole = (data.role || "").toUpperCase();
     const loggedUser = await login({
       email: data.email,
       password: data.password,
+      role: normalizedRole,
     });
 
     const isBuyer =
-      loggedUser?.role?.toUpperCase() === "BUYER" ||
-      data.role?.toUpperCase() === "BUYER";
+      loggedUser?.role === "BUYER" ||
+      normalizedRole === "BUYER";
 
     toast.success("Signed in successfully!");
     navigate(isBuyer ? "/buyer-dashboard" : "/publisher-dashboard");

@@ -11,8 +11,6 @@ import {
   Loader2,
   Trash2,
   Sparkles,
-  Check,
-  X,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -41,10 +39,6 @@ const PackageListing = () => {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const pageSize = 10;
-
-  // View Details Modal State
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState(null);
 
   // Fetch Packages from /v1/package/packageList
   const fetchPackages = useCallback(async () => {
@@ -125,12 +119,6 @@ const PackageListing = () => {
     } finally {
       setDeletingId(null);
     }
-  };
-
-  // View details modal trigger
-  const handleViewDetails = (pkg) => {
-    setSelectedPackage(pkg);
-    setViewModalOpen(true);
   };
 
   // Filtered list
@@ -347,14 +335,13 @@ const PackageListing = () => {
                       {/* Actions */}
                       <td className="py-4 pl-3 pr-6 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleViewDetails(pkg)}
+                          <Link
+                            to={`/package-manager/packages/${slug}`}
                             title="View Package Details"
-                            className="rounded-lg p-1.5 text-gray-500 hover:bg-cream hover:text-fg transition-colors cursor-pointer"
+                            className="rounded-lg p-1.5 text-gray-500 hover:bg-cream hover:text-fg transition-colors cursor-pointer inline-flex items-center"
                           >
                             <Eye className="h-4 w-4" />
-                          </button>
+                          </Link>
                           <Link
                             to={`/package-manager/packages/edit/${slug}`}
                             title="Edit Package"
@@ -417,119 +404,6 @@ const PackageListing = () => {
           </div>
         )}
       </div>
-
-      {/* View Package Details Modal */}
-      {viewModalOpen && selectedPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-border animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-start justify-between border-b border-border pb-4">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
-                  Package Details
-                </span>
-                <h3 className="text-lg font-bold text-fg mt-0.5">{selectedPackage.name}</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setViewModalOpen(false)}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-cream hover:text-fg"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="mt-4 space-y-4 text-xs">
-              <div>
-                <span className="font-semibold text-gray-500">Tagline:</span>
-                <p className="mt-0.5 text-fg">{selectedPackage.tagline || "None"}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 rounded-xl bg-cream/40 p-3">
-                <div>
-                  <span className="font-semibold text-gray-500">Price:</span>
-                  <p className="font-bold text-fg text-sm">
-                    {selectedPackage.isCustomPrice
-                      ? selectedPackage.customPriceLabel || "Custom"
-                      : `₹${selectedPackage.price ?? selectedPackage.basePrice ?? 0} ${
-                          selectedPackage.billingCycle || "/mo"
-                        }`}
-                  </p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-500">Display Order:</span>
-                  <p className="font-bold text-fg text-sm">{selectedPackage.displayOrder || 1}</p>
-                </div>
-              </div>
-
-              {selectedPackage.seoActivities && selectedPackage.seoActivities.length > 0 ? (
-                <div>
-                  <span className="font-semibold text-gray-500">Monthly SEO Activities:</span>
-                  <div className="mt-2 overflow-hidden rounded-xl border border-border">
-                    <table className="w-full text-left text-[11px]">
-                      <thead className="bg-cream/60 font-semibold text-gray-500">
-                        <tr>
-                          <th className="py-2 px-2.5">Activity</th>
-                          <th className="py-2 px-2.5 text-center">Qty</th>
-                          <th className="py-2 px-2.5 text-right">Unit ($)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {selectedPackage.seoActivities.map((act, i) => (
-                          <tr key={i}>
-                            <td className="py-1.5 px-2.5 font-medium">{act.name}</td>
-                            <td className="py-1.5 px-2.5 text-center">{act.monthlyQty}</td>
-                            <td className="py-1.5 px-2.5 text-right">${act.unitAddOn}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : selectedPackage.features && selectedPackage.features.length > 0 ? (
-                <div>
-                  <span className="font-semibold text-gray-500">Included Features:</span>
-                  <ul className="mt-2 space-y-1.5">
-                    {selectedPackage.features.map((feat, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-fg">
-                        <Check className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              <div className="flex items-center gap-3 pt-3 border-t border-border">
-                <span className="font-semibold text-gray-500">Status:</span>
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                    selectedPackage.isActive
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "bg-rose-50 text-rose-700"
-                  }`}
-                >
-                  {selectedPackage.isActive ? "Active" : "Inactive"}
-                </span>
-                {selectedPackage.isPopular && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                    <Sparkles className="h-3 w-3" /> Popular
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setViewModalOpen(false)}
-                className="rounded-xl border border-border bg-white px-4 py-2 text-xs font-semibold text-fg hover:bg-cream"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

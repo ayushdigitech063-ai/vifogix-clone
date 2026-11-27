@@ -142,6 +142,39 @@ export const getSellerWebsites = async (params = {}) => {
 };
 
 /**
+ * Fetches single seller website details by slug
+ * Maps to backend: router.get('/websites/:slug', validate(websiteSlugParamSchema), getMyWebsiteDetails) -> /v1/seller/websites/:slug
+ *
+ * @param {string} slug - Website slug
+ * @returns {Promise<Object>} { success, statusCode, message, data: website }
+ */
+export const getMyWebsiteDetails = async (slug) => {
+  try {
+    const { data } = await api.get(`/v1/seller/websites/${slug}`);
+    return data;
+  } catch (error) {
+    throw toError(error, "Failed to fetch website details.");
+  }
+};
+
+/**
+ * Updates a seller website listing by slug
+ * Maps to backend: router.patch('/websites/:slug', validate(updateWebsiteSchema), updateMyListing) -> /v1/seller/websites/:slug
+ *
+ * @param {string} slug - Website slug
+ * @param {Object} websiteData - Partial or full website update payload
+ * @returns {Promise<Object>} Updated website response data
+ */
+export const updateMyListing = async (slug, websiteData) => {
+  try {
+    const { data } = await api.patch(`/v1/seller/websites/${slug}`, websiteData);
+    return data;
+  } catch (error) {
+    throw toError(error, "Failed to update website listing.");
+  }
+};
+
+/**
  * Fetches all websites for admin review with filtering & pagination
  * Maps to backend: router.get('/websites', validate(adminListWebsitesQuerySchema), getAllWebsitesForAdmin) -> /v1/admin/websites
  *

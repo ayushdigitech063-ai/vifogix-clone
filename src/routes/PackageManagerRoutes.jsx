@@ -8,6 +8,7 @@ const PackageManagerLayout = lazy(() => import("../layouts/PackageManagerLayout"
 const PackageManagerLogin = lazy(() => import("../pages/packageManagerAdmin/PackageManagerLogin"));
 const PackageListing = lazy(() => import("../pages/packageManagerAdmin/packageListing"));
 const CreatePackage = lazy(() => import("../pages/packageManagerAdmin/createPackage"));
+const PackageDetail = lazy(() => import("../pages/packageManagerAdmin/packageDetail"));
 const PackageManagerPackages = lazy(() => import("../pages/packageManagerAdmin/PackageManagerPackages"));
 
 const LoadingFallback = () => (
@@ -43,6 +44,7 @@ export const packageManagerRoutes = [
           { path: "packages", element: <PackageListing /> },
           { path: "packages/new", element: <CreatePackage /> },
           { path: "packages/edit/:slug", element: <CreatePackage /> },
+          { path: "packages/:slug", element: <PackageDetail /> },
         ],
       },
     ],

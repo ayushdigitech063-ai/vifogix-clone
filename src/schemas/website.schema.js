@@ -235,3 +235,87 @@ export const csvWebsiteRowSchema = z.object({
         .or(z.literal(''))
         .transform((val) => (val === '' ? null : val ?? null))
 });
+
+export const updateWebsiteSchema = z
+  .object({
+    category: z
+      .string()
+      .trim()
+      .min(1, "Please select a valid category")
+      .optional(),
+    subCategories: z
+      .array(z.string().trim().min(1))
+      .min(1, "Please select at least 1 subcategory")
+      .transform((arr) => [...new Set(arr)])
+      .optional(),
+    country: z
+      .string()
+      .trim()
+      .min(2, "Country name must be at least 2 characters long")
+      .optional(),
+    otherCountriesCount: z.coerce
+      .number({ invalid_type_error: "Other countries count must be a number" })
+      .int()
+      .min(0, "Other countries count cannot be negative")
+      .optional(),
+    language: z
+      .string()
+      .trim()
+      .min(2, "Language must be at least 2 characters long")
+      .optional(),
+
+    // Commercial Details
+    price: z.coerce
+      .number({
+        required_error: "Price must be a valid number",
+        invalid_type_error: "Price must be a valid number",
+      })
+      .min(5, "Price must be at least $5")
+      .max(20000, "Price cannot exceed $20,000")
+      .optional(),
+    contentWritingPrice: z.coerce
+      .number({ invalid_type_error: "Content writing price must be a number" })
+      .nonnegative("Content writing price cannot be negative")
+      .optional(),
+    turnaroundDays: z.coerce
+      .number({ invalid_type_error: "Turnaround days must be a number" })
+      .int("Turnaround days must be a whole number")
+      .min(1, "Turnaround days must be at least 1 day")
+      .max(30, "Turnaround days cannot exceed 30 days")
+      .optional(),
+    maxLinksAllowed: z.coerce
+      .number()
+      .int()
+      .min(1, "Minimum 1 link must be allowed")
+      .max(5, "Maximum 5 links are allowed")
+      .optional(),
+    linkType: z
+      .enum(["DoFollow", "NoFollow"], {
+        errorMap: () => ({ message: "Link type must be either DoFollow or NoFollow" }),
+      })
+      .optional(),
+    samplePostUrl: z
+      .string()
+      .trim()
+      .url("Sample post URL must be a valid URL")
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((val) => (val === "" ? null : val)),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field is required to update",
+  })
+  .superRefine((data, ctx) => {
+    if (data.category || data.subCategories) {
+      if (!data.category || !data.subCategories) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["subCategories"],
+          message:
+            "Both category and subCategories must be provided together when updating category",
+        });
+      }
+    }
+  });

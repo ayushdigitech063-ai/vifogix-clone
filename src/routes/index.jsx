@@ -19,6 +19,7 @@ import BuyerProtectedRoute from "./BuyerProtecdRoute";
 
 const Marketplace = lazy(() => import("../pages/publicPages/Marketplace"));
 const LinkBuilding = lazy(() => import("../pages/publicPages/Linkbuilding"));
+const LinkBuildingPackageDetail = lazy(() => import("../components/linkbuilding-sections/PackageDetail"));
 const WebsiteDetail = lazy(() => import("../pages/publicPages/WebsiteDetail"));
 const PressReleaseDetail = lazy(() => import("../pages/publicPages/PressReleaseDetail"));
 const BlogDetail = lazy(() => import("../pages/publicPages/BlogDetail"));
@@ -39,6 +40,7 @@ const DashboardGigs = lazy(() => import("../pages/dashboard/DashboardGigs"));
 const DashboardEarnings = lazy(() => import("../pages/dashboard/DashboardEarnings"));
 const AddWebsite = lazy(() => import("../pages/dashboard/AddWebsite"));
 const WebsiteListing = lazy(() => import("../pages/dashboard/WebsiteListing"));
+const PublisherWebsiteDetail = lazy(() => import("../pages/dashboard/WebsiteDetail"));
 const PressReleaseListing = lazy(() => import("../pages/dashboard/PressReleaseListing"));
 const CreateGig = lazy(() => import("../pages/dashboard/CreateGig"));
 const Profile = lazy(() => import("../pages/dashboard/Profile"));
@@ -52,6 +54,7 @@ export const router = createBrowserRouter([
       { path: "marketplace", element: <Marketplace /> },
       { path: "website/:slug", element: <WebsiteDetail /> },
       { path: "link-building-services", element: <LinkBuilding /> },
+      { path: "link-building-services/:slug", element: <LinkBuildingPackageDetail /> },
       { path: "guest-posting-services", element: <GuestPosting /> },
       { path: "press-release", element: <PressRelease /> },
       { path: "press-release/:id", element: <PressReleaseDetail /> },
@@ -98,12 +101,14 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <PublisherDashboard /> },
           { path: "websites", element: <WebsiteListing /> },
+          { path: "websites/new", element: <AddWebsite /> },
+          { path: "websites/:slug", element: <PublisherWebsiteDetail /> },
+          { path: "websites/:slug/edit", element: <AddWebsite /> },
           { path: "press-releases", element: <PressReleaseListing /> },
           { path: "orders", element: <DashboardOrders /> },
           { path: "orders/:orderId", element: <DashboardOrderDetail /> },
           { path: "gigs", element: <DashboardGigs /> },
           { path: "earnings", element: <DashboardEarnings /> },
-          { path: "websites/new", element: <AddWebsite /> },
           { path: "gigs/new", element: <CreateGig /> },
           { path: "profile", element: <Profile /> },
         ],
