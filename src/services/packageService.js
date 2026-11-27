@@ -37,6 +37,65 @@ export const listPublicPackages = async (params = {}) => {
 };
 
 /**
+ * Fetch Single Public Package by slug
+ * Endpoint: /v1/public/packages/:slug (with fallback to listPublicPackages lookup)
+ *
+ * @param {string} slug
+ * @returns {Promise<Object>}
+ */
+export const getPublicPackageBySlug = async (slug) => {
+  try {
+    const { data } = await api.get(`/v1/public/packages/${slug}`);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const listRes = await listPublicPackages();
+        const list =
+          listRes?.data?.packages ||
+          listRes?.data ||
+          (Array.isArray(listRes) ? listRes : []);
+        const found = Array.isArray(list)
+          ? list.find((p) => p.slug === slug || p._id === slug || p.id === slug)
+          : null;
+        if (found) {
+          return { success: true, data: found };
+        }
+      } catch (err2) {
+        throw toError(err2, "Failed to fetch package details.");
+      }
+    }
+    throw toError(error, "Failed to fetch package details.");
+  }
+};
+
+/**
+ * Calculate Public Package Price with Add-ons
+ * Maps to backend: router.post('/packages/:slug/calculate-price', validate(calculatePackagePriceSchema), getCalculatedPackagePrice)
+ * Endpoint: /v1/public/packages/:slug/calculate-price
+ *
+ * @param {string} slug
+ * @param {Object} payload - { addons: [{ activityName, quantity }] }
+ * @returns {Promise<Object>}
+ */
+export const calculatePublicPackagePrice = async (slug, payload = {}) => {
+  try {
+    const { data } = await api.post(`/v1/public/packages/${slug}/calculate-price`, payload);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await api.post(`/v1/packages/${slug}/calculate-price`, payload);
+        return fallback.data;
+      } catch (err2) {
+        throw toError(err2, "Failed to calculate package price.");
+      }
+    }
+    throw toError(error, "Failed to calculate package price.");
+  }
+};
+
+/**
  * Fetch packages list for Admin
  * Maps to backend: GET /v1/admin/packages
  *

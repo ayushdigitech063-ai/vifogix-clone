@@ -119,24 +119,20 @@ const LightHouseWebsites = () => {
           onTouchEnd={handleTouchEnd}
         >
           <div
-            className="flex transition-transform duration-500 ease-out gap-6"
+            className="flex transition-transform duration-500 ease-out"
             style={{
-              transform: `translateX(-${currentIndex * (100 / visibleItems + (visibleItems > 1 ? 24 / visibleItems : 0))}%)`,
+              transform: `translateX(-${(currentIndex * 100) / visibleItems}%)`,
             }}
           >
             {lighthouseWebsites.map((site) => (
               <div
                 key={site.id}
-                className="flex-shrink-0 group bg-white rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="flex-shrink-0 px-3 flex"
                 style={{
-                  width:
-                    visibleItems === 1
-                      ? "100%"
-                      : visibleItems === 2
-                      ? "calc(50% - 12px)"
-                      : "calc(33.333% - 16px)",
+                  width: `${100 / visibleItems}%`,
                 }}
               >
+                <div className="group w-full bg-white rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
                 <div>
                   {/* Thumbnail Preview with Score Badge */}
                   <div className="relative h-48 w-full overflow-hidden bg-muted/10">
@@ -230,6 +226,7 @@ const LightHouseWebsites = () => {
                   <span className="inline-flex items-center gap-1 font-medium text-fg">
                     <ShieldCheck className="w-3.5 h-3.5 text-primary" /> Verified
                   </span>
+                </div>
                 </div>
               </div>
             ))}

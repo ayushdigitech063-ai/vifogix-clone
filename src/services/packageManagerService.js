@@ -66,6 +66,23 @@ export const getPackageManagerPackages = async (params = {}) => {
   }
 };
 
+export const getManagedPackage = async (slug) => {
+  try {
+    const { data } = await api.get(`/v1/package/get/${slug}`);
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await api.get(`/v1/package/packages/${slug}`);
+        return fallback.data;
+      } catch (err2) {
+        throw toError(err2, "Failed to fetch package details.");
+      }
+    }
+    throw toError(error, "Failed to fetch package details.");
+  }
+};
+
 export const createPackageManagerPackage = async (packageData) => {
   try {
     const { data } = await api.post("/v1/package/create", packageData);

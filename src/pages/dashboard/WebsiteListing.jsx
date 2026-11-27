@@ -16,6 +16,13 @@ import {
   Filter,
   DollarSign,
   Calendar,
+  Eye,
+  Edit2,
+  Edit,
+  Delete,
+  DeleteIcon,
+  LucideDelete,
+  Trash2,
 } from "lucide-react";
 import { getSellerWebsites } from "../../services/websiteService";
 import { useToast } from "../../hooks/useToast";
@@ -296,6 +303,7 @@ const WebsiteListing = () => {
                   <th className="py-3.5 px-4">Pricing</th>
                   <th className="py-3.5 px-4">Turnaround</th>
                   <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4">Actions</th>
                   <th className="py-3.5 px-4 text-right">Added On</th>
                 </tr>
               </thead>
@@ -416,6 +424,32 @@ const WebsiteListing = () => {
                             Note: {site.adminReviewNotes}
                           </p>
                         )}
+                      </td>
+
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Link
+                            to={`/publisher-dashboard/websites/${site.slug || site._id || site.id}`}
+                            className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-cream hover:text-fg"
+                            title="View details"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Link>
+                          <Link
+                            to={`/publisher-dashboard/websites/${site.slug || site._id || site.id}/edit`}
+                            className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-cream hover:text-fg"
+                            title="Edit details"
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Link>
+                           {/* <Link
+                            to={``}
+                            className="inline-flex items-center gap-1 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-cream hover:text-fg"
+                            title="delete details"
+                          >
+                           <Trash2 className="h-3.5 w-3.5"/>
+                          </Link> */}
+                        </div>
                       </td>
 
                       {/* Added Date */}

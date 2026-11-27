@@ -22,6 +22,12 @@ const PricingSection = () => {
             .filter((p) => p.isActive !== false)
             .sort((a, b) => (a.displayOrder || 1) - (b.displayOrder || 1))
             .map((p) => ({
+              slug:
+                p.slug ||
+                p._id ||
+                p.id ||
+                (p.name || "package").toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+              raw: p,
               name: p.name,
               price: p.isCustomPrice
                 ? p.customPriceLabel || "Custom"
@@ -31,7 +37,11 @@ const PricingSection = () => {
               period: p.isCustomPrice ? "" : p.billingCycle || "/mo",
               audience: p.tagline || "",
               featured: Boolean(p.isPopular),
-              features: Array.isArray(p.features) ? p.features : [],
+              features: Array.isArray(p.features) && p.features.length > 0
+                ? p.features
+                : Array.isArray(p.activities)
+                ? p.activities.map((a) => `${a.monthlyCount ?? 0} ${a.activityName}`)
+                : [],
             }));
 
           if (mapped.length > 0) {
@@ -87,8 +97,12 @@ const PricingSection = () => {
                 ))}
               </ul>
 
-              <a
-                href="#contact"
+              <Link
+                to={`/link-building-services/${
+                  plan.slug ||
+                  (plan.name || "package").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+                }`}
+                state={{ packageData: plan.raw || plan }}
                 className={`rounded-lg px-4 py-2.5 text-center text-sm font-semibold ${
                   plan.featured
                     ? "bg-primary text-white hover:bg-primary-light"
@@ -96,7 +110,7 @@ const PricingSection = () => {
                 }`}
               >
                 Get Started
-              </a>
+              </Link>
             </article>
           ))}
         </div>

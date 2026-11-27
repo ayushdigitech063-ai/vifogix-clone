@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Globe,
   DollarSign,
@@ -23,8 +23,10 @@ import {
   uploadBulkCsv,
   getMainCategories,
   getSubCategoriesByCategory,
+  getMyWebsiteDetails,
+  updateMyListing,
 } from "../../services/websiteService";
-import { addWebsiteSchema, csvWebsiteRowSchema } from "../../schemas";
+import { addWebsiteSchema, updateWebsiteSchema, csvWebsiteRowSchema } from "../../schemas";
 
 const languages = [
   "English",
@@ -41,8 +43,12 @@ const AddWebsite = () => {
   const { user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const { slug } = useParams();
+  const isEditMode = Boolean(slug);
 
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
+  const [initialForm, setInitialForm] = useState(null);
   const [errors, setErrors] = useState({});
 
   const [categoriesList, setCategoriesList] = useState([]);
@@ -109,6 +115,62 @@ const AddWebsite = () => {
       mounted = false;
     };
   }, []);
+
+  // Load existing website details when editing
+  useEffect(() => {
+    if (!isEditMode || !slug) {
+      setInitialLoading(false);
+      return;
+    }
+
+    let mounted = true;
+    const fetchWebsiteForEdit = async () => {
+      setInitialLoading(true);
+      try {
+        const res = await getMyWebsiteDetails(slug);
+        if (!mounted) return;
+        const site = res?.data?.website || res?.data || res;
+        if (site) {
+          const loadedForm = {
+            domain: site.domain || "",
+            category: site.category || "",
+            subCategories: Array.isArray(site.subCategories) ? site.subCategories : [],
+            country: site.country || "",
+            language: site.language || "English",
+            mozDA: site.mozDA ?? "",
+            ahrefsDR: site.ahrefsDR ?? "",
+            semrushAS: site.semrushAS ?? "",
+            monthlyTraffic: site.monthlyTraffic || "",
+            domainAge: site.domainAge || "",
+            price: site.price ?? "",
+            contentWritingPrice: site.contentWritingPrice ?? "0",
+            turnaroundDays: site.turnaroundDays ?? 3,
+            maxLinksAllowed: site.maxLinksAllowed ?? 2,
+            linkType: site.linkType || "DoFollow",
+            samplePostUrl: site.samplePostUrl || "",
+            noOfDeals: site.totalDeals ?? "",
+            semrushTraffic: site.semrushTraffic || "",
+            ahrefsTraffic: site.ahrefsTraffic || "",
+            followedBacklinks: site.followedBacklinks || "",
+            noFollowedBacklinks: site.noFollowedBacklinks || "",
+          };
+          setForm(loadedForm);
+          setInitialForm(loadedForm);
+        }
+      } catch (err) {
+        if (mounted) {
+          toast.error(err.message || "Failed to load website details.");
+        }
+      } finally {
+        if (mounted) setInitialLoading(false);
+      }
+    };
+
+    fetchWebsiteForEdit();
+    return () => {
+      mounted = false;
+    };
+  }, [isEditMode, slug, toast]);
 
   // Fetch subcategories whenever selected category changes
   useEffect(() => {
@@ -316,8 +378,90 @@ const AddWebsite = () => {
     document.body.removeChild(link);
   };
 
+  const buildUpdatePayload = () => {
+    if (!initialForm) return {};
+
+    const updated = {};
+    const categoryChanged = form.category !== initialForm.category;
+    const prevSubs = [...(initialForm.subCategories || [])].sort();
+    const currSubs = [...(form.subCategories || [])].sort();
+    const subCategoriesChanged =
+      prevSubs.length !== currSubs.length ||
+      prevSubs.some((val, idx) => val !== currSubs[idx]);
+
+    if (categoryChanged || subCategoriesChanged) {
+      updated.category = form.category;
+      updated.subCategories = form.subCategories;
+    }
+
+    if (form.country.trim() !== initialForm.country.trim()) {
+      updated.country = form.country.trim();
+    }
+    if (form.language !== initialForm.language) {
+      updated.language = form.language;
+    }
+    if (String(form.price) !== String(initialForm.price)) {
+      updated.price = form.price;
+    }
+    if (
+      String(form.contentWritingPrice === "" ? 0 : form.contentWritingPrice) !==
+      String(initialForm.contentWritingPrice === "" ? 0 : initialForm.contentWritingPrice)
+    ) {
+      updated.contentWritingPrice =
+        form.contentWritingPrice === "" ? 0 : form.contentWritingPrice;
+    }
+    if (String(form.turnaroundDays) !== String(initialForm.turnaroundDays)) {
+      updated.turnaroundDays = form.turnaroundDays;
+    }
+    if (String(form.maxLinksAllowed) !== String(initialForm.maxLinksAllowed)) {
+      updated.maxLinksAllowed = form.maxLinksAllowed;
+    }
+    if (form.linkType !== initialForm.linkType) {
+      updated.linkType = form.linkType;
+    }
+    if ((form.samplePostUrl?.trim() || "") !== (initialForm.samplePostUrl?.trim() || "")) {
+      updated.samplePostUrl = form.samplePostUrl?.trim() || "";
+    }
+
+    return updated;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isEditMode) {
+      const updatePayload = buildUpdatePayload();
+      const result = updateWebsiteSchema.safeParse(updatePayload);
+
+      if (!result.success) {
+        const next = {};
+        const flattened = result.error.flatten();
+        for (const [key, msgs] of Object.entries(flattened.fieldErrors)) {
+          if (msgs && msgs[0]) next[key] = msgs[0];
+        }
+        setErrors(next);
+        toast.error(
+          flattened.formErrors?.[0] || "Please fill in all required fields accurately."
+        );
+        return;
+      }
+
+      setErrors({});
+      setLoading(true);
+      try {
+        // Call backend API: router.patch('/websites/:slug', validate(updateWebsiteSchema), updateMyListing)
+        await updateMyListing(slug, result.data);
+        console.log("result", result.data)
+        toast.success("Website listing updated successfully!");
+        navigate("/publisher-dashboard/websites");
+      } catch (err) {
+        toast.error(err.message || "Failed to update website. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     const validationErrors = validate();
     setErrors(validationErrors);
 
@@ -331,7 +475,7 @@ const AddWebsite = () => {
     try {
       // Build clean payload matching Mongoose schema
       const payload = {
-        sellerId: user?._id || user?.id,
+        // sellerId: user?._id || user?.id,
         domain: form.domain,
         category: form.category,
         subCategories: form.subCategories,
@@ -357,7 +501,6 @@ const AddWebsite = () => {
 
       // Call backend API: router.post('/websites', validate(addWebsiteSchema), createSingleListing)
       await createSingleListing(payload);
-
       toast.success("Website submitted for verification successfully!");
       navigate("/publisher-dashboard");
     } catch (err) {
@@ -367,16 +510,25 @@ const AddWebsite = () => {
     }
   };
 
+  if (initialLoading) {
+    return (
+      <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+        <p className="text-sm font-semibold text-fg">Loading website details...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-4xl space-y-8 animate-fade-in pb-12">
       {/* Top Navigation & Header */}
       <div>
         <Link
-          to="/publisher-dashboard"
+          to={isEditMode ? "/publisher-dashboard/websites" : "/publisher-dashboard"}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-fg transition-colors mb-3"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Back to Publisher Dashboard</span>
+          <span>{isEditMode ? "Back to My Websites" : "Back to Publisher Dashboard"}</span>
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -385,15 +537,19 @@ const AddWebsite = () => {
               Publisher Inventory
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-fg tracking-tight">
-              Add New Website
+              {isEditMode ? "Edit Website" : "Add New Website"}
             </h1>
             <p className="text-sm text-muted mt-1">
-              List your verified domain. Our team verifies metrics before your listing goes live to buyers.
+              {isEditMode
+                ? "Update your website metrics, pricing, and publishing details."
+                : "List your verified domain. Our team verifies metrics before your listing goes live to buyers."}
             </p>
           </div>
         </div>
       </div>
 
+      {!isEditMode && (
+      <>
       {/* Bulk CSV Upload Card */}
       <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/[0.02] p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
@@ -545,6 +701,8 @@ const AddWebsite = () => {
           Or Add Single Website Manually
         </div>
       </div>
+      </>
+      )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         {/* 1. Basic Domain Information */}
@@ -1222,7 +1380,7 @@ const AddWebsite = () => {
         {/* Submit Actions */}
         <div className="flex items-center justify-end gap-3 pt-2">
           <Link
-            to="/publisher-dashboard"
+            to={isEditMode ? "/publisher-dashboard/websites" : "/publisher-dashboard"}
             className="rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-fg hover:bg-cream transition-colors"
           >
             Cancel
@@ -1234,7 +1392,15 @@ const AddWebsite = () => {
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-light active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin text-white" />}
-            <span>{loading ? "Submitting..." : "Submit Website for Review"}</span>
+            <span>
+              {loading
+                ? isEditMode
+                  ? "Updating..."
+                  : "Submitting..."
+                : isEditMode
+                ? "Save Changes"
+                : "Submit Website for Review"}
+            </span>
           </button>
         </div>
       </form>

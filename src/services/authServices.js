@@ -50,9 +50,9 @@ export const logoutBuyerRequest = () => api.post("v1/auth/buyer/logout");
 
 // login buyer and seller 
 
-export const userLogin = async ({ email, password }) => {
+export const userLogin = async ({ email, password , role}) => {
   try {
-    const { data } = await api.post("v1/auth/login", { email, password });
+    const { data } = await api.post("v1/auth/login", { email, password , role});
     return data; // { success, message, data: { user, accessToken } }
   } catch (error) {
     throw toError(error, "Failed to sign in.");
