@@ -120,11 +120,9 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
     : "3 Days";
 
     const handleSubmit = ()=>{
-        if(user.role !== "BUYER"){
-        navigate("/signin");
-        }else{
+        
             navigate(`/website/${websiteSlug}`)
-        }
+
         console.log("authenticate",isAuthenticated ,"USER ROLE",user.role)
     }
 
@@ -151,8 +149,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
             </span>
           )}
         </div>
-        {
-          user.role === "BUYER" ? 
+       
            <button
           onClick={handleToggleWishlist}
           disabled={toggling}
@@ -162,7 +159,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
         >
           <Heart className={`h-4 w-4 ${saved ? "fill-accent-red text-accent-red" : ""}`} />
         </button>  : ""
-        }
+        
        
         <div className="flex items-center gap-3">
           <img
