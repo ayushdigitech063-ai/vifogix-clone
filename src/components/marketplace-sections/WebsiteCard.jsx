@@ -32,7 +32,10 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
   const [saved, setSaved] = useState(isWishlisted);
   const [toggling, setToggling] = useState(false);
 
-  const websiteSlug = site._id || site.id;
+  const websiteID = site._id || site.id;
+  const websiteSlug = site._slug || site.slug;
+  console.log("website Card", websiteSlug)
+  console.log("user role",user);
 
 
   const handleToggleWishlist = async (e) => {
@@ -50,18 +53,18 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
       return;
     }
 
-    if (!websiteSlug) {
+    if (!websiteID) {
       setSaved((prev) => !prev);
       return;
     }
 
     setToggling(true);
     try {
-      const res = await toggleWishlist(websiteSlug);
+      const res = await toggleWishlist(websiteID);
       const isNowWishlisted = res?.data?.isWishlisted ?? !saved;
       setSaved(isNowWishlisted);
       if (onWishlistToggle) {
-        onWishlistToggle(websiteSlug);
+        onWishlistToggle(websiteID);
       }
       if (isNowWishlisted) {
         toast.success(res?.message || `${domain || "Website"} added to your wishlist!`, "Wishlist Updated");
@@ -116,6 +119,15 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
     ? `${site.turnaroundDays} Days` 
     : "3 Days";
 
+    const handleSubmit = ()=>{
+        if(user.role !== "BUYER"){
+        navigate("/signin");
+        }else{
+            navigate(`/website/${websiteSlug}`)
+        }
+        console.log("authenticate",isAuthenticated ,"USER ROLE",user.role)
+    }
+
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-shadow hover:shadow-lg">
       {/* Header */}
@@ -139,8 +151,9 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
             </span>
           )}
         </div>
-
-        <button
+        {
+          user.role === "BUYER" ? 
+           <button
           onClick={handleToggleWishlist}
           disabled={toggling}
           aria-pressed={saved}
@@ -148,8 +161,9 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-surface text-muted hover:text-accent-red transition-colors disabled:opacity-50"
         >
           <Heart className={`h-4 w-4 ${saved ? "fill-accent-red text-accent-red" : ""}`} />
-        </button>
-
+        </button>  : ""
+        }
+       
         <div className="flex items-center gap-3">
           <img
             src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
@@ -159,7 +173,6 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           />
           <div className="min-w-0">
             <Link
-              to={`/website/${websiteSlug}`}
               className="block truncate font-semibold text-fg hover:text-primary transition"
             >
               {domain}
@@ -198,7 +211,8 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           </span>
         </div>
 
-        <button className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light">
+        <button className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light"
+        onClick={handleSubmit}>
           Buy now
         </button>
       </div>

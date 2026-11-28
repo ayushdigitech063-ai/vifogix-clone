@@ -24,7 +24,7 @@ const Home = () => (
     <WebsitesTable />
     <PopularServices />
     <FeaturedOn />
-    <FeaturedPackages />
+    {/* <FeaturedPackages /> */}
     <ProcessSteps />
     <IntroSection />
     <WhyChooseUs />
@@ -37,7 +37,7 @@ const Home = () => (
       tone="navy"
       title="Link Building Services at Your Fingertips!"
       description="Join thousands of businesses growing their authority with Vefogix."
-      primary={{ label: "Join Vefogix", to: "/signin" }}
+      primary={{ label: "Join Sumitdevtech", to: "/signin" }}
     />
     <ContactForm tone="navy-950" />
   </>
