@@ -158,7 +158,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-surface text-muted hover:text-accent-red transition-colors disabled:opacity-50"
         >
           <Heart className={`h-4 w-4 ${saved ? "fill-accent-red text-accent-red" : ""}`} />
-        </button>  : ""
+        </button>
         
        
         <div className="flex items-center gap-3">
