@@ -186,7 +186,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           <Metric label="DA" value={da} />
           <Metric label="AS" value={as} />
         </div>  
-
+{/* ksajrfd */}
         <ul className="space-y-2 text-sm text-muted">
           <Stat icon={TrendingUp} label="Traffic (Ahrefs)" value={ahrefsTraffic} />
           <Stat icon={TrendingUp} label="Traffic (Semrush)" value={semrushTraffic} />
