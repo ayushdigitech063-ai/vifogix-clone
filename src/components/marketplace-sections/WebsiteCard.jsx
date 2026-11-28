@@ -120,11 +120,9 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
     : "3 Days";
 
     const handleSubmit = ()=>{
-        if(user.role !== "BUYER"){
-        navigate("/signin");
-        }else{
+        
             navigate(`/website/${websiteSlug}`)
-        }
+
         console.log("authenticate",isAuthenticated ,"USER ROLE",user.role)
     }
 
@@ -151,8 +149,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
             </span>
           )}
         </div>
-        {
-          user.role === "BUYER" ? 
+       
            <button
           onClick={handleToggleWishlist}
           disabled={toggling}
@@ -162,7 +159,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
         >
           <Heart className={`h-4 w-4 ${saved ? "fill-accent-red text-accent-red" : ""}`} />
         </button>  : ""
-        }
+        
        
         <div className="flex items-center gap-3">
           <img
@@ -189,7 +186,7 @@ const WebsiteCard = ({ site, isWishlisted = false, onWishlistToggle }) => {
           <Metric label="DA" value={da} />
           <Metric label="AS" value={as} />
         </div>  
-
+{/* ksajrfd */}
         <ul className="space-y-2 text-sm text-muted">
           <Stat icon={TrendingUp} label="Traffic (Ahrefs)" value={ahrefsTraffic} />
           <Stat icon={TrendingUp} label="Traffic (Semrush)" value={semrushTraffic} />
