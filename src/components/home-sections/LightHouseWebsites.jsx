@@ -148,7 +148,7 @@ const LightHouseWebsites = () => {
                     {/* Overall Score Badge */}
                     <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-emerald-600/95 backdrop-blur-md text-white font-bold px-3 py-1.5 rounded-full shadow-lg border border-emerald-400/30 text-xs">
                       <Gauge className="w-3.5 h-3.5" />
-                      <span>Lighthouse {site.score}/100</span>
+                      <span>In House {site.score}/100</span>
                     </div>
 
                     {/* Category Pill */}

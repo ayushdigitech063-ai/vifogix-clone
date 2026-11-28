@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { jsPDF } from "jspdf";
 import {
   Home,
   ChevronRight,
@@ -169,6 +170,7 @@ const PackageDetail = () => {
         const key = act._id || act.activityName || idx;
         const addedQty = Number(addonQuantities[key] || 0);
         const unitPrice = Number(act.unitAddonPrice || 0);
+        console.log(key,addedQty)
         return {
           key,
           activityName: act.activityName,
@@ -193,7 +195,7 @@ const PackageDetail = () => {
 
   // Auto-calculate price via backend API whenever selected add-ons change
   useEffect(() => {
-    if (!pkg || !slug) return;
+    if (!pkg || !slug || pkg.isCustomPrice || pkg.price === null) return;
 
     if (selectedAddons.length === 0) {
       setCalculatedPricing(null);
@@ -205,9 +207,9 @@ const PackageDetail = () => {
       setCalculatingPrice(true);
       try {
         const payload = {
-          addons: selectedAddons.map((item) => ({
-            activityName: item.activityName,
-            quantity: item.addedQty,
+          customizations: selectedAddons.map((item) => ({
+            activityId: String(item.key),
+            selectedCount: item.baseQty + item.addedQty,
           })),
         };
         const res = await calculatePublicPackagePrice(pkg.slug || slug, payload);
@@ -228,7 +230,9 @@ const PackageDetail = () => {
   }, [pkg, slug, selectedAddons]);
 
   const addonsTotalPrice =
-    typeof calculatedPricing?.addonsTotal === "number"
+    typeof calculatedPricing?.extraAddonCost === "number"
+      ? calculatedPricing.extraAddonCost
+      : typeof calculatedPricing?.addonsTotal === "number"
       ? calculatedPricing.addonsTotal
       : typeof calculatedPricing?.addonPrice === "number"
       ? calculatedPricing.addonPrice
@@ -237,18 +241,20 @@ const PackageDetail = () => {
       : localAddonsTotalPrice;
 
   const updatedTotalPrice =
-    typeof calculatedPricing?.totalPrice === "number"
+    typeof calculatedPricing?.finalPrice === "number"
+      ? calculatedPricing.finalPrice
+      : typeof calculatedPricing?.totalPrice === "number"
       ? calculatedPricing.totalPrice
       : typeof calculatedPricing?.calculatedPrice === "number"
       ? calculatedPricing.calculatedPrice
-      : typeof calculatedPricing?.finalPrice === "number"
-      ? calculatedPricing.finalPrice
       : typeof calculatedPricing?.updatedPrice === "number"
       ? calculatedPricing.updatedPrice
       : basePrice + addonsTotalPrice;
 
   const totalMonthlyLinks =
-    typeof calculatedPricing?.totalLinks === "number"
+    typeof calculatedPricing?.finalTotalLinks === "number"
+      ? calculatedPricing.finalTotalLinks
+      : typeof calculatedPricing?.totalLinks === "number"
       ? calculatedPricing.totalLinks
       : typeof calculatedPricing?.totalMonthlyLinks === "number"
       ? calculatedPricing.totalMonthlyLinks
@@ -285,33 +291,148 @@ const PackageDetail = () => {
   };
 
   const handleDownloadSummary = () => {
-    const lines = [
-      `Package: ${pkg.name}`,
-      `Tagline: ${pkg.tagline || "—"}`,
-      `Base Price: ₹${basePrice}${billingCycle}`,
-      `Base Monthly Links: ${baseTotalLinks}`,
-      "",
-      "Selected Add-ons:",
-      ...(selectedAddons.length > 0
-        ? selectedAddons.map(
-            (item) =>
-              `- ${item.activityName}: +${item.addedQty} links × ₹${item.unitPrice} = ₹${item.subtotal}`
-          )
-        : ["- None"]),
-      "",
-      `Total Monthly Links: ${totalMonthlyLinks}`,
-      `Updated Total Price: ₹${updatedTotalPrice}${billingCycle}`,
-    ];
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 40;
+    let y = 50;
 
-    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${pkg.slug || "package"}-quote.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("SEO PACKAGE INVOICE", margin, y);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Date: ${new Date().toLocaleDateString("en-IN")}`, pageWidth - margin, y, {
+      align: "right",
+    });
+
+    y += 24;
+    doc.setDrawColor(220);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 22;
+
+    // Package Info
+    doc.setTextColor(20);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    const titleLines = doc.splitTextToSize(pkg.name || "SEO Package", pageWidth - margin * 2);
+    doc.text(titleLines, margin, y);
+    y += titleLines.length * 16 + 4;
+
+    if (pkg.tagline) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(90);
+      const taglineLines = doc.splitTextToSize(pkg.tagline, pageWidth - margin * 2);
+      doc.text(taglineLines, margin, y);
+      y += taglineLines.length * 14 + 6;
+    }
+
+    y += 6;
+    doc.setTextColor(20);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      `Base Price: ${
+        pkg.isCustomPrice ? pkg.customPriceLabel || "Custom" : `INR ${basePrice}${billingCycle}`
+      }`,
+      margin,
+      y
+    );
+    doc.text(`Base Monthly Links: ${baseTotalLinks}`, pageWidth - margin, y, { align: "right" });
+    y += 22;
+
+    // SEO Activities Section
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("SEO Activities", margin, y);
+    y += 14;
+    doc.setDrawColor(230);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 16;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    if (activities.length === 0) {
+      doc.text("No SEO activities listed.", margin, y);
+      y += 16;
+    } else {
+      activities.forEach((act, idx) => {
+        const key = act._id || act.activityName || idx;
+        const baseQty = Number(act.monthlyCount || 0);
+        const addedQty = Number(addonQuantities[key] || 0);
+        const totalQty = baseQty + addedQty;
+        doc.text(`${idx + 1}. ${act.activityName}`, margin, y);
+        doc.text(
+          `${totalQty} links${addedQty > 0 ? ` (${baseQty} base + ${addedQty} add-on)` : ""}`,
+          pageWidth - margin,
+          y,
+          { align: "right" }
+        );
+        y += 16;
+      });
+    }
+
+    y += 10;
+
+    // Selected Add-ons Section
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("Selected Add-ons", margin, y);
+    y += 14;
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 16;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    if (selectedAddons.length === 0) {
+      doc.text("None", margin, y);
+      y += 18;
+    } else {
+      selectedAddons.forEach((item, idx) => {
+        doc.text(
+          `${idx + 1}. ${item.activityName} (${item.addedQty} links x INR ${item.unitPrice})`,
+          margin,
+          y
+        );
+        doc.text(`INR ${item.subtotal}`, pageWidth - margin, y, { align: "right" });
+        y += 16;
+      });
+    }
+
+    y += 12;
+    doc.setDrawColor(180);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 20;
+
+    // Totals
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Total Monthly Links:", margin, y);
+    doc.text(String(totalMonthlyLinks), pageWidth - margin, y, { align: "right" });
+    y += 16;
+
+    if (addonsTotalPrice > 0) {
+      doc.text("Add-ons Subtotal:", margin, y);
+      doc.text(`INR ${addonsTotalPrice}`, pageWidth - margin, y, { align: "right" });
+      y += 18;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Total Price:", margin, y);
+    doc.text(
+      pkg.isCustomPrice && addonsTotalPrice === 0
+        ? pkg.customPriceLabel || "Custom"
+        : `INR ${updatedTotalPrice}${billingCycle}`,
+      pageWidth - margin,
+      y,
+      { align: "right" }
+    );
+
+    doc.save(`${pkg.slug || "package"}-invoice.pdf`);
   };
 
   const handleChatOnWhatsApp = () => {

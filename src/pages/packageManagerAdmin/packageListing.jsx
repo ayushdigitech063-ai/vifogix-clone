@@ -65,21 +65,26 @@ const PackageListing = () => {
 
   // Toggle active status
   const handleToggleStatus = async (pkg) => {
-    const packageId = pkg._id || pkg.id;
+    const packageId = pkg._slug || pkg.slug;
     const newStatus = !pkg.isActive;
+    console.log("status",newStatus)
 
     const validation = togglePackageStatusSchema.safeParse({ isActive: newStatus });
     if (!validation.success) {
       toast.error(validation.error.errors[0]?.message || "Invalid status toggle payload.");
       return;
     }
-
-    setTogglingId(packageId);
+    const payload = {
+      isActive : newStatus
+    }
+     setTogglingId(packageId);
     try {
-      await changePackageManagerPackageStatus(packageId, validation.data);
+      await changePackageManagerPackageStatus(packageId, payload);
       setPackages((prev) =>
         prev.map((item) =>
-          (item._id || item.id) === packageId ? { ...item, isActive: newStatus } : item
+          (item._slug || item.slug) === packageId || (item._id || item.id) === packageId
+            ? { ...item, isActive: newStatus }
+            : item
         )
       );
       toast.success(`Package marked as ${newStatus ? "active" : "inactive"}.`);
@@ -242,7 +247,7 @@ const PackageListing = () => {
                 paginatedPackages.map((pkg) => {
                   const id = pkg._id || pkg.id;
                   const slug = pkg.slug || id;
-                  const isToggling = togglingId === id;
+                  const isToggling = togglingId === (pkg._slug || pkg.slug);
                   const isDeleting = deletingId === slug;
 
 

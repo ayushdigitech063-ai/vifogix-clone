@@ -52,15 +52,13 @@ export const legalLinks = [
 ];
 
 export const socialLinks = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/vefogix" },
-  { label: "X", href: "https://x.com/vefogix" },
-  { label: "YouTube", href: "https://www.youtube.com/@VefoGix" },
-  { label: "Instagram", href: "https://www.instagram.com/vefogix/" },
-  { label: "Facebook", href: "https://www.facebook.com/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/sumit-devtech-a905b33a6" },
+  { label: "Instagram", href: "https://www.instagram.com/sumitdevtech/" },
+  { label: "Facebook", href: "https://www.facebook.com/sumitdevtech/" },
 ];
 
 export const contactInfo = {
-  email: "hello@example.com", // replace with your own
-  phone: "+1 000-000-0000",
-  address: "Your company address here",
+  email: "info@sumitdevtech.com", // replace with your own
+  phone: "+91-6201533997",
+  address: "F-1, 60/189, Heera Path, Ward 27, Mansarovar Sector 6, Jaipur, Rajasthan 302020",
 };

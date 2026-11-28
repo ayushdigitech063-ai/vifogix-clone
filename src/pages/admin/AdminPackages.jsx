@@ -307,6 +307,7 @@ const AdminPackages = () => {
 
     const newStatus = !pkg.isActive;
     const status = pkg.status;
+    console.log("statussss",status)
 
     // Validate params & body with togglePackageStatusSchema
     const validation = togglePackageStatusSchema.safeParse({
@@ -536,21 +537,25 @@ const AdminPackages = () => {
                         {/* Status */}
                         <td className="px-5 py-3.5 whitespace-nowrap">
                           <div className="relative inline-flex items-center">
+                            {console.log("pkg" , pkg.status)}
                             <select
-                              value={pkg.status || (pkg.isActive ? "ACTIVE" : "SUSPENDED")}
+                              value={pkg.status || ""}
                               onChange={(e) => handleStatusChange(pkg, e.target.value)}
                               disabled={isToggling}
                               className={`rounded-lg border px-2.5 py-1 text-xs font-semibold focus:outline-hidden transition-colors cursor-pointer ${
-                                (pkg.status || (pkg.isActive ? "ACTIVE" : "SUSPENDED")) === "ACTIVE"
+                                (pkg.status) === "ACTIVE"
                                   ? "border-emerald-200 bg-emerald-50 text-emerald-700 focus:border-emerald-500"
                                   : (pkg.status || "") === "REJECTED"
                                   ? "border-rose-200 bg-rose-50 text-rose-700 focus:border-rose-500"
                                   : "border-amber-200 bg-amber-50 text-amber-700 focus:border-amber-500"
                               } disabled:opacity-50`}
                             >
+                              {pkg.status && pkg.status !== "ACTIVE" && pkg.status !== "REJECTED" && (
+                                <option value={pkg.status}>{pkg.status}</option>
+                              )}
                               <option value="ACTIVE">ACTIVE</option>
                               <option value="REJECTED">REJECTED</option>
-                              <option value="SUSPENDED">SUSPENDED</option>
+                              {/* <option value="PENDING VERIFICATION">PENDING VERIFICATION</option> */}
                             </select>
                             {isToggling && (
                               <Loader2 className="ml-1.5 h-3.5 w-3.5 animate-spin text-gray-500" />
